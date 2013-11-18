@@ -2,7 +2,9 @@
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var exports = exports || {};
-var fabric = fabric || { version: "1.3.0" };
+var fabric = fabric || {
+  version: "1.3.0"
+};
 
 // make sure exports.fabric is always defined when used as 'global' later scopes
 exports.fabric = fabric;
@@ -10,8 +12,7 @@ exports.fabric = fabric;
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   fabric.document = document;
   fabric.window = window;
-}
-else {
+} else {
   // assume we're running under node.js when document/window are not present
   fabric.document = require("jsdom").jsdom("<!DOCTYPE html><html><head></head><body></body></html>");
   fabric.window = fabric.document.createWindow();
@@ -45,13 +46,18 @@ var Cufon = (function() {
 
     ready: (function() {
 
-      var complete = false, readyStatus = { loaded: 1, complete: 1 };
+      var complete = false,
+        readyStatus = {
+          loaded: 1,
+          complete: 1
+        };
 
-      var queue = [], /** @ignore */ perform = function() {
-        if (complete) return;
-        complete = true;
-        for (var fn; fn = queue.shift(); fn());
-      };
+      var queue = [],
+        /** @ignore */ perform = function() {
+          if (complete) return;
+          complete = true;
+          for (var fn; fn = queue.shift(); fn());
+        };
 
       // Gecko, Opera, WebKit r26101+
 
@@ -62,18 +68,17 @@ var Cufon = (function() {
 
       // Old WebKit, Internet Explorer
 
-      if (!fabric.window.opera && fabric.document.readyState) (function() {
+      if (!fabric.window.opera && fabric.document.readyState)(function() {
         readyStatus[fabric.document.readyState] ? perform() : setTimeout(arguments.callee, 10);
       })();
 
       // Internet Explorer
 
-      if (fabric.document.readyState && fabric.document.createStyleSheet) (function() {
+      if (fabric.document.readyState && fabric.document.createStyleSheet)(function() {
         try {
           fabric.document.body.doScroll('left');
           perform();
-        }
-        catch (e) {
+        } catch (e) {
           setTimeout(arguments.callee, 1);
         }
       })();
@@ -129,7 +134,9 @@ var Cufon = (function() {
     quotedList: cached(function(value) {
       // doesn't work properly with empty quoted strings (""), but
       // it's not worth the extra code.
-      var list = [], re = /\s*((["'])([\s\S]*?[^\\])\2|[^,]+)\s*/g, match;
+      var list = [],
+        re = /\s*((["'])([\s\S]*?[^\\])\2|[^,]+)\s*/g,
+        match;
       while (match = re.exec(value)) list.push(match[3] || match[1]);
       return list;
     }),
@@ -138,23 +145,27 @@ var Cufon = (function() {
 
       var complete = false;
 
-      var queue = [], perform = function() {
-        complete = true;
-        for (var fn; fn = queue.shift(); fn());
-      };
+      var queue = [],
+        perform = function() {
+          complete = true;
+          for (var fn; fn = queue.shift(); fn());
+        };
 
       // Safari 2 does not include <style> elements in document.styleSheets.
       // Safari 2 also does not support Object.prototype.propertyIsEnumerable.
 
-      var styleElements = Object.prototype.propertyIsEnumerable ? elementsByTagName('style') : { length: 0 };
+      var styleElements = Object.prototype.propertyIsEnumerable ? elementsByTagName('style') : {
+        length: 0
+      };
       var linkElements = elementsByTagName('link');
 
       DOM.ready(function() {
         // These checks are actually only needed for WebKit-based browsers, but don't really hurt other browsers.
-        var linkStyles = 0, link;
+        var linkStyles = 0,
+          link;
         for (var i = 0, l = linkElements.length; link = linkElements[i], i < l; ++i) {
           // WebKit does not load alternate stylesheets.
-          if (!link.disabled && link.rel.toLowerCase() == 'stylesheet') ++linkStyles;
+          if (!link.disabled && link.rel.toLowerCase() == 'stylesheet')++linkStyles;
         }
         if (fabric.document.styleSheets.length >= styleElements.length + linkStyles) perform();
         else setTimeout(arguments.callee, 10);
@@ -179,8 +190,7 @@ var Cufon = (function() {
     textAlign: function(word, style, position, wordCount) {
       if (style.get('textAlign') == 'right') {
         if (position > 0) word = ' ' + word;
-      }
-      else if (position < wordCount - 1) word += ' ';
+      } else if (position < wordCount - 1) word += ' ';
       return word;
     },
 
@@ -192,7 +202,7 @@ var Cufon = (function() {
         overline: null,
         'line-through': null
       };
-      for (var search = el; search.parentNode && search.parentNode.nodeType == 1; ) {
+      for (var search = el; search.parentNode && search.parentNode.nodeType == 1;) {
         var foundAll = true;
         for (var type in types) {
           if (types[type]) continue;
@@ -207,18 +217,17 @@ var Cufon = (function() {
 
     textShadow: cached(function(value) {
       if (value == 'none') return null;
-      var shadows = [], currentShadow = {}, result, offCount = 0;
+      var shadows = [],
+        currentShadow = {}, result, offCount = 0;
       var re = /(#[a-f0-9]+|[a-z]+\(.*?\)|[a-z]+)|(-?[\d.]+[a-z%]*)|,/ig;
       while (result = re.exec(value)) {
         if (result[0] == ',') {
           shadows.push(currentShadow);
           currentShadow = {}, offCount = 0;
-        }
-        else if (result[1]) {
+        } else if (result[1]) {
           currentShadow.color = result[1];
-        }
-        else {
-          currentShadow[[ 'offX', 'offY', 'blur' ][offCount++]] = result[2];
+        } else {
+          currentShadow[['offX', 'offY', 'blur'][offCount++]] = result[2];
         }
       }
       shadows.push(currentShadow);
@@ -255,7 +264,7 @@ var Cufon = (function() {
     this.weight = face['font-weight'];
     this.style = face['font-style'] || 'normal';
 
-    this.viewBox = (function () {
+    this.viewBox = (function() {
       var parts = face.bbox.split(/\s+/);
       var box = {
         minX: parseInt(parts[0], 10),
@@ -267,7 +276,7 @@ var Cufon = (function() {
       box.height = box.maxY - box.minY;
       /** @ignore */
       box.toString = function() {
-        return [ this.minX, this.minY, this.width, this.height ].join(' ');
+        return [this.minX, this.minY, this.width, this.height].join(' ');
       };
       return box;
     })();
@@ -282,9 +291,9 @@ var Cufon = (function() {
   function FontFamily() {
 
     var styles = {}, mapping = {
-      oblique: 'italic',
-      italic: 'oblique'
-    };
+        oblique: 'italic',
+        italic: 'oblique'
+      };
 
     this.add = function(font) {
       (styles[font.style] || (styles[font.style] = {}))[font.weight] = font;
@@ -292,8 +301,7 @@ var Cufon = (function() {
 
     /** @ignore */
     this.get = function(style, weight) {
-      var weights = styles[style] || styles[mapping[style]]
-        || styles.normal || styles.italic || styles.oblique;
+      var weights = styles[style] || styles[mapping[style]] || styles.normal || styles.italic || styles.oblique;
       if (!weights) return null;
       // we don't have to worry about "bolder" and "lighter"
       // because IE's currentStyle returns a numeric value for it,
@@ -308,7 +316,9 @@ var Cufon = (function() {
       var up = {
         1: 1,
         99: 0
-      }[weight % 100], alts = [], min, max;
+      }[weight % 100],
+        alts = [],
+        min, max;
       if (up === undefined) up = weight > 400;
       if (weight == 500) weight = 400;
       for (var alt in weights) {
@@ -320,9 +330,7 @@ var Cufon = (function() {
       if (weight < min) weight = min;
       if (weight > max) weight = max;
       alts.sort(function(a, b) {
-        return (up
-          ? (a > weight && b > weight) ? a < b : a > b
-          : (a < weight && b < weight) ? a > b : a < b) ? -1 : 1;
+        return (up ? (a > weight && b > weight) ? a < b : a > b : (a < weight && b < weight) ? a > b : a < b) ? -1 : 1;
       });
       return weights[alts[0]];
     };
@@ -359,8 +367,7 @@ var Cufon = (function() {
       if (el.onmouseenter === undefined) {
         addEvent(el, 'mouseover', onOverOut);
         addEvent(el, 'mouseout', onOverOut);
-      }
-      else {
+      } else {
         addEvent(el, 'mouseenter', onEnterLeave);
         addEvent(el, 'mouseleave', onEnterLeave);
       }
@@ -406,8 +413,7 @@ var Cufon = (function() {
   function addEvent(el, type, listener) {
     if (el.addEventListener) {
       el.addEventListener(type, listener, false);
-    }
-    else if (el.attachEvent) {
+    } else if (el.attachEvent) {
       el.attachEvent('on' + type, function() {
         return listener.call(el, fabric.window.event);
       });
@@ -434,7 +440,8 @@ var Cufon = (function() {
 
   function getFont(el, style) {
     if (!style) style = CSS.getStyle(el);
-    var families = CSS.quotedList(style.get('fontFamily').toLowerCase()), family;
+    var families = CSS.quotedList(style.get('fontFamily').toLowerCase()),
+      family;
     for (var i = 0, l = families.length; i < l; ++i) {
       family = families[i];
       if (fonts[family]) return fonts[family].get(style.get('fontStyle'), style.get('fontWeight'));
@@ -458,8 +465,10 @@ var Cufon = (function() {
 
     var separate = options.separate;
     if (separate == 'none') return engines[options.engine].apply(null, arguments);
-    var fragment = fabric.document.createDocumentFragment(), processed;
-    var parts = text.split(separators[separate]), needsAligning = (separate == 'words');
+    var fragment = fabric.document.createDocumentFragment(),
+      processed;
+    var parts = text.split(separators[separate]),
+      needsAligning = (separate == 'words');
     if (needsAligning && HAS_BROKEN_REGEXP) {
       // @todo figure out a better way to do this
       if (/^\s/.test(text)) parts.unshift('');
@@ -475,6 +484,7 @@ var Cufon = (function() {
   }
 
   /** @ignore */
+
   function replaceElement(el, options) {
     var font, style, nextNode, redraw;
     for (var node = attach(el, options).firstChild; node; node = nextNode) {
@@ -485,8 +495,7 @@ var Cufon = (function() {
         if (!/cufon/.test(node.className)) {
           arguments.callee(node, options);
           continue;
-        }
-        else redraw = true;
+        } else redraw = true;
       }
       if (!style) style = CSS.getStyle(el).extend(options);
       if (!font) font = getFont(el, style);
@@ -499,7 +508,7 @@ var Cufon = (function() {
       var text = node.data;
       //for some reason, the carriage return is not stripped by IE but "\n" is, so let's keep \r as a new line marker...
       if (typeof G_vmlCanvasManager != 'undefined') {
-          text = text.replace(/\r/g, "\n");
+        text = text.replace(/\r/g, "\n");
       }
       if (text === '') continue;
       var processed = process(font, text, style, options, node, el);
@@ -515,28 +524,31 @@ var Cufon = (function() {
   var replaceHistory = [];
 
   var engines = {}, fonts = {}, defaultOptions = {
-    engine: null,
-    //fontScale: 1,
-    //fontScaling: false,
-    hover: false,
-    hoverables: {
-      a: true
-    },
-    printable: true,
-    //rotation: 0,
-    //selectable: false,
-    selector: (
-        fabric.window.Sizzle
-      ||  (fabric.window.jQuery && function(query) { return jQuery(query); }) // avoid noConflict issues
-      ||  (fabric.window.dojo && dojo.query)
-      ||  (fabric.window.$$ && function(query) { return $$(query); })
-      ||  (fabric.window.$ && function(query) { return $(query); })
-      ||  (fabric.document.querySelectorAll && function(query) { return fabric.document.querySelectorAll(query); })
-      ||  elementsByTagName
-    ),
-    separate: 'words', // 'none' and 'characters' are also accepted
-    textShadow: 'none'
-  };
+      engine: null,
+      //fontScale: 1,
+      //fontScaling: false,
+      hover: false,
+      hoverables: {
+        a: true
+      },
+      printable: true,
+      //rotation: 0,
+      //selectable: false,
+      selector: (
+        fabric.window.Sizzle || (fabric.window.jQuery && function(query) {
+          return jQuery(query);
+        }) // avoid noConflict issues
+        || (fabric.window.dojo && dojo.query) || (fabric.window.$$ && function(query) {
+          return $$(query);
+        }) || (fabric.window.$ && function(query) {
+          return $(query);
+        }) || (fabric.document.querySelectorAll && function(query) {
+          return fabric.document.querySelectorAll(query);
+        }) || elementsByTagName
+      ),
+      separate: 'words', // 'none' and 'characters' are also accepted
+      textShadow: 'none'
+    };
 
   var separators = {
     words: /\s+/,
@@ -567,7 +579,8 @@ var Cufon = (function() {
 
   /** @ignore */
   api.registerFont = function(data) {
-    var font = new Font(data), family = font.family;
+    var font = new Font(data),
+      family = font.family;
     if (!fonts[family]) fonts[family] = new FontFamily();
     fonts[family].add(font);
     return api.set('fontFamily', '"' + family + '"');
@@ -580,7 +593,7 @@ var Cufon = (function() {
     if (typeof options.textShadow == 'string' && options.textShadow)
       options.textShadow = CSS.textShadow(options.textShadow);
     if (!ignoreHistory) replaceHistory.push(arguments);
-    if (elements.nodeType || typeof elements == 'string') elements = [ elements ];
+    if (elements.nodeType || typeof elements == 'string') elements = [elements];
     CSS.ready(function() {
       for (var i = 0, l = elements.length; i < l; ++i) {
         var el = elements[i];
@@ -627,51 +640,62 @@ Cufon.registerEngine('canvas', (function() {
   var styleSheet = fabric.document.createElement('style');
   styleSheet.type = 'text/css';
 
-    var textNode = fabric.document.createTextNode(
-        '.cufon-canvas{text-indent:0}' +
-        '@media screen,projection{' +
-          '.cufon-canvas{display:inline;display:inline-block;position:relative;vertical-align:middle' +
-          (HAS_BROKEN_LINEHEIGHT
-            ? ''
-            : ';font-size:1px;line-height:1px') +
-          '}.cufon-canvas .cufon-alt{display:-moz-inline-box;display:inline-block;width:0;height:0;overflow:hidden}' +
-          (HAS_INLINE_BLOCK
-            ? '.cufon-canvas canvas{position:relative}'
-            : '.cufon-canvas canvas{position:absolute}') +
-        '}' +
-        '@media print{' +
-          '.cufon-canvas{padding:0 !important}' +
-          '.cufon-canvas canvas{display:none}' +
-          '.cufon-canvas .cufon-alt{display:inline}' +
-        '}'
-      )
+  var textNode = fabric.document.createTextNode(
+    '.cufon-canvas{text-indent:0}' +
+    '@media screen,projection{' +
+    '.cufon-canvas{display:inline;display:inline-block;position:relative;vertical-align:middle' +
+    (HAS_BROKEN_LINEHEIGHT ? '' : ';font-size:1px;line-height:1px') +
+    '}.cufon-canvas .cufon-alt{display:-moz-inline-box;display:inline-block;width:0;height:0;overflow:hidden}' +
+    (HAS_INLINE_BLOCK ? '.cufon-canvas canvas{position:relative}' : '.cufon-canvas canvas{position:absolute}') +
+    '}' +
+    '@media print{' +
+    '.cufon-canvas{padding:0 !important}' +
+    '.cufon-canvas canvas{display:none}' +
+    '.cufon-canvas .cufon-alt{display:inline}' +
+    '}'
+  )
 
   try {
-      styleSheet.appendChild(textNode);
-  } catch(e) {
-      //IE8- can't do this...
-      styleSheet.setAttribute("type", "text/css");
-      styleSheet.styleSheet.cssText = textNode.data;
+    styleSheet.appendChild(textNode);
+  } catch (e) {
+    //IE8- can't do this...
+    styleSheet.setAttribute("type", "text/css");
+    styleSheet.styleSheet.cssText = textNode.data;
   }
   fabric.document.getElementsByTagName('head')[0].appendChild(styleSheet);
 
   function generateFromVML(path, context) {
-    var atX = 0, atY = 0;
-    var code = [], re = /([mrvxe])([^a-z]*)/g, match;
+    var atX = 0,
+      atY = 0;
+    var code = [],
+      re = /([mrvxe])([^a-z]*)/g,
+      match;
     generate: for (var i = 0; match = re.exec(path); ++i) {
       var c = match[2].split(',');
       switch (match[1]) {
         case 'v':
-          code[i] = { m: 'bezierCurveTo', a: [ atX + ~~c[0], atY + ~~c[1], atX + ~~c[2], atY + ~~c[3], atX += ~~c[4], atY += ~~c[5] ] };
+          code[i] = {
+            m: 'bezierCurveTo',
+            a: [atX + ~~c[0], atY + ~~c[1], atX + ~~c[2], atY + ~~c[3], atX += ~~c[4], atY += ~~c[5]]
+          };
           break;
         case 'r':
-          code[i] = { m: 'lineTo', a: [ atX += ~~c[0], atY += ~~c[1] ] };
+          code[i] = {
+            m: 'lineTo',
+            a: [atX += ~~c[0], atY += ~~c[1]]
+          };
           break;
         case 'm':
-          code[i] = { m: 'moveTo', a: [ atX = ~~c[0], atY = ~~c[1] ] };
+          code[i] = {
+            m: 'moveTo',
+            a: [atX = ~~c[0], atY = ~~c[1]]
+          };
           break;
         case 'x':
-          code[i] = { m: 'closePath', a: [] };
+          code[i] = {
+            m: 'closePath',
+            a: []
+          };
           break;
         case 'e':
           break generate;
@@ -699,10 +723,14 @@ Cufon.registerEngine('canvas', (function() {
     var letterSpacing = style.get('letterSpacing');
     letterSpacing = (letterSpacing == 'normal') ? 0 : size.convertFrom(parseInt(letterSpacing, 10));
 
-    var expandTop = 0, expandRight = 0, expandBottom = 0, expandLeft = 0;
-    var shadows = options.textShadow, shadowOffsets = [];
+    var expandTop = 0,
+      expandRight = 0,
+      expandBottom = 0,
+      expandLeft = 0;
+    var shadows = options.textShadow,
+      shadowOffsets = [];
 
-    Cufon.textOptions.shadowOffsets = [ ];
+    Cufon.textOptions.shadowOffsets = [];
     Cufon.textOptions.shadows = null;
 
     if (shadows) {
@@ -711,7 +739,7 @@ Cufon.registerEngine('canvas', (function() {
         var shadow = shadows[i];
         var x = size.convertFrom(parseFloat(shadow.offX));
         var y = size.convertFrom(parseFloat(shadow.offY));
-        shadowOffsets[i] = [ x, y ];
+        shadowOffsets[i] = [x, y];
         //if (y < expandTop) expandTop = y;
         //if (x > expandRight) expandRight = x;
         //if (y > expandBottom) expandBottom = y;
@@ -721,9 +749,12 @@ Cufon.registerEngine('canvas', (function() {
 
     var chars = Cufon.CSS.textTransform(redraw ? node.alt : text, style).split('');
 
-    var width = 0, lastWidth = null;
+    var width = 0,
+      lastWidth = null;
 
-    var maxWidth = 0, lines = 1, lineWidths = [ ];
+    var maxWidth = 0,
+      lines = 1,
+      lineWidths = [];
     for (var i = 0, l = chars.length; i < l; ++i) {
       if (chars[i] === '\n') {
         lines++;
@@ -742,8 +773,8 @@ Cufon.registerEngine('canvas', (function() {
 
     width = Math.max(maxWidth, width);
 
-    var lineOffsets = [ ];
-    for (var i = lineWidths.length; i--; ) {
+    var lineOffsets = [];
+    for (var i = lineWidths.length; i--;) {
       lineOffsets[i] = width - lineWidths[i];
     }
 
@@ -757,8 +788,7 @@ Cufon.registerEngine('canvas', (function() {
     if (redraw) {
       wrapper = node;
       canvas = node.firstChild;
-    }
-    else {
+    } else {
       wrapper = fabric.document.createElement('span');
       wrapper.className = 'cufon cufon-canvas';
       wrapper.alt = text;
@@ -775,7 +805,7 @@ Cufon.registerEngine('canvas', (function() {
     }
 
     var wStyle = wrapper.style;
-    var cStyle = canvas.style || { };
+    var cStyle = canvas.style || {};
 
     var height = size.convert(viewBox.height - expandTop + expandBottom);
     var roundedHeight = Math.ceil(height);
@@ -802,20 +832,19 @@ Cufon.registerEngine('canvas', (function() {
     if (HAS_INLINE_BLOCK) {
       wStyle.width = wrapperWidth;
       wStyle.height = _height + 'px';
-    }
-    else {
+    } else {
       wStyle.paddingLeft = wrapperWidth;
       wStyle.paddingBottom = (_height - 1) + 'px';
     }
 
     var g = Cufon.textOptions.context || canvas.getContext('2d'),
-        scale = roundedHeight / viewBox.height;
+      scale = roundedHeight / viewBox.height;
 
     Cufon.textOptions.fontAscent = font.ascent * scale;
     Cufon.textOptions.boundaries = null;
 
-    for (var offsets = Cufon.textOptions.shadowOffsets, i = shadowOffsets.length; i--; ) {
-      offsets[i] = [ shadowOffsets[i][0] * scale, shadowOffsets[i][1] * scale ];
+    for (var offsets = Cufon.textOptions.shadowOffsets, i = shadowOffsets.length; i--;) {
+      offsets[i] = [shadowOffsets[i][0] * scale, shadowOffsets[i][1] * scale];
     }
 
     g.save();
@@ -824,8 +853,7 @@ Cufon.registerEngine('canvas', (function() {
     g.translate(
       // we're at the center of an object and need to jump to the top left corner
       // where first character is to be drawn
-      -expandLeft - ((1/scale * canvas.width) / 2) + (Cufon.fonts[font.family].offsetLeft || 0),
-      -expandTop - ((Cufon.textOptions.height / scale) / 2) + (Cufon.fonts[font.family].offsetTop || 0)
+      -expandLeft - ((1 / scale * canvas.width) / 2) + (Cufon.fonts[font.family].offsetLeft || 0), -expandTop - ((Cufon.textOptions.height / scale) / 2) + (Cufon.fonts[font.family].offsetTop || 0)
     );
 
     g.lineWidth = font.face['underline-thickness'];
@@ -844,12 +872,16 @@ Cufon.registerEngine('canvas', (function() {
     }
 
     var textDecoration = Cufon.getTextDecoration(options),
-        isItalic = options.fontStyle === 'italic';
+      isItalic = options.fontStyle === 'italic';
 
     function renderBackground() {
       g.save();
 
-      var left = 0, lineNum = 0, boundaries = [{ left: 0 }];
+      var left = 0,
+        lineNum = 0,
+        boundaries = [{
+          left: 0
+        }];
 
       if (options.backgroundColor) {
         g.save();
@@ -862,8 +894,7 @@ Cufon.registerEngine('canvas', (function() {
       if (options.textAlign === 'right') {
         g.translate(lineOffsets[lineNum], 0);
         boundaries[0].left = lineOffsets[lineNum] * scale;
-      }
-      else if (options.textAlign === 'center') {
+      } else if (options.textAlign === 'center') {
         g.translate(lineOffsets[lineNum] / 2, 0);
         boundaries[0].left = lineOffsets[lineNum] / 2 * scale;
       }
@@ -875,7 +906,9 @@ Cufon.registerEngine('canvas', (function() {
 
           var topOffset = -font.ascent - ((font.ascent / 5) * options.lineHeight);
           var boundary = boundaries[boundaries.length - 1];
-          var nextBoundary = { left: 0 };
+          var nextBoundary = {
+            left: 0
+          };
 
           boundary.width = left * scale;
           boundary.height = (-font.ascent + font.descent) * scale;
@@ -884,15 +917,13 @@ Cufon.registerEngine('canvas', (function() {
             g.translate(-width, topOffset);
             g.translate(lineOffsets[lineNum], 0);
             nextBoundary.left = lineOffsets[lineNum] * scale;
-          }
-          else if (options.textAlign === 'center') {
+          } else if (options.textAlign === 'center') {
             // offset to the start of text in previous line AND half of its offset
             // (essentially moving caret to the left edge of bounding box)
             g.translate(-left - (lineOffsets[lineNum - 1] / 2), topOffset);
             g.translate(lineOffsets[lineNum] / 2, 0);
             nextBoundary.left = lineOffsets[lineNum] / 2 * scale;
-          }
-          else {
+          } else {
             g.translate(-left, topOffset);
           }
 
@@ -920,7 +951,7 @@ Cufon.registerEngine('canvas', (function() {
         g.translate(charWidth, 0);
         left += charWidth;
 
-        if (i == l-1) {
+        if (i == l - 1) {
           boundaries[boundaries.length - 1].width = left * scale;
           boundaries[boundaries.length - 1].height = (-font.ascent + font.descent) * scale;
         }
@@ -933,12 +964,12 @@ Cufon.registerEngine('canvas', (function() {
     function renderText(color) {
       g.fillStyle = color || Cufon.textOptions.color || style.get('color');
 
-      var left = 0, lineNum = 0;
+      var left = 0,
+        lineNum = 0;
 
       if (options.textAlign === 'right') {
         g.translate(lineOffsets[lineNum], 0);
-      }
-      else if (options.textAlign === 'center') {
+      } else if (options.textAlign === 'center') {
         g.translate(lineOffsets[lineNum] / 2, 0);
       }
 
@@ -952,14 +983,12 @@ Cufon.registerEngine('canvas', (function() {
           if (options.textAlign === 'right') {
             g.translate(-width, topOffset);
             g.translate(lineOffsets[lineNum], 0);
-          }
-          else if (options.textAlign === 'center') {
+          } else if (options.textAlign === 'center') {
             // offset to the start of text in previous line AND half of its offset
             // (essentially moving caret to the left edge of bounding box)
             g.translate(-left - (lineOffsets[lineNum - 1] / 2), topOffset);
             g.translate(lineOffsets[lineNum] / 2, 0);
-          }
-          else {
+          } else {
             g.translate(-left, topOffset);
           }
 
@@ -1068,17 +1097,17 @@ Cufon.registerEngine('vml', (function() {
   fabric.document.write('<style type="text/css">' +
     '.cufon-vml-canvas{text-indent:0}' +
     '@media screen{' +
-      'cvml\\:shape,cvml\\:shadow{behavior:url(#default#VML);display:block;antialias:true;position:absolute}' +
-      '.cufon-vml-canvas{position:absolute;text-align:left}' +
-      '.cufon-vml{display:inline-block;position:relative;vertical-align:middle}' +
-      '.cufon-vml .cufon-alt{position:absolute;left:-10000in;font-size:1px}' +
-      'a .cufon-vml{cursor:pointer}' +
+    'cvml\\:shape,cvml\\:shadow{behavior:url(#default#VML);display:block;antialias:true;position:absolute}' +
+    '.cufon-vml-canvas{position:absolute;text-align:left}' +
+    '.cufon-vml{display:inline-block;position:relative;vertical-align:middle}' +
+    '.cufon-vml .cufon-alt{position:absolute;left:-10000in;font-size:1px}' +
+    'a .cufon-vml{cursor:pointer}' +
     '}' +
     '@media print{' +
-      '.cufon-vml *{display:none}' +
-      '.cufon-vml .cufon-alt{display:inline}' +
+    '.cufon-vml *{display:none}' +
+    '.cufon-vml .cufon-alt{display:inline}' +
     '}' +
-  '</style>');
+    '</style>');
 
   function getFontSizeInPixels(el, value) {
     return getSizeInPixels(el, /(?:em|ex|%)$/i.test(value) ? '1em' : value);
@@ -1086,9 +1115,11 @@ Cufon.registerEngine('vml', (function() {
 
   // Original by Dead Edwards.
   // Combined with getFontSizeInPixels it also works with relative units.
+
   function getSizeInPixels(el, value) {
     if (/px$/i.test(value)) return parseFloat(value);
-    var style = el.style.left, runtimeStyle = el.runtimeStyle.left;
+    var style = el.style.left,
+      runtimeStyle = el.runtimeStyle.left;
     el.runtimeStyle.left = el.currentStyle.left;
     el.style.left = value;
     var result = el.style.pixelLeft;
@@ -1122,8 +1153,7 @@ Cufon.registerEngine('vml', (function() {
     if (redraw) {
       wrapper = node;
       canvas = node.firstChild;
-    }
-    else {
+    } else {
       wrapper = fabric.document.createElement('span');
       wrapper.className = 'cufon cufon-vml';
       wrapper.alt = text;
@@ -1148,9 +1178,11 @@ Cufon.registerEngine('vml', (function() {
     var wStyle = wrapper.style;
     var cStyle = canvas.style;
 
-    var height = size.convert(viewBox.height), roundedHeight = Math.ceil(height);
+    var height = size.convert(viewBox.height),
+      roundedHeight = Math.ceil(height);
     var roundingFactor = roundedHeight / height;
-    var minX = viewBox.minX, minY = viewBox.minY;
+    var minX = viewBox.minX,
+      minY = viewBox.minY;
 
     cStyle.height = roundedHeight;
     cStyle.top = Math.round(size.convert(minY - font.ascent));
@@ -1164,23 +1196,27 @@ Cufon.registerEngine('vml', (function() {
 
     var chars = Cufon.CSS.textTransform(text, style).split('');
 
-    var width = 0, offsetX = 0, advance = null;
+    var width = 0,
+      offsetX = 0,
+      advance = null;
 
     var glyph, shape, shadows = options.textShadow;
 
     // pre-calculate width
     for (var i = 0, k = 0, l = chars.length; i < l; ++i) {
       glyph = font.glyphs[chars[i]] || font.missingGlyph;
-      if (glyph) width += advance = ~~(glyph.w || font.w) + letterSpacing;
+      if (glyph) width += advance = ~~ (glyph.w || font.w) + letterSpacing;
     }
 
     if (advance === null) return null;
 
     var fullWidth = -minX + width + (viewBox.width - advance);
 
-    var shapeWidth = size.convert(fullWidth * roundingFactor), roundedShapeWidth = Math.round(shapeWidth);
+    var shapeWidth = size.convert(fullWidth * roundingFactor),
+      roundedShapeWidth = Math.round(shapeWidth);
 
-    var coordSize = fullWidth + ',' + viewBox.height, coordOrigin;
+    var coordSize = fullWidth + ',' + viewBox.height,
+      coordOrigin;
     var stretch = 'r' + coordSize + 'nsnf';
 
     for (i = 0; i < l; ++i) {
@@ -1192,8 +1228,7 @@ Cufon.registerEngine('vml', (function() {
         // some glyphs may be missing so we can't use i
         shape = canvas.childNodes[k];
         if (shape.firstChild) shape.removeChild(shape.firstChild); // shadow
-      }
-      else {
+      } else {
         shape = fabric.document.createElement('cvml:shape');
         canvas.appendChild(shape);
       }
@@ -1213,8 +1248,10 @@ Cufon.registerEngine('vml', (function() {
         // due to the limitations of the VML shadow element there
         // can only be two visible shadows. opacity is shared
         // for all shadows.
-        var shadow1 = shadows[0], shadow2 = shadows[1];
-        var color1 = Cufon.CSS.color(shadow1.color), color2;
+        var shadow1 = shadows[0],
+          shadow2 = shadows[1];
+        var color1 = Cufon.CSS.color(shadow1.color),
+          color2;
         var shadow = fabric.document.createElement('cvml:shadow');
         shadow.on = 't';
         shadow.color = color1.color;
@@ -1417,334 +1454,325 @@ if (typeof exports != 'undefined') {
 
 var JSON;
 if (!JSON) {
-    JSON = {};
+  JSON = {};
 }
 
-(function () {
-    'use strict';
+(function() {
+  'use strict';
 
-    function f(n) {
-        // Format integers to have at least two digits.
-        return n < 10 ? '0' + n : n;
+  function f(n) {
+    // Format integers to have at least two digits.
+    return n < 10 ? '0' + n : n;
+  }
+
+  if (typeof Date.prototype.toJSON !== 'function') {
+
+    /** @ignore */
+    Date.prototype.toJSON = function(key) {
+
+      return isFinite(this.valueOf()) ? this.getUTCFullYear() + '-' +
+        f(this.getUTCMonth() + 1) + '-' +
+        f(this.getUTCDate()) + 'T' +
+        f(this.getUTCHours()) + ':' +
+        f(this.getUTCMinutes()) + ':' +
+        f(this.getUTCSeconds()) + 'Z' : null;
+    };
+
+    String.prototype.toJSON =
+      Number.prototype.toJSON =
+    /** @ignore */
+    Boolean.prototype.toJSON = function(key) {
+      return this.valueOf();
+    };
+  }
+
+  var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+    escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+    gap,
+    indent,
+    meta = { // table of character substitutions
+      '\b': '\\b',
+      '\t': '\\t',
+      '\n': '\\n',
+      '\f': '\\f',
+      '\r': '\\r',
+      '"': '\\"',
+      '\\': '\\\\'
+    },
+    rep;
+
+
+  function quote(string) {
+
+    // If the string contains no control characters, no quote characters, and no
+    // backslash characters, then we can safely slap some quotes around it.
+    // Otherwise we must also replace the offending characters with safe escape
+    // sequences.
+
+    escapable.lastIndex = 0;
+    return escapable.test(string) ? '"' + string.replace(escapable, function(a) {
+      var c = meta[a];
+      return typeof c === 'string' ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+    }) + '"' : '"' + string + '"';
+  }
+
+
+  function str(key, holder) {
+
+    // Produce a string from holder[key].
+
+    var i, // The loop counter.
+      k, // The member key.
+      v, // The member value.
+      length,
+      mind = gap,
+      partial,
+      value = holder[key];
+
+    // If the value has a toJSON method, call it to obtain a replacement value.
+
+    if (value && typeof value === 'object' &&
+      typeof value.toJSON === 'function') {
+      value = value.toJSON(key);
     }
 
-    if (typeof Date.prototype.toJSON !== 'function') {
+    // If we were called with a replacer function, then call the replacer to
+    // obtain a replacement value.
 
-        /** @ignore */
-        Date.prototype.toJSON = function (key) {
-
-            return isFinite(this.valueOf())
-                ? this.getUTCFullYear()     + '-' +
-                    f(this.getUTCMonth() + 1) + '-' +
-                    f(this.getUTCDate())      + 'T' +
-                    f(this.getUTCHours())     + ':' +
-                    f(this.getUTCMinutes())   + ':' +
-                    f(this.getUTCSeconds())   + 'Z'
-                : null;
-        };
-
-        String.prototype.toJSON      =
-            Number.prototype.toJSON  =
-            /** @ignore */
-            Boolean.prototype.toJSON = function (key) {
-                return this.valueOf();
-            };
+    if (typeof rep === 'function') {
+      value = rep.call(holder, key, value);
     }
 
-    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        gap,
-        indent,
-        meta = {    // table of character substitutions
-            '\b': '\\b',
-            '\t': '\\t',
-            '\n': '\\n',
-            '\f': '\\f',
-            '\r': '\\r',
-            '"' : '\\"',
-            '\\': '\\\\'
-        },
-        rep;
+    // What happens next depends on the value's type.
 
+    switch (typeof value) {
+      case 'string':
+        return quote(value);
 
-    function quote(string) {
+      case 'number':
 
-// If the string contains no control characters, no quote characters, and no
-// backslash characters, then we can safely slap some quotes around it.
-// Otherwise we must also replace the offending characters with safe escape
-// sequences.
+        // JSON numbers must be finite. Encode non-finite numbers as null.
 
-        escapable.lastIndex = 0;
-        return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
-            var c = meta[a];
-            return typeof c === 'string'
-                ? c
-                : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-        }) + '"' : '"' + string + '"';
-    }
+        return isFinite(value) ? String(value) : 'null';
 
+      case 'boolean':
+      case 'null':
 
-    function str(key, holder) {
+        // If the value is a boolean or null, convert it to a string. Note:
+        // typeof null does not produce 'null'. The case is included here in
+        // the remote chance that this gets fixed someday.
 
-// Produce a string from holder[key].
+        return String(value);
 
-        var i,          // The loop counter.
-            k,          // The member key.
-            v,          // The member value.
-            length,
-            mind = gap,
-            partial,
-            value = holder[key];
+        // If the type is 'object', we might be dealing with an object or an array or
+        // null.
 
-// If the value has a toJSON method, call it to obtain a replacement value.
+      case 'object':
 
-        if (value && typeof value === 'object' &&
-                typeof value.toJSON === 'function') {
-            value = value.toJSON(key);
+        // Due to a specification blunder in ECMAScript, typeof null is 'object',
+        // so watch out for that case.
+
+        if (!value) {
+          return 'null';
         }
 
-// If we were called with a replacer function, then call the replacer to
-// obtain a replacement value.
+        // Make an array to hold the partial results of stringifying this object value.
 
-        if (typeof rep === 'function') {
-            value = rep.call(holder, key, value);
+        gap += indent;
+        partial = [];
+
+        // Is the value an array?
+
+        if (Object.prototype.toString.apply(value) === '[object Array]') {
+
+          // The value is an array. Stringify every element. Use null as a placeholder
+          // for non-JSON values.
+
+          length = value.length;
+          for (i = 0; i < length; i += 1) {
+            partial[i] = str(i, value) || 'null';
+          }
+
+          // Join all of the elements together, separated with commas, and wrap them in
+          // brackets.
+
+          v = partial.length === 0 ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']';
+          gap = mind;
+          return v;
         }
 
-// What happens next depends on the value's type.
+        // If the replacer is an array, use it to select the members to be stringified.
 
-        switch (typeof value) {
-        case 'string':
-            return quote(value);
-
-        case 'number':
-
-// JSON numbers must be finite. Encode non-finite numbers as null.
-
-            return isFinite(value) ? String(value) : 'null';
-
-        case 'boolean':
-        case 'null':
-
-// If the value is a boolean or null, convert it to a string. Note:
-// typeof null does not produce 'null'. The case is included here in
-// the remote chance that this gets fixed someday.
-
-            return String(value);
-
-// If the type is 'object', we might be dealing with an object or an array or
-// null.
-
-        case 'object':
-
-// Due to a specification blunder in ECMAScript, typeof null is 'object',
-// so watch out for that case.
-
-            if (!value) {
-                return 'null';
+        if (rep && typeof rep === 'object') {
+          length = rep.length;
+          for (i = 0; i < length; i += 1) {
+            if (typeof rep[i] === 'string') {
+              k = rep[i];
+              v = str(k, value);
+              if (v) {
+                partial.push(quote(k) + (gap ? ': ' : ':') + v);
+              }
             }
+          }
+        } else {
 
-// Make an array to hold the partial results of stringifying this object value.
+          // Otherwise, iterate through all of the keys in the object.
 
-            gap += indent;
-            partial = [];
-
-// Is the value an array?
-
-            if (Object.prototype.toString.apply(value) === '[object Array]') {
-
-// The value is an array. Stringify every element. Use null as a placeholder
-// for non-JSON values.
-
-                length = value.length;
-                for (i = 0; i < length; i += 1) {
-                    partial[i] = str(i, value) || 'null';
-                }
-
-// Join all of the elements together, separated with commas, and wrap them in
-// brackets.
-
-                v = partial.length === 0
-                    ? '[]'
-                    : gap
-                    ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']'
-                    : '[' + partial.join(',') + ']';
-                gap = mind;
-                return v;
+          for (k in value) {
+            if (Object.prototype.hasOwnProperty.call(value, k)) {
+              v = str(k, value);
+              if (v) {
+                partial.push(quote(k) + (gap ? ': ' : ':') + v);
+              }
             }
-
-// If the replacer is an array, use it to select the members to be stringified.
-
-            if (rep && typeof rep === 'object') {
-                length = rep.length;
-                for (i = 0; i < length; i += 1) {
-                    if (typeof rep[i] === 'string') {
-                        k = rep[i];
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                        }
-                    }
-                }
-            } else {
-
-// Otherwise, iterate through all of the keys in the object.
-
-                for (k in value) {
-                    if (Object.prototype.hasOwnProperty.call(value, k)) {
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                        }
-                    }
-                }
-            }
-
-// Join all of the member texts together, separated with commas,
-// and wrap them in braces.
-
-            v = partial.length === 0
-                ? '{}'
-                : gap
-                ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}'
-                : '{' + partial.join(',') + '}';
-            gap = mind;
-            return v;
+          }
         }
+
+        // Join all of the member texts together, separated with commas,
+        // and wrap them in braces.
+
+        v = partial.length === 0 ? '{}' : gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' : '{' + partial.join(',') + '}';
+        gap = mind;
+        return v;
     }
+  }
 
-// If the JSON object does not yet have a stringify method, give it one.
+  // If the JSON object does not yet have a stringify method, give it one.
 
-    if (typeof JSON.stringify !== 'function') {
-        /** @ignore */
-        JSON.stringify = function (value, replacer, space) {
+  if (typeof JSON.stringify !== 'function') {
+    /** @ignore */
+    JSON.stringify = function(value, replacer, space) {
 
-// The stringify method takes a value and an optional replacer, and an optional
-// space parameter, and returns a JSON text. The replacer can be a function
-// that can replace values, or an array of strings that will select the keys.
-// A default replacer method can be provided. Use of the space parameter can
-// produce text that is more easily readable.
+      // The stringify method takes a value and an optional replacer, and an optional
+      // space parameter, and returns a JSON text. The replacer can be a function
+      // that can replace values, or an array of strings that will select the keys.
+      // A default replacer method can be provided. Use of the space parameter can
+      // produce text that is more easily readable.
 
-            var i;
-            gap = '';
-            indent = '';
+      var i;
+      gap = '';
+      indent = '';
 
-// If the space parameter is a number, make an indent string containing that
-// many spaces.
+      // If the space parameter is a number, make an indent string containing that
+      // many spaces.
 
-            if (typeof space === 'number') {
-                for (i = 0; i < space; i += 1) {
-                    indent += ' ';
-                }
+      if (typeof space === 'number') {
+        for (i = 0; i < space; i += 1) {
+          indent += ' ';
+        }
 
-// If the space parameter is a string, it will be used as the indent string.
+        // If the space parameter is a string, it will be used as the indent string.
 
-            } else if (typeof space === 'string') {
-                indent = space;
+      } else if (typeof space === 'string') {
+        indent = space;
+      }
+
+      // If there is a replacer, it must be a function or an array.
+      // Otherwise, throw an error.
+
+      rep = replacer;
+      if (replacer && typeof replacer !== 'function' &&
+        (typeof replacer !== 'object' ||
+          typeof replacer.length !== 'number')) {
+        throw new Error('JSON.stringify');
+      }
+
+      // Make a fake root object containing our value under the key of ''.
+      // Return the result of stringifying the value.
+
+      return str('', {
+        '': value
+      });
+    };
+  }
+
+
+  // If the JSON object does not yet have a parse method, give it one.
+
+  if (typeof JSON.parse !== 'function') {
+    /** @ignore */
+    JSON.parse = function(text, reviver) {
+
+      // The parse method takes a text and an optional reviver function, and returns
+      // a JavaScript value if the text is a valid JSON text.
+
+      var j;
+
+      function walk(holder, key) {
+
+        // The walk method is used to recursively walk the resulting structure so
+        // that modifications can be made.
+
+        var k, v, value = holder[key];
+        if (value && typeof value === 'object') {
+          for (k in value) {
+            if (Object.prototype.hasOwnProperty.call(value, k)) {
+              v = walk(value, k);
+              if (v !== undefined) {
+                value[k] = v;
+              } else {
+                delete value[k];
+              }
             }
-
-// If there is a replacer, it must be a function or an array.
-// Otherwise, throw an error.
-
-            rep = replacer;
-            if (replacer && typeof replacer !== 'function' &&
-                    (typeof replacer !== 'object' ||
-                    typeof replacer.length !== 'number')) {
-                throw new Error('JSON.stringify');
-            }
-
-// Make a fake root object containing our value under the key of ''.
-// Return the result of stringifying the value.
-
-            return str('', {'': value});
-        };
-    }
+          }
+        }
+        return reviver.call(holder, key, value);
+      }
 
 
-// If the JSON object does not yet have a parse method, give it one.
+      // Parsing happens in four stages. In the first stage, we replace certain
+      // Unicode characters with escape sequences. JavaScript handles many characters
+      // incorrectly, either silently deleting them, or treating them as line endings.
 
-    if (typeof JSON.parse !== 'function') {
-        /** @ignore */
-        JSON.parse = function (text, reviver) {
+      text = String(text);
+      cx.lastIndex = 0;
+      if (cx.test(text)) {
+        text = text.replace(cx, function(a) {
+          return '\\u' +
+            ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+        });
+      }
 
-// The parse method takes a text and an optional reviver function, and returns
-// a JavaScript value if the text is a valid JSON text.
+      // In the second stage, we run the text against regular expressions that look
+      // for non-JSON patterns. We are especially concerned with '()' and 'new'
+      // because they can cause invocation, and '=' because it can cause mutation.
+      // But just to be safe, we want to reject all unexpected forms.
 
-            var j;
+      // We split the second stage into 4 regexp operations in order to work around
+      // crippling inefficiencies in IE's and Safari's regexp engines. First we
+      // replace the JSON backslash pairs with '@' (a non-JSON character). Second, we
+      // replace all simple value tokens with ']' characters. Third, we delete all
+      // open brackets that follow a colon or comma or that begin the text. Finally,
+      // we look to see that the remaining characters are only whitespace or ']' or
+      // ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.
 
-            function walk(holder, key) {
+      if (/^[\],:{}\s]*$/
+        .test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
+          .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+          .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 
-// The walk method is used to recursively walk the resulting structure so
-// that modifications can be made.
+        // In the third stage we use the eval function to compile the text into a
+        // JavaScript structure. The '{' operator is subject to a syntactic ambiguity
+        // in JavaScript: it can begin a block or an object literal. We wrap the text
+        // in parens to eliminate the ambiguity.
 
-                var k, v, value = holder[key];
-                if (value && typeof value === 'object') {
-                    for (k in value) {
-                        if (Object.prototype.hasOwnProperty.call(value, k)) {
-                            v = walk(value, k);
-                            if (v !== undefined) {
-                                value[k] = v;
-                            } else {
-                                delete value[k];
-                            }
-                        }
-                    }
-                }
-                return reviver.call(holder, key, value);
-            }
+        j = eval('(' + text + ')');
 
+        // In the optional fourth stage, we recursively walk the new structure, passing
+        // each name/value pair to a reviver function for possible transformation.
 
-// Parsing happens in four stages. In the first stage, we replace certain
-// Unicode characters with escape sequences. JavaScript handles many characters
-// incorrectly, either silently deleting them, or treating them as line endings.
+        return typeof reviver === 'function' ? walk({
+          '': j
+        }, '') : j;
+      }
 
-            text = String(text);
-            cx.lastIndex = 0;
-            if (cx.test(text)) {
-                text = text.replace(cx, function (a) {
-                    return '\\u' +
-                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-                });
-            }
+      // If the text is not JSON parseable, then a SyntaxError is thrown.
 
-// In the second stage, we run the text against regular expressions that look
-// for non-JSON patterns. We are especially concerned with '()' and 'new'
-// because they can cause invocation, and '=' because it can cause mutation.
-// But just to be safe, we want to reject all unexpected forms.
-
-// We split the second stage into 4 regexp operations in order to work around
-// crippling inefficiencies in IE's and Safari's regexp engines. First we
-// replace the JSON backslash pairs with '@' (a non-JSON character). Second, we
-// replace all simple value tokens with ']' characters. Third, we delete all
-// open brackets that follow a colon or comma or that begin the text. Finally,
-// we look to see that the remaining characters are only whitespace or ']' or
-// ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.
-
-            if (/^[\],:{}\s]*$/
-                    .test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
-                        .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
-                        .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
-
-// In the third stage we use the eval function to compile the text into a
-// JavaScript structure. The '{' operator is subject to a syntactic ambiguity
-// in JavaScript: it can begin a block or an object literal. We wrap the text
-// in parens to eliminate the ambiguity.
-
-                j = eval('(' + text + ')');
-
-// In the optional fourth stage, we recursively walk the new structure, passing
-// each name/value pair to a reviver function for possible transformation.
-
-                return typeof reviver === 'function'
-                    ? walk({'': j}, '')
-                    : j;
-            }
-
-// If the text is not JSON parseable, then a SyntaxError is thrown.
-
-            throw new SyntaxError('JSON.parse');
-        };
-    }
-}());/*
+      throw new SyntaxError('JSON.parse');
+    };
+  }
+}());
+/*
  ----------------------------------------------------
  Event.js : 1.1.1 : 2012/11/19 : MIT License
  ----------------------------------------------------
@@ -1968,368 +1996,368 @@ if (!JSON) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(eventjs) === "undefined")
-    var eventjs = Event;
+  var eventjs = Event;
 
 Event = (function(root) {
-    "use strict";
+  "use strict";
 
-// Add custom *EventListener commands to HTMLElements.
-    root.modifyEventListener = false;
+  // Add custom *EventListener commands to HTMLElements.
+  root.modifyEventListener = false;
 
-// Add bulk *EventListener commands on NodeLists from querySelectorAll and others.
-    root.modifySelectors = false;
+  // Add bulk *EventListener commands on NodeLists from querySelectorAll and others.
+  root.modifySelectors = false;
 
-// Event maintenance.
-    root.add = function(target, type, listener, configure) {
-        return eventManager(target, type, listener, configure, "add");
-    };
+  // Event maintenance.
+  root.add = function(target, type, listener, configure) {
+    return eventManager(target, type, listener, configure, "add");
+  };
 
-    root.remove = function(target, type, listener, configure) {
-        return eventManager(target, type, listener, configure, "remove");
-    };
+  root.remove = function(target, type, listener, configure) {
+    return eventManager(target, type, listener, configure, "remove");
+  };
 
-    root.stop = function(event) {
-        if (event.stopPropagation)
-            event.stopPropagation();
-        event.cancelBubble = true; // <= IE8
-        event.bubble = 0;
-    };
+  root.stop = function(event) {
+    if (event.stopPropagation)
+      event.stopPropagation();
+    event.cancelBubble = true; // <= IE8
+    event.bubble = 0;
+  };
 
-    root.prevent = function(event) {
-        if (event.preventDefault)
-            event.preventDefault();
-        event.returnValue = false; // <= IE8
-    };
+  root.prevent = function(event) {
+    if (event.preventDefault)
+      event.preventDefault();
+    event.returnValue = false; // <= IE8
+  };
 
-    root.cancel = function(event) {
-        root.stop(event);
-        root.prevent(event);
-    };
+  root.cancel = function(event) {
+    root.stop(event);
+    root.prevent(event);
+  };
 
-// Check whether event is natively supported (via @kangax)
-    root.supports = function(target, type) {
-        if (typeof(target) === "string") {
-            type = target;
-            target = window;
+  // Check whether event is natively supported (via @kangax)
+  root.supports = function(target, type) {
+    if (typeof(target) === "string") {
+      type = target;
+      target = window;
+    }
+    type = "on" + type;
+    if (type in target)
+      return true;
+    if (!target.setAttribute)
+      target = document.createElement("div");
+    if (target.setAttribute && target.removeAttribute) {
+      target.setAttribute(type, "");
+      var isSupported = typeof target[type] === "function";
+      if (typeof target[type] !== "undefined")
+        target[type] = null;
+      target.removeAttribute(type);
+      return isSupported;
+    }
+  };
+
+  var clone = function(obj) {
+    if (!obj || typeof(obj) !== 'object')
+      return obj;
+    var temp = new obj.constructor();
+    for (var key in obj) {
+      if (!obj[key] || typeof(obj[key]) !== 'object') {
+        temp[key] = obj[key];
+      } else { // clone sub-object
+        temp[key] = clone(obj[key]);
+      }
+    }
+    return temp;
+  };
+
+  /// Handle custom *EventListener commands.
+  var eventManager = function(target, type, listener, configure, trigger, fromOverwrite) {
+    configure = configure || {};
+    // Check for element to load on interval (before onload).
+    if (typeof(target) === "string" && type === "ready") {
+      var time = (new Date()).getTime();
+      var timeout = configure.timeout;
+      var ms = configure.interval || 1000 / 60;
+      var interval = window.setInterval(function() {
+        if ((new Date()).getTime() - time > timeout) {
+          window.clearInterval(interval);
         }
-        type = "on" + type;
-        if (type in target)
-            return true;
-        if (!target.setAttribute)
-            target = document.createElement("div");
-        if (target.setAttribute && target.removeAttribute) {
-            target.setAttribute(type, "");
-            var isSupported = typeof target[type] === "function";
-            if (typeof target[type] !== "undefined")
-                target[type] = null;
-            target.removeAttribute(type);
-            return isSupported;
+        if (document.querySelector(target)) {
+          window.clearInterval(interval);
+          listener();
         }
-    };
-
-    var clone = function(obj) {
-        if (!obj || typeof (obj) !== 'object')
-            return obj;
-        var temp = new obj.constructor();
-        for (var key in obj) {
-            if (!obj[key] || typeof (obj[key]) !== 'object') {
-                temp[key] = obj[key];
-            } else { // clone sub-object
-                temp[key] = clone(obj[key]);
-            }
+      }, ms);
+      return;
+    }
+    // Get DOM element from Query Selector.
+    if (typeof(target) === "string") {
+      target = document.querySelectorAll(target);
+      if (target.length === 0)
+        return createError("Missing target on listener!"); // No results.
+      if (target.length === 1) { // Single target.
+        target = target[0];
+      }
+    }
+    /// Handle multiple targets.
+    var event;
+    var events = {};
+    if (target.length > 0) {
+      for (var n0 = 0, length0 = target.length; n0 < length0; n0++) {
+        event = eventManager(target[n0], type, listener, clone(configure), trigger);
+        if (event)
+          events[n0] = event;
+      }
+      return createBatchCommands(events);
+    }
+    // Check for multiple events in one string.
+    if (type.indexOf && type.indexOf(" ") !== -1)
+      type = type.split(" ");
+    if (type.indexOf && type.indexOf(",") !== -1)
+      type = type.split(",");
+    // Attach or remove multiple events associated with a target.
+    if (typeof(type) !== "string") { // Has multiple events.
+      if (typeof(type.length) === "number") { // Handle multiple listeners glued together.
+        for (var n1 = 0, length1 = type.length; n1 < length1; n1++) { // Array [type]
+          event = eventManager(target, type[n1], listener, clone(configure), trigger);
+          if (event)
+            events[type[n1]] = event;
         }
-        return temp;
-    };
-
-/// Handle custom *EventListener commands.
-    var eventManager = function(target, type, listener, configure, trigger, fromOverwrite) {
-        configure = configure || {};
-        // Check for element to load on interval (before onload).
-        if (typeof(target) === "string" && type === "ready") {
-            var time = (new Date()).getTime();
-            var timeout = configure.timeout;
-            var ms = configure.interval || 1000 / 60;
-            var interval = window.setInterval(function() {
-                if ((new Date()).getTime() - time > timeout) {
-                    window.clearInterval(interval);
-                }
-                if (document.querySelector(target)) {
-                    window.clearInterval(interval);
-                    listener();
-                }
-            }, ms);
-            return;
+      } else { // Handle multiple listeners.
+        for (var key in type) { // Object {type}
+          if (typeof(type[key]) === "function") { // without configuration.
+            event = eventManager(target, key, type[key], clone(configure), trigger);
+          } else { // with configuration.
+            event = eventManager(target, key, type[key].listener, clone(type[key]), trigger);
+          }
+          if (event)
+            events[key] = event;
         }
-        // Get DOM element from Query Selector.
-        if (typeof(target) === "string") {
-            target = document.querySelectorAll(target);
-            if (target.length === 0)
-                return createError("Missing target on listener!"); // No results.
-            if (target.length === 1) { // Single target.
-                target = target[0];
-            }
+      }
+      return createBatchCommands(events);
+    }
+    // Ensure listener is a function.
+    if (typeof(listener) !== "function")
+      return createError("Listener is not a function!");
+    // Generate a unique wrapper identifier.
+    var useCapture = configure.useCapture || false;
+    var id = normalize(type) + getID(target) + "." + getID(listener) + "." + (useCapture ? 1 : 0);
+    // Handle the event.
+    if (root.Gesture && root.Gesture._gestureHandlers[type]) { // Fire custom event.
+      if (trigger === "remove") { // Remove event listener.
+        if (!wrappers[id])
+          return; // Already removed.
+        wrappers[id].remove();
+        delete wrappers[id];
+      } else if (trigger === "add") { // Attach event listener.
+        if (wrappers[id])
+          return wrappers[id]; // Already attached.
+        // Retains "this" orientation.
+        if (configure.useCall && !root.modifyEventListener) {
+          var tmp = listener;
+          listener = function(event, self) {
+            for (var key in self)
+              event[key] = self[key];
+            return tmp.call(target, event);
+          };
         }
-        /// Handle multiple targets.
-        var event;
-        var events = {};
-        if (target.length > 0) {
-            for (var n0 = 0, length0 = target.length; n0 < length0; n0++) {
-                event = eventManager(target[n0], type, listener, clone(configure), trigger);
-                if (event)
-                    events[n0] = event;
-            }
-            return createBatchCommands(events);
-        }
-        // Check for multiple events in one string.
-        if (type.indexOf && type.indexOf(" ") !== -1)
-            type = type.split(" ");
-        if (type.indexOf && type.indexOf(",") !== -1)
-            type = type.split(",");
-        // Attach or remove multiple events associated with a target.
-        if (typeof(type) !== "string") { // Has multiple events.
-            if (typeof(type.length) === "number") { // Handle multiple listeners glued together.
-                for (var n1 = 0, length1 = type.length; n1 < length1; n1++) { // Array [type]
-                    event = eventManager(target, type[n1], listener, clone(configure), trigger);
-                    if (event)
-                        events[type[n1]] = event;
-                }
-            } else { // Handle multiple listeners.
-                for (var key in type) { // Object {type}
-                    if (typeof(type[key]) === "function") { // without configuration.
-                        event = eventManager(target, key, type[key], clone(configure), trigger);
-                    } else { // with configuration.
-                        event = eventManager(target, key, type[key].listener, clone(type[key]), trigger);
-                    }
-                    if (event)
-                        events[key] = event;
-                }
-            }
-            return createBatchCommands(events);
-        }
-        // Ensure listener is a function.
-        if (typeof(listener) !== "function")
-            return createError("Listener is not a function!");
-        // Generate a unique wrapper identifier.
-        var useCapture = configure.useCapture || false;
-        var id = normalize(type) + getID(target) + "." + getID(listener) + "." + (useCapture ? 1 : 0);
-        // Handle the event.
-        if (root.Gesture && root.Gesture._gestureHandlers[type]) { // Fire custom event.
-            if (trigger === "remove") { // Remove event listener.
-                if (!wrappers[id])
-                    return; // Already removed.
-                wrappers[id].remove();
-                delete wrappers[id];
-            } else if (trigger === "add") { // Attach event listener.
-                if (wrappers[id])
-                    return wrappers[id]; // Already attached.
-                // Retains "this" orientation.
-                if (configure.useCall && !root.modifyEventListener) {
-                    var tmp = listener;
-                    listener = function(event, self) {
-                        for (var key in self)
-                            event[key] = self[key];
-                        return tmp.call(target, event);
-                    };
-                }
-                // Create listener proxy.
-                configure.gesture = type;
-                configure.target = target;
-                configure.listener = listener;
-                configure.fromOverwrite = fromOverwrite;
-                // Record wrapper.
-                wrappers[id] = root.proxy[type](configure);
-            }
-        } else { // Fire native event.
-            type = normalize(type);
-            if (trigger === "remove") { // Remove event listener.
-                if (!wrappers[id])
-                    return; // Already removed.
-                target[remove](type, listener, useCapture);
-                delete wrappers[id];
-            } else if (trigger === "add") { // Attach event listener.
-                if (wrappers[id])
-                    return wrappers[id]; // Already attached.
-                target[add](type, listener, useCapture);
-                // Record wrapper.
-                wrappers[id] = {
-                    type: type,
-                    target: target,
-                    listener: listener,
-                    remove: function() {
-                        root.remove(target, type, listener, configure);
-                    }
-                };
-            }
-        }
-        return wrappers[id];
-    };
-
-/// Perform batch actions on multiple events.
-    var createBatchCommands = function(events) {
-        return {
-            remove: function() { // Remove multiple events.
-                for (var key in events) {
-                    events[key].remove();
-                }
-            },
-            add: function() { // Add multiple events.
-                for (var key in events) {
-                    events[key].add();
-                }
-            }
+        // Create listener proxy.
+        configure.gesture = type;
+        configure.target = target;
+        configure.listener = listener;
+        configure.fromOverwrite = fromOverwrite;
+        // Record wrapper.
+        wrappers[id] = root.proxy[type](configure);
+      }
+    } else { // Fire native event.
+      type = normalize(type);
+      if (trigger === "remove") { // Remove event listener.
+        if (!wrappers[id])
+          return; // Already removed.
+        target[remove](type, listener, useCapture);
+        delete wrappers[id];
+      } else if (trigger === "add") { // Attach event listener.
+        if (wrappers[id])
+          return wrappers[id]; // Already attached.
+        target[add](type, listener, useCapture);
+        // Record wrapper.
+        wrappers[id] = {
+          type: type,
+          target: target,
+          listener: listener,
+          remove: function() {
+            root.remove(target, type, listener, configure);
+          }
         };
+      }
+    }
+    return wrappers[id];
+  };
+
+  /// Perform batch actions on multiple events.
+  var createBatchCommands = function(events) {
+    return {
+      remove: function() { // Remove multiple events.
+        for (var key in events) {
+          events[key].remove();
+        }
+      },
+      add: function() { // Add multiple events.
+        for (var key in events) {
+          events[key].add();
+        }
+      }
     };
+  };
 
-/// Display error message in console.
-    var createError = function(message) {
-        if (typeof(console) === "undefined")
-            return;
-        if (typeof(console.error) === "undefined")
-            return;
-        console.error(message);
+  /// Display error message in console.
+  var createError = function(message) {
+    if (typeof(console) === "undefined")
+      return;
+    if (typeof(console.error) === "undefined")
+      return;
+    console.error(message);
+  };
+
+  /// Handle naming discrepancies between platforms.
+  var normalize = (function() {
+    var translate = {};
+    return function(type) {
+      if (!root.pointerType) {
+        if (window.navigator.msPointerEnabled) {
+          root.pointerType = "mspointer";
+          translate = {
+            "mousedown": "MSPointerDown",
+            "mousemove": "MSPointerMove",
+            "mouseup": "MSPointerUp"
+          };
+        } else if (root.supports("touchstart")) {
+          root.pointerType = "touch";
+          translate = {
+            "mousedown": "touchstart",
+            "mouseup": "touchend",
+            "mousemove": "touchmove"
+          };
+        } else {
+          root.pointerType = "mouse";
+        }
+      }
+      if (translate[type])
+        type = translate[type];
+      if (!document.addEventListener) { // IE
+        return "on" + type;
+      } else {
+        return type;
+      }
     };
+  })();
 
-/// Handle naming discrepancies between platforms.
-    var normalize = (function() {
-        var translate = {};
-        return function(type) {
-            if (!root.pointerType) {
-                if (window.navigator.msPointerEnabled) {
-                    root.pointerType = "mspointer";
-                    translate = {
-                        "mousedown": "MSPointerDown",
-                        "mousemove": "MSPointerMove",
-                        "mouseup": "MSPointerUp"
-                    };
-                } else if (root.supports("touchstart")) {
-                    root.pointerType = "touch";
-                    translate = {
-                        "mousedown": "touchstart",
-                        "mouseup": "touchend",
-                        "mousemove": "touchmove"
-                    };
-                } else {
-                    root.pointerType = "mouse";
-                }
-            }
-            if (translate[type])
-                type = translate[type];
-            if (!document.addEventListener) { // IE
-                return "on" + type;
-            } else {
-                return type;
-            }
-        };
-    })();
+  /// Event wrappers to keep track of all events placed in the window.
+  var wrappers = {};
+  var counter = 0;
+  var getID = function(object) {
+    if (object === window)
+      return "#window";
+    if (object === document)
+      return "#document";
+    if (!object)
+      return createError("Missing target on listener!");
+    if (!object.uniqueID)
+      object.uniqueID = "id" + counter++;
+    return object.uniqueID;
+  };
 
-/// Event wrappers to keep track of all events placed in the window.
-    var wrappers = {};
-    var counter = 0;
-    var getID = function(object) {
-        if (object === window)
-            return "#window";
-        if (object === document)
-            return "#document";
-        if (!object)
-            return createError("Missing target on listener!");
-        if (!object.uniqueID)
-            object.uniqueID = "id" + counter++;
-        return object.uniqueID;
-    };
+  /// Detect platforms native *EventListener command.
+  var add = document.addEventListener ? "addEventListener" : "attachEvent";
+  var remove = document.removeEventListener ? "removeEventListener" : "detachEvent";
 
-/// Detect platforms native *EventListener command.
-    var add = document.addEventListener ? "addEventListener" : "attachEvent";
-    var remove = document.removeEventListener ? "removeEventListener" : "detachEvent";
-
-    /*
+  /*
      Pointer.js
      ------------------------
      Modified from; https://github.com/borismus/pointer.js
      */
 
-    root.createPointerEvent = function(event, self, preventRecord) {
-        var eventName = self.gesture;
-        var target = self.target;
-        var pts = event.changedTouches || root.proxy.getCoords(event);
-        if (pts.length) {
-            var pt = pts[0];
-            self.pointers = preventRecord ? [] : pts;
-            self.pageX = pt.pageX;
-            self.pageY = pt.pageY;
-            self.x = self.pageX;
-            self.y = self.pageY;
-        }
-        ///
-        var newEvent = document.createEvent("Event");
-        newEvent.initEvent(eventName, true, true);
-        newEvent.originalEvent = event;
-        for (var k in self) {
-            if (k === "target")
-                continue;
-            newEvent[k] = self[k];
-        }
-        target.dispatchEvent(newEvent);
-    };
+  root.createPointerEvent = function(event, self, preventRecord) {
+    var eventName = self.gesture;
+    var target = self.target;
+    var pts = event.changedTouches || root.proxy.getCoords(event);
+    if (pts.length) {
+      var pt = pts[0];
+      self.pointers = preventRecord ? [] : pts;
+      self.pageX = pt.pageX;
+      self.pageY = pt.pageY;
+      self.x = self.pageX;
+      self.y = self.pageY;
+    }
+    ///
+    var newEvent = document.createEvent("Event");
+    newEvent.initEvent(eventName, true, true);
+    newEvent.originalEvent = event;
+    for (var k in self) {
+      if (k === "target")
+        continue;
+      newEvent[k] = self[k];
+    }
+    target.dispatchEvent(newEvent);
+  };
 
-/// Allows *EventListener to use custom event proxies.
-    if (root.modifyEventListener && window.HTMLElement)
-        (function() {
-            var augmentEventListener = function(proto) {
-                var recall = function(trigger) { // overwrite native *EventListener's
-                    var handle = trigger + "EventListener";
-                    var handler = proto[handle];
-                    proto[handle] = function(type, listener, useCapture) {
-                        if (root.Gesture && root.Gesture._gestureHandlers[type]) { // capture custom events.
-                            var configure = useCapture;
-                            if (typeof(useCapture) === "object") {
-                                configure.useCall = true;
-                            } else { // convert to configuration object.
-                                configure = {
-                                    useCall: true,
-                                    useCapture: useCapture
-                                };
-                            }
-                            eventManager(this, type, listener, configure, trigger, true);
-                            handler.call(this, type, listener, useCapture);
-                        } else { // use native function.
-                            handler.call(this, normalize(type), listener, useCapture);
-                        }
-                    };
+  /// Allows *EventListener to use custom event proxies.
+  if (root.modifyEventListener && window.HTMLElement)
+    (function() {
+      var augmentEventListener = function(proto) {
+        var recall = function(trigger) { // overwrite native *EventListener's
+          var handle = trigger + "EventListener";
+          var handler = proto[handle];
+          proto[handle] = function(type, listener, useCapture) {
+            if (root.Gesture && root.Gesture._gestureHandlers[type]) { // capture custom events.
+              var configure = useCapture;
+              if (typeof(useCapture) === "object") {
+                configure.useCall = true;
+              } else { // convert to configuration object.
+                configure = {
+                  useCall: true,
+                  useCapture: useCapture
                 };
-                recall("add");
-                recall("remove");
-            };
-            // NOTE: overwriting HTMLElement doesn't do anything in Firefox.
-            if (navigator.userAgent.match(/Firefox/)) {
-                // TODO: fix Firefox for the general case.
-                augmentEventListener(HTMLDivElement.prototype);
-                augmentEventListener(HTMLCanvasElement.prototype);
-            } else {
-                augmentEventListener(HTMLElement.prototype);
+              }
+              eventManager(this, type, listener, configure, trigger, true);
+              handler.call(this, type, listener, useCapture);
+            } else { // use native function.
+              handler.call(this, normalize(type), listener, useCapture);
             }
-            augmentEventListener(document);
-            augmentEventListener(window);
-        })();
+          };
+        };
+        recall("add");
+        recall("remove");
+      };
+      // NOTE: overwriting HTMLElement doesn't do anything in Firefox.
+      if (navigator.userAgent.match(/Firefox/)) {
+        // TODO: fix Firefox for the general case.
+        augmentEventListener(HTMLDivElement.prototype);
+        augmentEventListener(HTMLCanvasElement.prototype);
+      } else {
+        augmentEventListener(HTMLElement.prototype);
+      }
+      augmentEventListener(document);
+      augmentEventListener(window);
+    })();
 
-/// Allows querySelectorAll and other NodeLists to perform *EventListener commands in bulk.
-    if (root.modifySelectors)
-        (function() {
-            var proto = NodeList.prototype;
-            proto.removeEventListener = function(type, listener, useCapture) {
-                for (var n = 0, length = this.length; n < length; n++) {
-                    this[n].removeEventListener(type, listener, useCapture);
-                }
-            };
-            proto.addEventListener = function(type, listener, useCapture) {
-                for (var n = 0, length = this.length; n < length; n++) {
-                    this[n].addEventListener(type, listener, useCapture);
-                }
-            };
-        })();
+  /// Allows querySelectorAll and other NodeLists to perform *EventListener commands in bulk.
+  if (root.modifySelectors)
+    (function() {
+      var proto = NodeList.prototype;
+      proto.removeEventListener = function(type, listener, useCapture) {
+        for (var n = 0, length = this.length; n < length; n++) {
+          this[n].removeEventListener(type, listener, useCapture);
+        }
+      };
+      proto.addEventListener = function(type, listener, useCapture) {
+        for (var n = 0, length = this.length; n < length; n++) {
+          this[n].addEventListener(type, listener, useCapture);
+        }
+      };
+    })();
 
-    return root;
+  return root;
 
 })(Event);
 /*
@@ -2360,201 +2388,207 @@ Event = (function(root) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(Event.proxy) === "undefined")
-    Event.proxy = {};
+  Event.proxy = {};
 
 Event.proxy = (function(root) {
-    "use strict";
+  "use strict";
 
-    /*
+  /*
      Create a new pointer gesture instance.
      */
 
-    root.pointerSetup = function(conf, self) {
-        /// Configure.
-        conf.doc = conf.target.ownerDocument || conf.target; // Associated document.
-        conf.minFingers = conf.minFingers || conf.fingers || 1; // Minimum required fingers.
-        conf.maxFingers = conf.maxFingers || conf.fingers || Infinity; // Maximum allowed fingers.
-        conf.position = conf.position || "relative"; // Determines what coordinate system points are returned.
-        delete conf.fingers; //-
-        /// Convenience data.
-        self = self || {};
-        self.gesture = conf.gesture;
-        self.target = conf.target;
-        self.pointerType = Event.pointerType;
-        ///
-        if (Event.modifyEventListener && conf.fromOverwrite)
-            conf.listener = Event.createPointerEvent;
-        /// Convenience commands.
-        var fingers = 0;
-        var type = self.gesture.indexOf("pointer") === 0 && Event.modifyEventListener ? "pointer" : "mouse";
-        self.listener = conf.listener;
-        self.proxy = function(listener) {
-            self.defaultListener = conf.listener;
-            conf.listener = listener;
-            listener(conf.event, self);
-        };
-        self.remove = function() {
-            if (conf.onPointerDown)
-                Event.remove(conf.target, type + "down", conf.onPointerDown);
-            if (conf.onPointerMove)
-                Event.remove(conf.doc, type + "move", conf.onPointerMove);
-            if (conf.onPointerUp)
-                Event.remove(conf.doc, type + "up", conf.onPointerUp);
-        };
-        self.resume = function(opt) {
-            if (conf.onPointerMove && (!opt || opt.move))
-                Event.add(conf.doc, type + "move", conf.onPointerMove);
-            if (conf.onPointerUp && (!opt || opt.move))
-                Event.add(conf.doc, type + "up", conf.onPointerUp);
-            conf.fingers = fingers;
-        };
-        self.pause = function(opt) {
-            fingers = conf.fingers;
-            if (conf.onPointerMove && (!opt || opt.move))
-                Event.remove(conf.doc, type + "move", conf.onPointerMove);
-            if (conf.onPointerUp && (!opt || opt.up))
-                Event.remove(conf.doc, type + "up", conf.onPointerUp);
-            conf.fingers = 0;
-        };
-        ///
-        return self;
+  root.pointerSetup = function(conf, self) {
+    /// Configure.
+    conf.doc = conf.target.ownerDocument || conf.target; // Associated document.
+    conf.minFingers = conf.minFingers || conf.fingers || 1; // Minimum required fingers.
+    conf.maxFingers = conf.maxFingers || conf.fingers || Infinity; // Maximum allowed fingers.
+    conf.position = conf.position || "relative"; // Determines what coordinate system points are returned.
+    delete conf.fingers; //-
+    /// Convenience data.
+    self = self || {};
+    self.gesture = conf.gesture;
+    self.target = conf.target;
+    self.pointerType = Event.pointerType;
+    ///
+    if (Event.modifyEventListener && conf.fromOverwrite)
+      conf.listener = Event.createPointerEvent;
+    /// Convenience commands.
+    var fingers = 0;
+    var type = self.gesture.indexOf("pointer") === 0 && Event.modifyEventListener ? "pointer" : "mouse";
+    self.listener = conf.listener;
+    self.proxy = function(listener) {
+      self.defaultListener = conf.listener;
+      conf.listener = listener;
+      listener(conf.event, self);
     };
+    self.remove = function() {
+      if (conf.onPointerDown)
+        Event.remove(conf.target, type + "down", conf.onPointerDown);
+      if (conf.onPointerMove)
+        Event.remove(conf.doc, type + "move", conf.onPointerMove);
+      if (conf.onPointerUp)
+        Event.remove(conf.doc, type + "up", conf.onPointerUp);
+    };
+    self.resume = function(opt) {
+      if (conf.onPointerMove && (!opt || opt.move))
+        Event.add(conf.doc, type + "move", conf.onPointerMove);
+      if (conf.onPointerUp && (!opt || opt.move))
+        Event.add(conf.doc, type + "up", conf.onPointerUp);
+      conf.fingers = fingers;
+    };
+    self.pause = function(opt) {
+      fingers = conf.fingers;
+      if (conf.onPointerMove && (!opt || opt.move))
+        Event.remove(conf.doc, type + "move", conf.onPointerMove);
+      if (conf.onPointerUp && (!opt || opt.up))
+        Event.remove(conf.doc, type + "up", conf.onPointerUp);
+      conf.fingers = 0;
+    };
+    ///
+    return self;
+  };
 
-    /*
+  /*
      Begin proxied pointer command.
      */
 
-    root.pointerStart = function(event, self, conf) {
-        var addTouchStart = function(touch, sid) {
-            var bbox = conf.bbox;
-            var pt = track[sid] = {};
-            ///
-            switch (conf.position) {
-                case "absolute": // Absolute from within window.
-                    pt.offsetX = 0;
-                    pt.offsetY = 0;
-                    break;
-                case "difference": // Relative from origin.
-                    pt.offsetX = touch.pageX;
-                    pt.offsetY = touch.pageY;
-                    break;
-                case "move": // Move target element.
-                    pt.offsetX = touch.pageX - bbox.x1;
-                    pt.offsetY = touch.pageY - bbox.y1;
-                    break;
-                default: // Relative from within target.
-                    pt.offsetX = bbox.x1;
-                    pt.offsetY = bbox.y1;
-                    break;
-            }
-            ///
-            if (conf.position === "relative") {
-                var x = (touch.pageX + bbox.scrollLeft - pt.offsetX) * bbox.scaleX;
-                var y = (touch.pageY + bbox.scrollTop - pt.offsetY) * bbox.scaleY;
-            } else {
-                var x = (touch.pageX - pt.offsetX);
-                var y = (touch.pageY - pt.offsetY);
-            }
-            ///
-            pt.rotation = 0;
-            pt.scale = 1;
-            pt.startTime = pt.moveTime = (new Date).getTime();
-            pt.move = {x: x, y: y};
-            pt.start = {x: x, y: y};
-            ///
-            conf.fingers++;
-        };
-        ///
-        conf.event = event;
-        if (self.defaultListener) {
-            conf.listener = self.defaultListener;
-            delete self.defaultListener;
-        }
-        ///
-        var isTouchStart = !conf.fingers;
-        var track = conf.tracker;
-        var touches = event.changedTouches || root.getCoords(event);
-        var length = touches.length;
-        // Adding touch events to tracking.
-        for (var i = 0; i < length; i++) {
-            var touch = touches[i];
-            var sid = touch.identifier || Infinity; // Touch ID.
-            // Track the current state of the touches.
-            if (conf.fingers) {
-                if (conf.fingers >= conf.maxFingers) {
-                    var ids = [];
-                    for (var sid in conf.tracker)
-                        ids.push(sid);
-                    self.identifier = ids.join(",");
-                    return isTouchStart;
-                }
-                var fingers = 0; // Finger ID.
-                for (var rid in track) {
-                    // Replace removed finger.
-                    if (track[rid].up) {
-                        delete track[rid];
-                        addTouchStart(touch, sid);
-                        conf.cancel = true;
-                        break;
-                    }
-                    fingers++;
-                }
-                // Add additional finger.
-                if (track[sid])
-                    continue;
-                addTouchStart(touch, sid);
-            } else { // Start tracking fingers.
-                track = conf.tracker = {};
-                self.bbox = conf.bbox = root.getBoundingBox(conf.target);
-                conf.fingers = 0;
-                conf.cancel = false;
-                addTouchStart(touch, sid);
-            }
-        }
-        ///
-        var ids = [];
-        for (var sid in conf.tracker)
-            ids.push(sid);
-        self.identifier = ids.join(",");
-        ///
-        return isTouchStart;
+  root.pointerStart = function(event, self, conf) {
+    var addTouchStart = function(touch, sid) {
+      var bbox = conf.bbox;
+      var pt = track[sid] = {};
+      ///
+      switch (conf.position) {
+        case "absolute": // Absolute from within window.
+          pt.offsetX = 0;
+          pt.offsetY = 0;
+          break;
+        case "difference": // Relative from origin.
+          pt.offsetX = touch.pageX;
+          pt.offsetY = touch.pageY;
+          break;
+        case "move": // Move target element.
+          pt.offsetX = touch.pageX - bbox.x1;
+          pt.offsetY = touch.pageY - bbox.y1;
+          break;
+        default: // Relative from within target.
+          pt.offsetX = bbox.x1;
+          pt.offsetY = bbox.y1;
+          break;
+      }
+      ///
+      if (conf.position === "relative") {
+        var x = (touch.pageX + bbox.scrollLeft - pt.offsetX) * bbox.scaleX;
+        var y = (touch.pageY + bbox.scrollTop - pt.offsetY) * bbox.scaleY;
+      } else {
+        var x = (touch.pageX - pt.offsetX);
+        var y = (touch.pageY - pt.offsetY);
+      }
+      ///
+      pt.rotation = 0;
+      pt.scale = 1;
+      pt.startTime = pt.moveTime = (new Date).getTime();
+      pt.move = {
+        x: x,
+        y: y
+      };
+      pt.start = {
+        x: x,
+        y: y
+      };
+      ///
+      conf.fingers++;
     };
+    ///
+    conf.event = event;
+    if (self.defaultListener) {
+      conf.listener = self.defaultListener;
+      delete self.defaultListener;
+    }
+    ///
+    var isTouchStart = !conf.fingers;
+    var track = conf.tracker;
+    var touches = event.changedTouches || root.getCoords(event);
+    var length = touches.length;
+    // Adding touch events to tracking.
+    for (var i = 0; i < length; i++) {
+      var touch = touches[i];
+      var sid = touch.identifier || Infinity; // Touch ID.
+      // Track the current state of the touches.
+      if (conf.fingers) {
+        if (conf.fingers >= conf.maxFingers) {
+          var ids = [];
+          for (var sid in conf.tracker)
+            ids.push(sid);
+          self.identifier = ids.join(",");
+          return isTouchStart;
+        }
+        var fingers = 0; // Finger ID.
+        for (var rid in track) {
+          // Replace removed finger.
+          if (track[rid].up) {
+            delete track[rid];
+            addTouchStart(touch, sid);
+            conf.cancel = true;
+            break;
+          }
+          fingers++;
+        }
+        // Add additional finger.
+        if (track[sid])
+          continue;
+        addTouchStart(touch, sid);
+      } else { // Start tracking fingers.
+        track = conf.tracker = {};
+        self.bbox = conf.bbox = root.getBoundingBox(conf.target);
+        conf.fingers = 0;
+        conf.cancel = false;
+        addTouchStart(touch, sid);
+      }
+    }
+    ///
+    var ids = [];
+    for (var sid in conf.tracker)
+      ids.push(sid);
+    self.identifier = ids.join(",");
+    ///
+    return isTouchStart;
+  };
 
-    /*
+  /*
      End proxied pointer command.
      */
 
-    root.pointerEnd = function(event, self, conf, onPointerUp) {
-        // Record changed touches have ended (iOS changedTouches is not reliable).
-        var touches = event.touches || [];
-        var length = touches.length;
-        var exists = {};
-        for (var i = 0; i < length; i++) {
-            var touch = touches[i];
-            var sid = touch.identifier;
-            exists[sid || Infinity] = true;
-        }
-        for (var sid in conf.tracker) {
-            var track = conf.tracker[sid];
-            if (exists[sid] || track.up)
-                continue;
-            if (onPointerUp) { // add changedTouches to mouse.
-                onPointerUp({
-                    pageX: track.pageX,
-                    pageY: track.pageY,
-                    changedTouches: [{
-                            pageX: track.pageX,
-                            pageY: track.pageY,
-                            identifier: sid === "Infinity" ? Infinity : sid
-                        }]
-                }, "up");
-            }
-            track.up = true;
-            conf.fingers--;
-        }
-        /*  // This should work but fails in Safari on iOS4 so not using it.
+  root.pointerEnd = function(event, self, conf, onPointerUp) {
+    // Record changed touches have ended (iOS changedTouches is not reliable).
+    var touches = event.touches || [];
+    var length = touches.length;
+    var exists = {};
+    for (var i = 0; i < length; i++) {
+      var touch = touches[i];
+      var sid = touch.identifier;
+      exists[sid || Infinity] = true;
+    }
+    for (var sid in conf.tracker) {
+      var track = conf.tracker[sid];
+      if (exists[sid] || track.up)
+        continue;
+      if (onPointerUp) { // add changedTouches to mouse.
+        onPointerUp({
+          pageX: track.pageX,
+          pageY: track.pageY,
+          changedTouches: [{
+            pageX: track.pageX,
+            pageY: track.pageY,
+            identifier: sid === "Infinity" ? Infinity : sid
+          }]
+        }, "up");
+      }
+      track.up = true;
+      conf.fingers--;
+    }
+    /*  // This should work but fails in Safari on iOS4 so not using it.
          var touches = event.changedTouches || root.getCoords(event);
          var length = touches.length;
          // Record changed touches have ended (this should work).
@@ -2576,177 +2610,182 @@ Event.proxy = (function(root) {
          conf.fingers --;
          }
          } */
-        // Wait for all fingers to be released.
-        if (conf.fingers !== 0)
-            return false;
-        // Record total number of fingers gesture used.
-        var ids = [];
-        conf.gestureFingers = 0;
-        for (var sid in conf.tracker) {
-            conf.gestureFingers++;
-            ids.push(sid);
-        }
-        self.identifier = ids.join(",");
-        // Our pointer gesture has ended.
-        return true;
-    };
+    // Wait for all fingers to be released.
+    if (conf.fingers !== 0)
+      return false;
+    // Record total number of fingers gesture used.
+    var ids = [];
+    conf.gestureFingers = 0;
+    for (var sid in conf.tracker) {
+      conf.gestureFingers++;
+      ids.push(sid);
+    }
+    self.identifier = ids.join(",");
+    // Our pointer gesture has ended.
+    return true;
+  };
 
-    /*
+  /*
      Returns mouse coords in an array to match event.*Touches
      ------------------------------------------------------------
      var touch = event.changedTouches || root.getCoords(event);
      */
 
-    root.getCoords = function(event) {
-        if (typeof(event.pageX) !== "undefined") { // Desktop browsers.
-            root.getCoords = function(event) {
-                return Array({
-                    type: "mouse",
-                    x: event.pageX,
-                    y: event.pageY,
-                    pageX: event.pageX,
-                    pageY: event.pageY,
-                    identifier: Infinity
-                });
-            };
-        } else { // Internet Explorer <= 8.0
-            root.getCoords = function(event) {
-                event = event || window.event;
-                return Array({
-                    type: "mouse",
-                    x: event.clientX + document.documentElement.scrollLeft,
-                    y: event.clientY + document.documentElement.scrollTop,
-                    pageX: event.clientX + document.documentElement.scrollLeft,
-                    pageY: event.clientY + document.documentElement.scrollTop,
-                    identifier: Infinity
-                });
-            };
-        }
-        return root.getCoords(event);
-    };
+  root.getCoords = function(event) {
+    if (typeof(event.pageX) !== "undefined") { // Desktop browsers.
+      root.getCoords = function(event) {
+        return Array({
+          type: "mouse",
+          x: event.pageX,
+          y: event.pageY,
+          pageX: event.pageX,
+          pageY: event.pageY,
+          identifier: Infinity
+        });
+      };
+    } else { // Internet Explorer <= 8.0
+      root.getCoords = function(event) {
+        event = event || window.event;
+        return Array({
+          type: "mouse",
+          x: event.clientX + document.documentElement.scrollLeft,
+          y: event.clientY + document.documentElement.scrollTop,
+          pageX: event.clientX + document.documentElement.scrollLeft,
+          pageY: event.clientY + document.documentElement.scrollTop,
+          identifier: Infinity
+        });
+      };
+    }
+    return root.getCoords(event);
+  };
 
-    /*
+  /*
      Returns single coords in an object.
      ------------------------------------------------------------
      var mouse = root.getCoord(event);
      */
 
-    root.getCoord = function(event) {
-        if ("ontouchstart" in window) { // Mobile browsers.
-            var pX = 0;
-            var pY = 0;
-            root.getCoord = function(event) {
-                var touches = event.changedTouches;
-                if (touches.length) { // ontouchstart + ontouchmove
-                    return {
-                        x: pX = touches[0].pageX,
-                        y: pY = touches[0].pageY
-                    };
-                } else { // ontouchend
-                    return {
-                        x: pX,
-                        y: pY
-                    };
-                }
-            };
-        } else if (typeof(event.pageX) !== "undefined" && typeof(event.pageY) !== "undefined") { // Desktop browsers.
-            root.getCoord = function(event) {
-                return {
-                    x: event.pageX,
-                    y: event.pageY
-                };
-            };
-        } else { // Internet Explorer <=8.0
-            root.getCoord = function(event) {
-                event = event || window.event;
-                return {
-                    x: event.clientX + document.documentElement.scrollLeft,
-                    y: event.clientY + document.documentElement.scrollTop
-                };
-            };
+  root.getCoord = function(event) {
+    if ("ontouchstart" in window) { // Mobile browsers.
+      var pX = 0;
+      var pY = 0;
+      root.getCoord = function(event) {
+        var touches = event.changedTouches;
+        if (touches.length) { // ontouchstart + ontouchmove
+          return {
+            x: pX = touches[0].pageX,
+            y: pY = touches[0].pageY
+          };
+        } else { // ontouchend
+          return {
+            x: pX,
+            y: pY
+          };
         }
-        return root.getCoord(event);
-    };
+      };
+    } else if (typeof(event.pageX) !== "undefined" && typeof(event.pageY) !== "undefined") { // Desktop browsers.
+      root.getCoord = function(event) {
+        return {
+          x: event.pageX,
+          y: event.pageY
+        };
+      };
+    } else { // Internet Explorer <=8.0
+      root.getCoord = function(event) {
+        event = event || window.event;
+        return {
+          x: event.clientX + document.documentElement.scrollLeft,
+          y: event.clientY + document.documentElement.scrollTop
+        };
+      };
+    }
+    return root.getCoord(event);
+  };
 
-    /*
+  /*
      Get target scale and position in space.
      */
 
-    root.getBoundingBox = function(o) {
-        if (o === window || o === document)
-            o = document.body;
-        ///
-        var bbox = {
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 0,
-            scrollLeft: 0,
-            scrollTop: 0
-        };
-        ///
-        if (o === document.body) {
-            bbox.height = window.innerHeight;
-            bbox.width = window.innerWidth;
-        } else {
-            bbox.height = o.offsetHeight;
-            bbox.width = o.offsetWidth;
-        }
-        /// Get the scale of the element.
-        bbox.scaleX = o.width / bbox.width || 1;
-        bbox.scaleY = o.height / bbox.height || 1;
-        /// Get the offset of element.
-        var tmp = o;
-        while (tmp !== null) {
-            bbox.x1 += tmp.offsetLeft;
-            bbox.y1 += tmp.offsetTop;
-            tmp = tmp.offsetParent;
-        }
-        ;
-        /// Get the scroll of container element.
-        var tmp = o.parentNode;
-        while (tmp !== null) {
-            if (tmp === document.body)
-                break;
-            if (tmp.scrollTop === undefined)
-                break;
-            bbox.scrollLeft += tmp.scrollLeft;
-            bbox.scrollTop += tmp.scrollTop;
-            tmp = tmp.parentNode;
-        }
-        ;
-        /// Record the extent of box.
-        bbox.x2 = bbox.x1 + bbox.width;
-        bbox.y2 = bbox.y1 + bbox.height;
-        ///
-        return bbox;
+  root.getBoundingBox = function(o) {
+    if (o === window || o === document)
+      o = document.body;
+    ///
+    var bbox = {
+      x1: 0,
+      y1: 0,
+      x2: 0,
+      y2: 0,
+      scrollLeft: 0,
+      scrollTop: 0
     };
+    ///
+    if (o === document.body) {
+      bbox.height = window.innerHeight;
+      bbox.width = window.innerWidth;
+    } else {
+      bbox.height = o.offsetHeight;
+      bbox.width = o.offsetWidth;
+    }
+    /// Get the scale of the element.
+    bbox.scaleX = o.width / bbox.width || 1;
+    bbox.scaleY = o.height / bbox.height || 1;
+    /// Get the offset of element.
+    var tmp = o;
+    while (tmp !== null) {
+      bbox.x1 += tmp.offsetLeft;
+      bbox.y1 += tmp.offsetTop;
+      tmp = tmp.offsetParent;
+    };
+    /// Get the scroll of container element.
+    var tmp = o.parentNode;
+    while (tmp !== null) {
+      if (tmp === document.body)
+        break;
+      if (tmp.scrollTop === undefined)
+        break;
+      bbox.scrollLeft += tmp.scrollLeft;
+      bbox.scrollTop += tmp.scrollTop;
+      tmp = tmp.parentNode;
+    };
+    /// Record the extent of box.
+    bbox.x2 = bbox.x1 + bbox.width;
+    bbox.y2 = bbox.y1 + bbox.height;
+    ///
+    return bbox;
+  };
 
-    /*
+  /*
      Keep track of metaKey, the proper ctrlKey for users platform.
      */
 
-    (function() {
-        var agent = navigator.userAgent.toLowerCase();
-        var mac = agent.indexOf("macintosh") !== -1;
-        if (mac && agent.indexOf("khtml") !== -1) { // chrome, safari.
-            var watch = {91: true, 93: true};
-        } else if (mac && agent.indexOf("firefox") !== -1) {  // mac firefox.
-            var watch = {224: true};
-        } else { // windows, linux, or mac opera.
-            var watch = {17: true};
-        }
-        root.isMetaKey = function(event) {
-            return !!watch[event.keyCode];
-        };
-        root.metaTracker = function(event) {
-            if (watch[event.keyCode]) {
-                root.metaKey = event.type === "keydown";
-            }
-        };
-    })();
+  (function() {
+    var agent = navigator.userAgent.toLowerCase();
+    var mac = agent.indexOf("macintosh") !== -1;
+    if (mac && agent.indexOf("khtml") !== -1) { // chrome, safari.
+      var watch = {
+        91: true,
+        93: true
+      };
+    } else if (mac && agent.indexOf("firefox") !== -1) { // mac firefox.
+      var watch = {
+        224: true
+      };
+    } else { // windows, linux, or mac opera.
+      var watch = {
+        17: true
+      };
+    }
+    root.isMetaKey = function(event) {
+      return !!watch[event.keyCode];
+    };
+    root.metaTracker = function(event) {
+      if (watch[event.keyCode]) {
+        root.metaKey = event.type === "keydown";
+      }
+    };
+  })();
 
-    return root;
+  return root;
 
 })(Event.proxy);
 /*
@@ -2756,65 +2795,65 @@ Event.proxy = (function(root) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(Event.proxy) === "undefined")
-    Event.proxy = {};
+  Event.proxy = {};
 
 Event.proxy = (function(root) {
-    "use strict";
+  "use strict";
 
-    root.click = function(conf) {
-        conf.maxFingers = conf.maxFingers || conf.fingers || 1;
-        // Setting up local variables.
-        var EVENT;
-        // Tracking the events.
-        conf.onPointerDown = function(event) {
-            if (root.pointerStart(event, self, conf)) {
-                Event.add(conf.doc, "mousemove", conf.onPointerMove).listener(event);
-                Event.add(conf.doc, "mouseup", conf.onPointerUp);
-            }
-        };
-        conf.onPointerMove = function(event) {
-            EVENT = event;
-        };
-        conf.onPointerUp = function(event) {
-            if (root.pointerEnd(event, self, conf)) {
-                Event.remove(conf.doc, "mousemove", conf.onPointerMove);
-                Event.remove(conf.doc, "mouseup", conf.onPointerUp);
-                if (EVENT.cancelBubble && ++EVENT.bubble > 1)
-                    return;
-                var pointers = EVENT.changedTouches || root.getCoords(EVENT);
-                var pointer = pointers[0];
-                var bbox = conf.bbox;
-                var newbbox = root.getBoundingBox(conf.target);
-                if (conf.position === "relative") {
-                    var ax = (pointer.pageX + bbox.scrollLeft - bbox.x1) * bbox.scaleX;
-                    var ay = (pointer.pageY + bbox.scrollTop - bbox.y1) * bbox.scaleY;
-                } else {
-                    var ax = (pointer.pageX - bbox.x1);
-                    var ay = (pointer.pageY - bbox.y1);
-                }
-                if (ax > 0 && ax < bbox.width && // Within target coordinates.
-                        ay > 0 && ay < bbox.height &&
-                        bbox.scrollTop === newbbox.scrollTop) {
-                    conf.listener(EVENT, self);
-                }
-            }
-        };
-        // Generate maintenance commands, and other configurations.
-        var self = root.pointerSetup(conf);
-        self.state = "click";
-        // Attach events.
-        Event.add(conf.target, "mousedown", conf.onPointerDown);
-        // Return this object.
-        return self;
+  root.click = function(conf) {
+    conf.maxFingers = conf.maxFingers || conf.fingers || 1;
+    // Setting up local variables.
+    var EVENT;
+    // Tracking the events.
+    conf.onPointerDown = function(event) {
+      if (root.pointerStart(event, self, conf)) {
+        Event.add(conf.doc, "mousemove", conf.onPointerMove).listener(event);
+        Event.add(conf.doc, "mouseup", conf.onPointerUp);
+      }
     };
+    conf.onPointerMove = function(event) {
+      EVENT = event;
+    };
+    conf.onPointerUp = function(event) {
+      if (root.pointerEnd(event, self, conf)) {
+        Event.remove(conf.doc, "mousemove", conf.onPointerMove);
+        Event.remove(conf.doc, "mouseup", conf.onPointerUp);
+        if (EVENT.cancelBubble && ++EVENT.bubble > 1)
+          return;
+        var pointers = EVENT.changedTouches || root.getCoords(EVENT);
+        var pointer = pointers[0];
+        var bbox = conf.bbox;
+        var newbbox = root.getBoundingBox(conf.target);
+        if (conf.position === "relative") {
+          var ax = (pointer.pageX + bbox.scrollLeft - bbox.x1) * bbox.scaleX;
+          var ay = (pointer.pageY + bbox.scrollTop - bbox.y1) * bbox.scaleY;
+        } else {
+          var ax = (pointer.pageX - bbox.x1);
+          var ay = (pointer.pageY - bbox.y1);
+        }
+        if (ax > 0 && ax < bbox.width && // Within target coordinates.
+          ay > 0 && ay < bbox.height &&
+          bbox.scrollTop === newbbox.scrollTop) {
+          conf.listener(EVENT, self);
+        }
+      }
+    };
+    // Generate maintenance commands, and other configurations.
+    var self = root.pointerSetup(conf);
+    self.state = "click";
+    // Attach events.
+    Event.add(conf.target, "mousedown", conf.onPointerDown);
+    // Return this object.
+    return self;
+  };
 
-    Event.Gesture = Event.Gesture || {};
-    Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
-    Event.Gesture._gestureHandlers.click = root.click;
+  Event.Gesture = Event.Gesture || {};
+  Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
+  Event.Gesture._gestureHandlers.click = root.click;
 
-    return root;
+  return root;
 
 })(Event.proxy);
 /*
@@ -2826,92 +2865,92 @@ Event.proxy = (function(root) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(Event.proxy) === "undefined")
-    Event.proxy = {};
+  Event.proxy = {};
 
 Event.proxy = (function(root) {
-    "use strict";
+  "use strict";
 
-    root.dbltap =
-            root.dblclick = function(conf) {
-        conf.maxFingers = conf.maxFingers || conf.fingers || 1;
-        // Setting up local variables.
-        var delay = 700; // in milliseconds
-        var time0, time1, timeout;
-        var pointer0, pointer1;
-        // Tracking the events.
-        conf.onPointerDown = function(event) {
-            var pointers = event.changedTouches || root.getCoords(event);
-            if (time0 && !time1) { // Click #2
-                pointer1 = pointers[0];
-                time1 = (new Date).getTime() - time0;
-            } else { // Click #1
-                pointer0 = pointers[0];
-                time0 = (new Date).getTime();
-                time1 = 0;
-                clearTimeout(timeout);
-                timeout = setTimeout(function() {
-                    time0 = 0;
-                }, delay);
-            }
-            if (root.pointerStart(event, self, conf)) {
-                Event.add(conf.doc, "mousemove", conf.onPointerMove).listener(event);
-                Event.add(conf.doc, "mouseup", conf.onPointerUp);
-            }
-        };
-        conf.onPointerMove = function(event) {
-            if (time0 && !time1) {
-                var pointers = event.changedTouches || root.getCoords(event);
-                pointer1 = pointers[0];
-            }
-            var bbox = conf.bbox;
-            if (conf.position === "relative") {
-                var ax = (pointer1.pageX + bbox.scrollLeft - bbox.x1) * bbox.scaleX;
-                var ay = (pointer1.pageY + bbox.scrollTop - bbox.y1) * bbox.scaleY;
-            } else {
-                var ax = (pointer1.pageX - bbox.x1);
-                var ay = (pointer1.pageY - bbox.y1);
-            }
-            if (!(ax > 0 && ax < bbox.width && // Within target coordinates..
-                    ay > 0 && ay < bbox.height &&
-                    Math.abs(pointer1.pageX - pointer0.pageX) <= 25 && // Within drift deviance.
-                    Math.abs(pointer1.pageY - pointer0.pageY) <= 25)) {
-                // Cancel out this listener.
-                Event.remove(conf.doc, "mousemove", conf.onPointerMove);
-                clearTimeout(timeout);
-                time0 = time1 = 0;
-            }
-        };
-        conf.onPointerUp = function(event) {
-            if (root.pointerEnd(event, self, conf)) {
-                Event.remove(conf.doc, "mousemove", conf.onPointerMove);
-                Event.remove(conf.doc, "mouseup", conf.onPointerUp);
-            }
-            if (time0 && time1) {
-                if (time1 <= delay && !(event.cancelBubble && ++event.bubble > 1)) {
-                    self.state = conf.gesture;
-                    conf.listener(event, self);
-                }
-                clearTimeout(timeout);
-                time0 = time1 = 0;
-            }
-        };
-        // Generate maintenance commands, and other configurations.
-        var self = root.pointerSetup(conf);
-        self.state = "dblclick";
-        // Attach events.
-        Event.add(conf.target, "mousedown", conf.onPointerDown);
-        // Return this object.
-        return self;
-    };
+  root.dbltap =
+    root.dblclick = function(conf) {
+      conf.maxFingers = conf.maxFingers || conf.fingers || 1;
+      // Setting up local variables.
+      var delay = 700; // in milliseconds
+      var time0, time1, timeout;
+      var pointer0, pointer1;
+      // Tracking the events.
+      conf.onPointerDown = function(event) {
+        var pointers = event.changedTouches || root.getCoords(event);
+        if (time0 && !time1) { // Click #2
+          pointer1 = pointers[0];
+          time1 = (new Date).getTime() - time0;
+        } else { // Click #1
+          pointer0 = pointers[0];
+          time0 = (new Date).getTime();
+          time1 = 0;
+          clearTimeout(timeout);
+          timeout = setTimeout(function() {
+            time0 = 0;
+          }, delay);
+        }
+        if (root.pointerStart(event, self, conf)) {
+          Event.add(conf.doc, "mousemove", conf.onPointerMove).listener(event);
+          Event.add(conf.doc, "mouseup", conf.onPointerUp);
+        }
+      };
+      conf.onPointerMove = function(event) {
+        if (time0 && !time1) {
+          var pointers = event.changedTouches || root.getCoords(event);
+          pointer1 = pointers[0];
+        }
+        var bbox = conf.bbox;
+        if (conf.position === "relative") {
+          var ax = (pointer1.pageX + bbox.scrollLeft - bbox.x1) * bbox.scaleX;
+          var ay = (pointer1.pageY + bbox.scrollTop - bbox.y1) * bbox.scaleY;
+        } else {
+          var ax = (pointer1.pageX - bbox.x1);
+          var ay = (pointer1.pageY - bbox.y1);
+        }
+        if (!(ax > 0 && ax < bbox.width && // Within target coordinates..
+          ay > 0 && ay < bbox.height &&
+          Math.abs(pointer1.pageX - pointer0.pageX) <= 25 && // Within drift deviance.
+          Math.abs(pointer1.pageY - pointer0.pageY) <= 25)) {
+          // Cancel out this listener.
+          Event.remove(conf.doc, "mousemove", conf.onPointerMove);
+          clearTimeout(timeout);
+          time0 = time1 = 0;
+        }
+      };
+      conf.onPointerUp = function(event) {
+        if (root.pointerEnd(event, self, conf)) {
+          Event.remove(conf.doc, "mousemove", conf.onPointerMove);
+          Event.remove(conf.doc, "mouseup", conf.onPointerUp);
+        }
+        if (time0 && time1) {
+          if (time1 <= delay && !(event.cancelBubble && ++event.bubble > 1)) {
+            self.state = conf.gesture;
+            conf.listener(event, self);
+          }
+          clearTimeout(timeout);
+          time0 = time1 = 0;
+        }
+      };
+      // Generate maintenance commands, and other configurations.
+      var self = root.pointerSetup(conf);
+      self.state = "dblclick";
+      // Attach events.
+      Event.add(conf.target, "mousedown", conf.onPointerDown);
+      // Return this object.
+      return self;
+  };
 
-    Event.Gesture = Event.Gesture || {};
-    Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
-    Event.Gesture._gestureHandlers.dbltap = root.dbltap;
-    Event.Gesture._gestureHandlers.dblclick = root.dblclick;
+  Event.Gesture = Event.Gesture || {};
+  Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
+  Event.Gesture._gestureHandlers.dbltap = root.dbltap;
+  Event.Gesture._gestureHandlers.dblclick = root.dblclick;
 
-    return root;
+  return root;
 
 })(Event.proxy);
 /*
@@ -2925,99 +2964,99 @@ Event.proxy = (function(root) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(Event.proxy) === "undefined")
-    Event.proxy = {};
+  Event.proxy = {};
 
 Event.proxy = (function(root) {
-    "use strict";
+  "use strict";
 
-    root.dragElement = function(that, event) {
-        root.drag({
-            event: event,
-            target: that,
-            position: "move",
-            listener: function(event, self) {
-                that.style.left = self.x + "px";
-                that.style.top = self.y + "px";
-                Event.prevent(event);
-            }
-        });
-    };
+  root.dragElement = function(that, event) {
+    root.drag({
+      event: event,
+      target: that,
+      position: "move",
+      listener: function(event, self) {
+        that.style.left = self.x + "px";
+        that.style.top = self.y + "px";
+        Event.prevent(event);
+      }
+    });
+  };
 
-    root.drag = function(conf) {
-        conf.gesture = "drag";
-        conf.onPointerDown = function(event) {
-            if (root.pointerStart(event, self, conf)) {
-                if (!conf.monitor) {
-                    Event.add(conf.doc, "mousemove", conf.onPointerMove);
-                    Event.add(conf.doc, "mouseup", conf.onPointerUp);
-                }
-            }
-            // Process event listener.
-            conf.onPointerMove(event, "down");
-        };
-        conf.onPointerMove = function(event, state) {
-            if (!conf.tracker)
-                return conf.onPointerDown(event);
-            var bbox = conf.bbox;
-            var touches = event.changedTouches || root.getCoords(event);
-            var length = touches.length;
-            for (var i = 0; i < length; i++) {
-                var touch = touches[i];
-                var identifier = touch.identifier || Infinity;
-                var pt = conf.tracker[identifier];
-                // Identifier defined outside of listener.
-                if (!pt)
-                    continue;
-                pt.pageX = touch.pageX;
-                pt.pageY = touch.pageY;
-                // Record data.
-                self.state = state || "move";
-                self.identifier = identifier;
-                self.start = pt.start;
-                self.fingers = conf.fingers;
-                if (conf.position === "relative") {
-                    self.x = (pt.pageX + bbox.scrollLeft - pt.offsetX) * bbox.scaleX;
-                    self.y = (pt.pageY + bbox.scrollTop - pt.offsetY) * bbox.scaleY;
-                } else {
-                    self.x = (pt.pageX - pt.offsetX);
-                    self.y = (pt.pageY - pt.offsetY);
-                }
-                ///
-                conf.listener(event, self);
-            }
-        };
-        conf.onPointerUp = function(event) {
-            // Remove tracking for touch.
-            if (root.pointerEnd(event, self, conf, conf.onPointerMove)) {
-                if (!conf.monitor) {
-                    Event.remove(conf.doc, "mousemove", conf.onPointerMove);
-                    Event.remove(conf.doc, "mouseup", conf.onPointerUp);
-                }
-            }
-        };
-        // Generate maintenance commands, and other configurations.
-        var self = root.pointerSetup(conf);
-        // Attach events.
-        if (conf.event) {
-            conf.onPointerDown(conf.event);
-        } else { //
-            Event.add(conf.target, "mousedown", conf.onPointerDown);
-            if (conf.monitor) {
-                Event.add(conf.doc, "mousemove", conf.onPointerMove);
-                Event.add(conf.doc, "mouseup", conf.onPointerUp);
-            }
+  root.drag = function(conf) {
+    conf.gesture = "drag";
+    conf.onPointerDown = function(event) {
+      if (root.pointerStart(event, self, conf)) {
+        if (!conf.monitor) {
+          Event.add(conf.doc, "mousemove", conf.onPointerMove);
+          Event.add(conf.doc, "mouseup", conf.onPointerUp);
         }
-        // Return this object.
-        return self;
+      }
+      // Process event listener.
+      conf.onPointerMove(event, "down");
     };
+    conf.onPointerMove = function(event, state) {
+      if (!conf.tracker)
+        return conf.onPointerDown(event);
+      var bbox = conf.bbox;
+      var touches = event.changedTouches || root.getCoords(event);
+      var length = touches.length;
+      for (var i = 0; i < length; i++) {
+        var touch = touches[i];
+        var identifier = touch.identifier || Infinity;
+        var pt = conf.tracker[identifier];
+        // Identifier defined outside of listener.
+        if (!pt)
+          continue;
+        pt.pageX = touch.pageX;
+        pt.pageY = touch.pageY;
+        // Record data.
+        self.state = state || "move";
+        self.identifier = identifier;
+        self.start = pt.start;
+        self.fingers = conf.fingers;
+        if (conf.position === "relative") {
+          self.x = (pt.pageX + bbox.scrollLeft - pt.offsetX) * bbox.scaleX;
+          self.y = (pt.pageY + bbox.scrollTop - pt.offsetY) * bbox.scaleY;
+        } else {
+          self.x = (pt.pageX - pt.offsetX);
+          self.y = (pt.pageY - pt.offsetY);
+        }
+        ///
+        conf.listener(event, self);
+      }
+    };
+    conf.onPointerUp = function(event) {
+      // Remove tracking for touch.
+      if (root.pointerEnd(event, self, conf, conf.onPointerMove)) {
+        if (!conf.monitor) {
+          Event.remove(conf.doc, "mousemove", conf.onPointerMove);
+          Event.remove(conf.doc, "mouseup", conf.onPointerUp);
+        }
+      }
+    };
+    // Generate maintenance commands, and other configurations.
+    var self = root.pointerSetup(conf);
+    // Attach events.
+    if (conf.event) {
+      conf.onPointerDown(conf.event);
+    } else { //
+      Event.add(conf.target, "mousedown", conf.onPointerDown);
+      if (conf.monitor) {
+        Event.add(conf.doc, "mousemove", conf.onPointerMove);
+        Event.add(conf.doc, "mouseup", conf.onPointerUp);
+      }
+    }
+    // Return this object.
+    return self;
+  };
 
-    Event.Gesture = Event.Gesture || {};
-    Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
-    Event.Gesture._gestureHandlers.drag = root.drag;
+  Event.Gesture = Event.Gesture || {};
+  Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
+  Event.Gesture._gestureHandlers.drag = root.drag;
 
-    return root;
+  return root;
 
 })(Event.proxy);
 /*
@@ -3031,149 +3070,149 @@ Event.proxy = (function(root) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(Event.proxy) === "undefined")
-    Event.proxy = {};
+  Event.proxy = {};
 
 Event.proxy = (function(root) {
-    "use strict";
+  "use strict";
 
-    var RAD_DEG = Math.PI / 180;
+  var RAD_DEG = Math.PI / 180;
 
-    root.gesture = function(conf) {
-        conf.minFingers = conf.minFingers || conf.fingers || 2;
-        // Tracking the events.
-        conf.onPointerDown = function(event) {
-            var fingers = conf.fingers;
-            if (root.pointerStart(event, self, conf)) {
-                Event.add(conf.doc, "mousemove", conf.onPointerMove);
-                Event.add(conf.doc, "mouseup", conf.onPointerUp);
-            }
-            // Record gesture start.
-            if (conf.fingers === conf.minFingers && fingers !== conf.fingers) {
-                self.fingers = conf.minFingers;
-                self.scale = 1;
-                self.rotation = 0;
-                self.state = "start";
-                var sids = ""; //- FIXME(mud): can generate duplicate IDs.
-                for (var key in conf.tracker)
-                    sids += key;
-                self.identifier = parseInt(sids);
-                conf.listener(event, self);
-            }
-        };
-        ///
-        conf.onPointerMove = function(event, state) {
-            var bbox = conf.bbox;
-            var points = conf.tracker;
-            var touches = event.changedTouches || root.getCoords(event);
-            var length = touches.length;
-            // Update tracker coordinates.
-            for (var i = 0; i < length; i++) {
-                var touch = touches[i];
-                var sid = touch.identifier || Infinity;
-                var pt = points[sid];
-                // Check whether "pt" is used by another gesture.
-                if (!pt)
-                    continue;
-                // Find the actual coordinates.
-                if (conf.position === "relative") {
-                    pt.move.x = (touch.pageX + bbox.scrollLeft - bbox.x1) * bbox.scaleX;
-                    pt.move.y = (touch.pageY + bbox.scrollTop - bbox.y1) * bbox.scaleY;
-                } else {
-                    pt.move.x = (touch.pageX - bbox.x1);
-                    pt.move.y = (touch.pageY - bbox.y1);
-                }
-            }
-            ///
-            if (conf.fingers < conf.minFingers)
-                return;
-            ///
-            var touches = [];
-            var scale = 0;
-            var rotation = 0;
-            /// Calculate centroid of gesture.
-            var centroidx = 0;
-            var centroidy = 0;
-            var length = 0;
-            for (var sid in points) {
-                var touch = points[sid];
-                if (touch.up)
-                    continue;
-                centroidx += touch.move.x;
-                centroidy += touch.move.y;
-                length++;
-            }
-            centroidx /= length;
-            centroidy /= length;
-            ///
-            for (var sid in points) {
-                var touch = points[sid];
-                if (touch.up)
-                    continue;
-                var start = touch.start;
-                if (!start.distance) {
-                    var dx = start.x - centroidx;
-                    var dy = start.y - centroidy;
-                    start.distance = Math.sqrt(dx * dx + dy * dy);
-                    start.angle = Math.atan2(dx, dy) / RAD_DEG;
-                }
-                // Calculate scale.
-                var dx = touch.move.x - centroidx;
-                var dy = touch.move.y - centroidy;
-                var distance = Math.sqrt(dx * dx + dy * dy);
-                scale += distance / start.distance;
-                // Calculate rotation.
-                var angle = Math.atan2(dx, dy) / RAD_DEG;
-                var rotate = (start.angle - angle + 360) % 360 - 180;
-                touch.DEG2 = touch.DEG1; // Previous degree.
-                touch.DEG1 = rotate > 0 ? rotate : -rotate; // Current degree.
-                if (typeof(touch.DEG2) !== "undefined") {
-                    if (rotate > 0) {
-                        touch.rotation += touch.DEG1 - touch.DEG2;
-                    } else {
-                        touch.rotation -= touch.DEG1 - touch.DEG2;
-                    }
-                    rotation += touch.rotation;
-                }
-                // Attach current points to self.
-                touches.push(touch.move);
-            }
-            ///
-            self.touches = touches;
-            self.fingers = conf.fingers;
-            self.scale = scale / conf.fingers;
-            self.rotation = rotation / conf.fingers;
-            self.state = "change";
-            conf.listener(event, self);
-        };
-        conf.onPointerUp = function(event) {
-            // Remove tracking for touch.
-            var fingers = conf.fingers;
-            if (root.pointerEnd(event, self, conf)) {
-                Event.remove(conf.doc, "mousemove", conf.onPointerMove);
-                Event.remove(conf.doc, "mouseup", conf.onPointerUp);
-            }
-            // Check whether fingers has dropped below minFingers.
-            if (fingers === conf.minFingers && conf.fingers < conf.minFingers) {
-                self.fingers = conf.fingers;
-                self.state = "end";
-                conf.listener(event, self);
-            }
-        };
-        // Generate maintenance commands, and other configurations.
-        var self = root.pointerSetup(conf);
-        // Attach events.
-        Event.add(conf.target, "mousedown", conf.onPointerDown);
-        // Return this object.
-        return self;
+  root.gesture = function(conf) {
+    conf.minFingers = conf.minFingers || conf.fingers || 2;
+    // Tracking the events.
+    conf.onPointerDown = function(event) {
+      var fingers = conf.fingers;
+      if (root.pointerStart(event, self, conf)) {
+        Event.add(conf.doc, "mousemove", conf.onPointerMove);
+        Event.add(conf.doc, "mouseup", conf.onPointerUp);
+      }
+      // Record gesture start.
+      if (conf.fingers === conf.minFingers && fingers !== conf.fingers) {
+        self.fingers = conf.minFingers;
+        self.scale = 1;
+        self.rotation = 0;
+        self.state = "start";
+        var sids = ""; //- FIXME(mud): can generate duplicate IDs.
+        for (var key in conf.tracker)
+          sids += key;
+        self.identifier = parseInt(sids);
+        conf.listener(event, self);
+      }
     };
+    ///
+    conf.onPointerMove = function(event, state) {
+      var bbox = conf.bbox;
+      var points = conf.tracker;
+      var touches = event.changedTouches || root.getCoords(event);
+      var length = touches.length;
+      // Update tracker coordinates.
+      for (var i = 0; i < length; i++) {
+        var touch = touches[i];
+        var sid = touch.identifier || Infinity;
+        var pt = points[sid];
+        // Check whether "pt" is used by another gesture.
+        if (!pt)
+          continue;
+        // Find the actual coordinates.
+        if (conf.position === "relative") {
+          pt.move.x = (touch.pageX + bbox.scrollLeft - bbox.x1) * bbox.scaleX;
+          pt.move.y = (touch.pageY + bbox.scrollTop - bbox.y1) * bbox.scaleY;
+        } else {
+          pt.move.x = (touch.pageX - bbox.x1);
+          pt.move.y = (touch.pageY - bbox.y1);
+        }
+      }
+      ///
+      if (conf.fingers < conf.minFingers)
+        return;
+      ///
+      var touches = [];
+      var scale = 0;
+      var rotation = 0;
+      /// Calculate centroid of gesture.
+      var centroidx = 0;
+      var centroidy = 0;
+      var length = 0;
+      for (var sid in points) {
+        var touch = points[sid];
+        if (touch.up)
+          continue;
+        centroidx += touch.move.x;
+        centroidy += touch.move.y;
+        length++;
+      }
+      centroidx /= length;
+      centroidy /= length;
+      ///
+      for (var sid in points) {
+        var touch = points[sid];
+        if (touch.up)
+          continue;
+        var start = touch.start;
+        if (!start.distance) {
+          var dx = start.x - centroidx;
+          var dy = start.y - centroidy;
+          start.distance = Math.sqrt(dx * dx + dy * dy);
+          start.angle = Math.atan2(dx, dy) / RAD_DEG;
+        }
+        // Calculate scale.
+        var dx = touch.move.x - centroidx;
+        var dy = touch.move.y - centroidy;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        scale += distance / start.distance;
+        // Calculate rotation.
+        var angle = Math.atan2(dx, dy) / RAD_DEG;
+        var rotate = (start.angle - angle + 360) % 360 - 180;
+        touch.DEG2 = touch.DEG1; // Previous degree.
+        touch.DEG1 = rotate > 0 ? rotate : -rotate; // Current degree.
+        if (typeof(touch.DEG2) !== "undefined") {
+          if (rotate > 0) {
+            touch.rotation += touch.DEG1 - touch.DEG2;
+          } else {
+            touch.rotation -= touch.DEG1 - touch.DEG2;
+          }
+          rotation += touch.rotation;
+        }
+        // Attach current points to self.
+        touches.push(touch.move);
+      }
+      ///
+      self.touches = touches;
+      self.fingers = conf.fingers;
+      self.scale = scale / conf.fingers;
+      self.rotation = rotation / conf.fingers;
+      self.state = "change";
+      conf.listener(event, self);
+    };
+    conf.onPointerUp = function(event) {
+      // Remove tracking for touch.
+      var fingers = conf.fingers;
+      if (root.pointerEnd(event, self, conf)) {
+        Event.remove(conf.doc, "mousemove", conf.onPointerMove);
+        Event.remove(conf.doc, "mouseup", conf.onPointerUp);
+      }
+      // Check whether fingers has dropped below minFingers.
+      if (fingers === conf.minFingers && conf.fingers < conf.minFingers) {
+        self.fingers = conf.fingers;
+        self.state = "end";
+        conf.listener(event, self);
+      }
+    };
+    // Generate maintenance commands, and other configurations.
+    var self = root.pointerSetup(conf);
+    // Attach events.
+    Event.add(conf.target, "mousedown", conf.onPointerDown);
+    // Return this object.
+    return self;
+  };
 
-    Event.Gesture = Event.Gesture || {};
-    Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
-    Event.Gesture._gestureHandlers.gesture = root.gesture;
+  Event.Gesture = Event.Gesture || {};
+  Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
+  Event.Gesture._gestureHandlers.gesture = root.gesture;
 
-    return root;
+  return root;
 
 })(Event.proxy);
 /*
@@ -3187,52 +3226,52 @@ Event.proxy = (function(root) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(Event.proxy) === "undefined")
-    Event.proxy = {};
+  Event.proxy = {};
 
 Event.proxy = (function(root) {
-    "use strict";
+  "use strict";
 
-    root.pointerdown =
-            root.pointermove =
-            root.pointerup = function(conf) {
-        if (conf.target.isPointerEmitter)
-            return;
-        // Tracking the events.
-        var isDown = true;
-        conf.onPointerDown = function(event) {
-            isDown = false;
-            self.gesture = "pointerdown";
-            conf.listener(event, self);
-        };
-        conf.onPointerMove = function(event) {
-            self.gesture = "pointermove";
-            conf.listener(event, self, isDown);
-        };
-        conf.onPointerUp = function(event) {
-            isDown = true;
-            self.gesture = "pointerup";
-            conf.listener(event, self, true);
-        };
-        // Generate maintenance commands, and other configurations.
-        var self = root.pointerSetup(conf);
-        // Attach events.
-        Event.add(conf.target, "mousedown", conf.onPointerDown);
-        Event.add(conf.target, "mousemove", conf.onPointerMove);
-        Event.add(conf.doc, "mouseup", conf.onPointerUp);
-        // Return this object.
-        conf.target.isPointerEmitter = true;
-        return self;
-    };
+  root.pointerdown =
+    root.pointermove =
+    root.pointerup = function(conf) {
+      if (conf.target.isPointerEmitter)
+        return;
+      // Tracking the events.
+      var isDown = true;
+      conf.onPointerDown = function(event) {
+        isDown = false;
+        self.gesture = "pointerdown";
+        conf.listener(event, self);
+      };
+      conf.onPointerMove = function(event) {
+        self.gesture = "pointermove";
+        conf.listener(event, self, isDown);
+      };
+      conf.onPointerUp = function(event) {
+        isDown = true;
+        self.gesture = "pointerup";
+        conf.listener(event, self, true);
+      };
+      // Generate maintenance commands, and other configurations.
+      var self = root.pointerSetup(conf);
+      // Attach events.
+      Event.add(conf.target, "mousedown", conf.onPointerDown);
+      Event.add(conf.target, "mousemove", conf.onPointerMove);
+      Event.add(conf.doc, "mouseup", conf.onPointerUp);
+      // Return this object.
+      conf.target.isPointerEmitter = true;
+      return self;
+  };
 
-    Event.Gesture = Event.Gesture || {};
-    Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
-    Event.Gesture._gestureHandlers.pointerdown = root.pointerdown;
-    Event.Gesture._gestureHandlers.pointermove = root.pointermove;
-    Event.Gesture._gestureHandlers.pointerup = root.pointerup;
+  Event.Gesture = Event.Gesture || {};
+  Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
+  Event.Gesture._gestureHandlers.pointerdown = root.pointerdown;
+  Event.Gesture._gestureHandlers.pointermove = root.pointermove;
+  Event.Gesture._gestureHandlers.pointerup = root.pointerup;
 
-    return root;
+  return root;
 
 })(Event.proxy);
 /*
@@ -3247,100 +3286,113 @@ Event.proxy = (function(root) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(Event.proxy) === "undefined")
-    Event.proxy = {};
+  Event.proxy = {};
 
 Event.proxy = (function(root) {
-    "use strict";
+  "use strict";
 
-    root.shake = function(conf) {
-        // Externally accessible data.
-        var self = {
-            gesture: "devicemotion",
-            acceleration: {},
-            accelerationIncludingGravity: {},
-            target: conf.target,
-            listener: conf.listener,
-            remove: function() {
-                window.removeEventListener('devicemotion', onDeviceMotion, false);
-            }
-        };
-        // Setting up local variables.
-        var threshold = 4; // Gravitational threshold.
-        var timeout = 1000; // Timeout between shake events.
-        var timeframe = 200; // Time between shakes.
-        var shakes = 3; // Minimum shakes to trigger event.
-        var lastShake = (new Date).getTime();
-        var gravity = {x: 0, y: 0, z: 0};
-        var delta = {
-            x: {count: 0, value: 0},
-            y: {count: 0, value: 0},
-            z: {count: 0, value: 0}
-        };
-        // Tracking the events.
-        var onDeviceMotion = function(e) {
-            var alpha = 0.8; // Low pass filter.
-            var o = e.accelerationIncludingGravity;
-            gravity.x = alpha * gravity.x + (1 - alpha) * o.x;
-            gravity.y = alpha * gravity.y + (1 - alpha) * o.y;
-            gravity.z = alpha * gravity.z + (1 - alpha) * o.z;
-            self.accelerationIncludingGravity = gravity;
-            self.acceleration.x = o.x - gravity.x;
-            self.acceleration.y = o.y - gravity.y;
-            self.acceleration.z = o.z - gravity.z;
-            ///
-            if (conf.gesture === "devicemotion") {
-                conf.listener(e, self);
-                return;
-            }
-            var data = "xyz";
-            var now = (new Date).getTime();
-            for (var n = 0, length = data.length; n < length; n++) {
-                var letter = data[n];
-                var ACCELERATION = self.acceleration[letter];
-                var DELTA = delta[letter];
-                var abs = Math.abs(ACCELERATION);
-                /// Check whether another shake event was recently registered.
-                if (now - lastShake < timeout)
-                    continue;
-                /// Check whether delta surpasses threshold.
-                if (abs > threshold) {
-                    var idx = now * ACCELERATION / abs;
-                    var span = Math.abs(idx + DELTA.value);
-                    // Check whether last delta was registered within timeframe.
-                    if (DELTA.value && span < timeframe) {
-                        DELTA.value = idx;
-                        DELTA.count++;
-                        // Check whether delta count has enough shakes.
-                        if (DELTA.count === shakes) {
-                            conf.listener(e, self);
-                            // Reset tracking.
-                            lastShake = now;
-                            DELTA.value = 0;
-                            DELTA.count = 0;
-                        }
-                    } else {
-                        // Track first shake.
-                        DELTA.value = idx;
-                        DELTA.count = 1;
-                    }
-                }
-            }
-        };
-        // Attach events.
-        if (!window.addEventListener)
-            return;
-        window.addEventListener('devicemotion', onDeviceMotion, false);
-        // Return this object.
-        return self;
+  root.shake = function(conf) {
+    // Externally accessible data.
+    var self = {
+      gesture: "devicemotion",
+      acceleration: {},
+      accelerationIncludingGravity: {},
+      target: conf.target,
+      listener: conf.listener,
+      remove: function() {
+        window.removeEventListener('devicemotion', onDeviceMotion, false);
+      }
     };
+    // Setting up local variables.
+    var threshold = 4; // Gravitational threshold.
+    var timeout = 1000; // Timeout between shake events.
+    var timeframe = 200; // Time between shakes.
+    var shakes = 3; // Minimum shakes to trigger event.
+    var lastShake = (new Date).getTime();
+    var gravity = {
+      x: 0,
+      y: 0,
+      z: 0
+    };
+    var delta = {
+      x: {
+        count: 0,
+        value: 0
+      },
+      y: {
+        count: 0,
+        value: 0
+      },
+      z: {
+        count: 0,
+        value: 0
+      }
+    };
+    // Tracking the events.
+    var onDeviceMotion = function(e) {
+      var alpha = 0.8; // Low pass filter.
+      var o = e.accelerationIncludingGravity;
+      gravity.x = alpha * gravity.x + (1 - alpha) * o.x;
+      gravity.y = alpha * gravity.y + (1 - alpha) * o.y;
+      gravity.z = alpha * gravity.z + (1 - alpha) * o.z;
+      self.accelerationIncludingGravity = gravity;
+      self.acceleration.x = o.x - gravity.x;
+      self.acceleration.y = o.y - gravity.y;
+      self.acceleration.z = o.z - gravity.z;
+      ///
+      if (conf.gesture === "devicemotion") {
+        conf.listener(e, self);
+        return;
+      }
+      var data = "xyz";
+      var now = (new Date).getTime();
+      for (var n = 0, length = data.length; n < length; n++) {
+        var letter = data[n];
+        var ACCELERATION = self.acceleration[letter];
+        var DELTA = delta[letter];
+        var abs = Math.abs(ACCELERATION);
+        /// Check whether another shake event was recently registered.
+        if (now - lastShake < timeout)
+          continue;
+        /// Check whether delta surpasses threshold.
+        if (abs > threshold) {
+          var idx = now * ACCELERATION / abs;
+          var span = Math.abs(idx + DELTA.value);
+          // Check whether last delta was registered within timeframe.
+          if (DELTA.value && span < timeframe) {
+            DELTA.value = idx;
+            DELTA.count++;
+            // Check whether delta count has enough shakes.
+            if (DELTA.count === shakes) {
+              conf.listener(e, self);
+              // Reset tracking.
+              lastShake = now;
+              DELTA.value = 0;
+              DELTA.count = 0;
+            }
+          } else {
+            // Track first shake.
+            DELTA.value = idx;
+            DELTA.count = 1;
+          }
+        }
+      }
+    };
+    // Attach events.
+    if (!window.addEventListener)
+      return;
+    window.addEventListener('devicemotion', onDeviceMotion, false);
+    // Return this object.
+    return self;
+  };
 
-    Event.Gesture = Event.Gesture || {};
-    Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
-    Event.Gesture._gestureHandlers.shake = root.shake;
+  Event.Gesture = Event.Gesture || {};
+  Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
+  Event.Gesture._gestureHandlers.shake = root.shake;
 
-    return root;
+  return root;
 
 })(Event.proxy);
 /*
@@ -3354,109 +3406,112 @@ Event.proxy = (function(root) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(Event.proxy) === "undefined")
-    Event.proxy = {};
+  Event.proxy = {};
 
 Event.proxy = (function(root) {
-    "use strict";
+  "use strict";
 
-    var RAD_DEG = Math.PI / 180;
+  var RAD_DEG = Math.PI / 180;
 
-    root.swipe = function(conf) {
-        conf.snap = conf.snap || 90; // angle snap.
-        conf.threshold = conf.threshold || 1; // velocity threshold.
-        // Tracking the events.
-        conf.onPointerDown = function(event) {
-            if (root.pointerStart(event, self, conf)) {
-                Event.add(conf.doc, "mousemove", conf.onPointerMove).listener(event);
-                Event.add(conf.doc, "mouseup", conf.onPointerUp);
-            }
-        };
-        conf.onPointerMove = function(event) {
-            var touches = event.changedTouches || root.getCoords(event);
-            var length = touches.length;
-            for (var i = 0; i < length; i++) {
-                var touch = touches[i];
-                var sid = touch.identifier || Infinity;
-                var o = conf.tracker[sid];
-                // Identifier defined outside of listener.
-                if (!o)
-                    continue;
-                o.move.x = touch.pageX;
-                o.move.y = touch.pageY;
-                o.moveTime = (new Date).getTime();
-            }
-        };
-        conf.onPointerUp = function(event) {
-            if (root.pointerEnd(event, self, conf)) {
-                Event.remove(conf.doc, "mousemove", conf.onPointerMove);
-                Event.remove(conf.doc, "mouseup", conf.onPointerUp);
-                ///
-                var velocity1;
-                var velocity2
-                var degree1;
-                var degree2;
-                /// Calculate centroid of gesture.
-                var start = {x: 0, y: 0};
-                var endx = 0;
-                var endy = 0;
-                var length = 0;
-                ///
-                for (var sid in conf.tracker) {
-                    var touch = conf.tracker[sid];
-                    var xdist = touch.move.x - touch.start.x;
-                    var ydist = touch.move.y - touch.start.y;
-
-                    endx += touch.move.x;
-                    endy += touch.move.y;
-                    start.x += touch.start.x;
-                    start.y += touch.start.y;
-                    length++;
-
-
-                    var distance = Math.sqrt(xdist * xdist + ydist * ydist);
-                    var ms = touch.moveTime - touch.startTime;
-                    var degree2 = Math.atan2(xdist, ydist) / RAD_DEG + 180;
-                    var velocity2 = ms ? distance / ms : 0;
-                    if (typeof(degree1) === "undefined") {
-                        degree1 = degree2;
-                        velocity1 = velocity2;
-                    } else if (Math.abs(degree2 - degree1) <= 20) {
-                        degree1 = (degree1 + degree2) / 2;
-                        velocity1 = (velocity1 + velocity2) / 2;
-                    } else {
-                        return;
-                    }
-                }
-                ///
-                if (velocity1 > conf.threshold) {
-                    start.x /= length;
-                    start.y /= length;
-                    self.start = start;
-                    self.x = endx / length;
-                    self.y = endy / length;
-                    self.angle = -((((degree1 / conf.snap + 0.5) >> 0) * conf.snap || 360) - 360);
-                    self.velocity = velocity1;
-                    self.fingers = conf.gestureFingers;
-                    self.state = "swipe";
-                    conf.listener(event, self);
-                }
-            }
-        };
-        // Generate maintenance commands, and other configurations.
-        var self = root.pointerSetup(conf);
-        // Attach events.
-        Event.add(conf.target, "mousedown", conf.onPointerDown);
-        // Return this object.
-        return self;
+  root.swipe = function(conf) {
+    conf.snap = conf.snap || 90; // angle snap.
+    conf.threshold = conf.threshold || 1; // velocity threshold.
+    // Tracking the events.
+    conf.onPointerDown = function(event) {
+      if (root.pointerStart(event, self, conf)) {
+        Event.add(conf.doc, "mousemove", conf.onPointerMove).listener(event);
+        Event.add(conf.doc, "mouseup", conf.onPointerUp);
+      }
     };
+    conf.onPointerMove = function(event) {
+      var touches = event.changedTouches || root.getCoords(event);
+      var length = touches.length;
+      for (var i = 0; i < length; i++) {
+        var touch = touches[i];
+        var sid = touch.identifier || Infinity;
+        var o = conf.tracker[sid];
+        // Identifier defined outside of listener.
+        if (!o)
+          continue;
+        o.move.x = touch.pageX;
+        o.move.y = touch.pageY;
+        o.moveTime = (new Date).getTime();
+      }
+    };
+    conf.onPointerUp = function(event) {
+      if (root.pointerEnd(event, self, conf)) {
+        Event.remove(conf.doc, "mousemove", conf.onPointerMove);
+        Event.remove(conf.doc, "mouseup", conf.onPointerUp);
+        ///
+        var velocity1;
+        var velocity2
+        var degree1;
+        var degree2;
+        /// Calculate centroid of gesture.
+        var start = {
+          x: 0,
+          y: 0
+        };
+        var endx = 0;
+        var endy = 0;
+        var length = 0;
+        ///
+        for (var sid in conf.tracker) {
+          var touch = conf.tracker[sid];
+          var xdist = touch.move.x - touch.start.x;
+          var ydist = touch.move.y - touch.start.y;
 
-    Event.Gesture = Event.Gesture || {};
-    Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
-    Event.Gesture._gestureHandlers.swipe = root.swipe;
+          endx += touch.move.x;
+          endy += touch.move.y;
+          start.x += touch.start.x;
+          start.y += touch.start.y;
+          length++;
 
-    return root;
+
+          var distance = Math.sqrt(xdist * xdist + ydist * ydist);
+          var ms = touch.moveTime - touch.startTime;
+          var degree2 = Math.atan2(xdist, ydist) / RAD_DEG + 180;
+          var velocity2 = ms ? distance / ms : 0;
+          if (typeof(degree1) === "undefined") {
+            degree1 = degree2;
+            velocity1 = velocity2;
+          } else if (Math.abs(degree2 - degree1) <= 20) {
+            degree1 = (degree1 + degree2) / 2;
+            velocity1 = (velocity1 + velocity2) / 2;
+          } else {
+            return;
+          }
+        }
+        ///
+        if (velocity1 > conf.threshold) {
+          start.x /= length;
+          start.y /= length;
+          self.start = start;
+          self.x = endx / length;
+          self.y = endy / length;
+          self.angle = -((((degree1 / conf.snap + 0.5) >> 0) * conf.snap || 360) - 360);
+          self.velocity = velocity1;
+          self.fingers = conf.gestureFingers;
+          self.state = "swipe";
+          conf.listener(event, self);
+        }
+      }
+    };
+    // Generate maintenance commands, and other configurations.
+    var self = root.pointerSetup(conf);
+    // Attach events.
+    Event.add(conf.target, "mousedown", conf.onPointerDown);
+    // Return this object.
+    return self;
+  };
+
+  Event.Gesture = Event.Gesture || {};
+  Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
+  Event.Gesture._gestureHandlers.swipe = root.swipe;
+
+  return root;
 
 })(Event.proxy);
 /*
@@ -3473,117 +3528,117 @@ Event.proxy = (function(root) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(Event.proxy) === "undefined")
-    Event.proxy = {};
+  Event.proxy = {};
 
 Event.proxy = (function(root) {
-    "use strict";
+  "use strict";
 
-    root.tap =
-            root.longpress = function(conf) {
-        conf.delay = conf.delay || 500;
-        conf.timeout = conf.timeout || 250;
-        // Setting up local variables.
-        var timestamp, timeout;
-        // Tracking the events.
-        conf.onPointerDown = function(event) {
-            if (root.pointerStart(event, self, conf)) {
-                timestamp = (new Date).getTime();
-                // Initialize event listeners.
-                Event.add(conf.doc, "mousemove", conf.onPointerMove).listener(event);
-                Event.add(conf.doc, "mouseup", conf.onPointerUp);
-                // Make sure this is a "longpress" event.
-                if (conf.gesture !== "longpress")
-                    return;
-                timeout = setTimeout(function() {
-                    if (event.cancelBubble && ++event.bubble > 1)
-                        return;
-                    // Make sure no fingers have been changed.
-                    var fingers = 0;
-                    for (var key in conf.tracker) {
-                        if (conf.tracker[key].end === true)
-                            return;
-                        if (conf.cancel)
-                            return;
-                        fingers++;
-                    }
-                    // Send callback.
-                    self.state = "start";
-                    self.fingers = fingers;
-                    conf.listener(event, self);
-                }, conf.delay);
+  root.tap =
+    root.longpress = function(conf) {
+      conf.delay = conf.delay || 500;
+      conf.timeout = conf.timeout || 250;
+      // Setting up local variables.
+      var timestamp, timeout;
+      // Tracking the events.
+      conf.onPointerDown = function(event) {
+        if (root.pointerStart(event, self, conf)) {
+          timestamp = (new Date).getTime();
+          // Initialize event listeners.
+          Event.add(conf.doc, "mousemove", conf.onPointerMove).listener(event);
+          Event.add(conf.doc, "mouseup", conf.onPointerUp);
+          // Make sure this is a "longpress" event.
+          if (conf.gesture !== "longpress")
+            return;
+          timeout = setTimeout(function() {
+            if (event.cancelBubble && ++event.bubble > 1)
+              return;
+            // Make sure no fingers have been changed.
+            var fingers = 0;
+            for (var key in conf.tracker) {
+              if (conf.tracker[key].end === true)
+                return;
+              if (conf.cancel)
+                return;
+              fingers++;
             }
-        };
-        conf.onPointerMove = function(event) {
-            var bbox = conf.bbox;
-            var touches = event.changedTouches || root.getCoords(event);
-            var length = touches.length;
-            for (var i = 0; i < length; i++) {
-                var touch = touches[i];
-                var identifier = touch.identifier || Infinity;
-                var pt = conf.tracker[identifier];
-                if (!pt)
-                    continue;
-                if (conf.position === "relative") {
-                    var x = (touch.pageX + bbox.scrollLeft - bbox.x1) * bbox.scaleX;
-                    var y = (touch.pageY + bbox.scrollTop - bbox.y1) * bbox.scaleY;
-                } else {
-                    var x = (touch.pageX - bbox.x1);
-                    var y = (touch.pageY - bbox.y1);
-                }
-                if (!(x > 0 && x < bbox.width && // Within target coordinates..
-                        y > 0 && y < bbox.height &&
-                        Math.abs(x - pt.start.x) <= 25 && // Within drift deviance.
-                        Math.abs(y - pt.start.y) <= 25)) {
-                    // Cancel out this listener.
-                    Event.remove(conf.doc, "mousemove", conf.onPointerMove);
-                    conf.cancel = true;
-                    return;
-                }
+            // Send callback.
+            self.state = "start";
+            self.fingers = fingers;
+            conf.listener(event, self);
+          }, conf.delay);
+        }
+      };
+      conf.onPointerMove = function(event) {
+        var bbox = conf.bbox;
+        var touches = event.changedTouches || root.getCoords(event);
+        var length = touches.length;
+        for (var i = 0; i < length; i++) {
+          var touch = touches[i];
+          var identifier = touch.identifier || Infinity;
+          var pt = conf.tracker[identifier];
+          if (!pt)
+            continue;
+          if (conf.position === "relative") {
+            var x = (touch.pageX + bbox.scrollLeft - bbox.x1) * bbox.scaleX;
+            var y = (touch.pageY + bbox.scrollTop - bbox.y1) * bbox.scaleY;
+          } else {
+            var x = (touch.pageX - bbox.x1);
+            var y = (touch.pageY - bbox.y1);
+          }
+          if (!(x > 0 && x < bbox.width && // Within target coordinates..
+            y > 0 && y < bbox.height &&
+            Math.abs(x - pt.start.x) <= 25 && // Within drift deviance.
+            Math.abs(y - pt.start.y) <= 25)) {
+            // Cancel out this listener.
+            Event.remove(conf.doc, "mousemove", conf.onPointerMove);
+            conf.cancel = true;
+            return;
+          }
+        }
+      };
+      conf.onPointerUp = function(event) {
+        if (root.pointerEnd(event, self, conf)) {
+          clearTimeout(timeout);
+          Event.remove(conf.doc, "mousemove", conf.onPointerMove);
+          Event.remove(conf.doc, "mouseup", conf.onPointerUp);
+          if (event.cancelBubble && ++event.bubble > 1)
+            return;
+          // Callback release on longpress.
+          if (conf.gesture === "longpress") {
+            if (self.state === "start") {
+              self.state = "end";
+              conf.listener(event, self);
             }
-        };
-        conf.onPointerUp = function(event) {
-            if (root.pointerEnd(event, self, conf)) {
-                clearTimeout(timeout);
-                Event.remove(conf.doc, "mousemove", conf.onPointerMove);
-                Event.remove(conf.doc, "mouseup", conf.onPointerUp);
-                if (event.cancelBubble && ++event.bubble > 1)
-                    return;
-                // Callback release on longpress.
-                if (conf.gesture === "longpress") {
-                    if (self.state === "start") {
-                        self.state = "end";
-                        conf.listener(event, self);
-                    }
-                    return;
-                }
-                // Cancel event due to movement.
-                if (conf.cancel)
-                    return;
-                // Ensure delay is within margins.
-                if ((new Date).getTime() - timestamp > conf.timeout)
-                    return;
-                // Send callback.
-                self.state = "tap";
-                self.fingers = conf.gestureFingers;
-                conf.listener(event, self);
-            }
-        };
-        // Generate maintenance commands, and other configurations.
-        var self = root.pointerSetup(conf);
-        // Attach events.
-        Event.add(conf.target, "mousedown", conf.onPointerDown);
-        // Return this object.
-        return self;
-    };
+            return;
+          }
+          // Cancel event due to movement.
+          if (conf.cancel)
+            return;
+          // Ensure delay is within margins.
+          if ((new Date).getTime() - timestamp > conf.timeout)
+            return;
+          // Send callback.
+          self.state = "tap";
+          self.fingers = conf.gestureFingers;
+          conf.listener(event, self);
+        }
+      };
+      // Generate maintenance commands, and other configurations.
+      var self = root.pointerSetup(conf);
+      // Attach events.
+      Event.add(conf.target, "mousedown", conf.onPointerDown);
+      // Return this object.
+      return self;
+  };
 
-    Event.Gesture = Event.Gesture || {};
-    Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
-    Event.Gesture._gestureHandlers.tap = root.tap;
-    Event.Gesture._gestureHandlers.longpress = root.longpress;
+  Event.Gesture = Event.Gesture || {};
+  Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
+  Event.Gesture._gestureHandlers.tap = root.tap;
+  Event.Gesture._gestureHandlers.longpress = root.longpress;
 
-    return root;
+  return root;
 
 })(Event.proxy);
 /*
@@ -3595,70 +3650,70 @@ Event.proxy = (function(root) {
  */
 
 if (typeof(Event) === "undefined")
-    var Event = {};
+  var Event = {};
 if (typeof(Event.proxy) === "undefined")
-    Event.proxy = {};
+  Event.proxy = {};
 
 Event.proxy = (function(root) {
-    "use strict";
+  "use strict";
 
-    root.wheel = function(conf) {
-        // Configure event listener.
-        var interval;
-        var timeout = conf.timeout || 150;
-        var count = 0;
-        // Externally accessible data.
-        var self = {
-            gesture: "wheel",
-            state: "start",
-            wheelDelta: 0,
-            target: conf.target,
-            listener: conf.listener,
-            remove: function() {
-                conf.target[remove](type, onMouseWheel, false);
-            }
-        };
-        // Tracking the events.
-        var onMouseWheel = function(event) {
-            event = event || window.event;
-            self.state = count++ ? "change" : "start";
-            self.wheelDelta = event.detail ? event.detail * -20 : event.wheelDelta;
-            conf.listener(event, self);
-            clearTimeout(interval);
-            interval = setTimeout(function() {
-                count = 0;
-                self.state = "end";
-                self.wheelDelta = 0;
-                conf.listener(event, self);
-            }, timeout);
-        };
-        // Attach events.
-        var add = document.addEventListener ? "addEventListener" : "attachEvent";
-        var remove = document.removeEventListener ? "removeEventListener" : "detachEvent";
-        var type = Event.supports("mousewheel") ? "mousewheel" : "DOMMouseScroll";
-        conf.target[add](type, onMouseWheel, false);
-        // Return this object.
-        return self;
+  root.wheel = function(conf) {
+    // Configure event listener.
+    var interval;
+    var timeout = conf.timeout || 150;
+    var count = 0;
+    // Externally accessible data.
+    var self = {
+      gesture: "wheel",
+      state: "start",
+      wheelDelta: 0,
+      target: conf.target,
+      listener: conf.listener,
+      remove: function() {
+        conf.target[remove](type, onMouseWheel, false);
+      }
     };
+    // Tracking the events.
+    var onMouseWheel = function(event) {
+      event = event || window.event;
+      self.state = count++ ? "change" : "start";
+      self.wheelDelta = event.detail ? event.detail * -20 : event.wheelDelta;
+      conf.listener(event, self);
+      clearTimeout(interval);
+      interval = setTimeout(function() {
+        count = 0;
+        self.state = "end";
+        self.wheelDelta = 0;
+        conf.listener(event, self);
+      }, timeout);
+    };
+    // Attach events.
+    var add = document.addEventListener ? "addEventListener" : "attachEvent";
+    var remove = document.removeEventListener ? "removeEventListener" : "detachEvent";
+    var type = Event.supports("mousewheel") ? "mousewheel" : "DOMMouseScroll";
+    conf.target[add](type, onMouseWheel, false);
+    // Return this object.
+    return self;
+  };
 
-    Event.Gesture = Event.Gesture || {};
-    Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
-    Event.Gesture._gestureHandlers.wheel = root.wheel;
+  Event.Gesture = Event.Gesture || {};
+  Event.Gesture._gestureHandlers = Event.Gesture._gestureHandlers || {};
+  Event.Gesture._gestureHandlers.wheel = root.wheel;
 
-    return root;
+  return root;
 
 })(Event.proxy);
 /**
  * Wrapper around `console.log` (when available)
  * @param {Any} values Values to log
  */
-fabric.log = function() { };
+fabric.log = function() {};
 
 /**
  * Wrapper around `console.warn` (when available)
  * @param {Any} Values to log as a warning
  */
-fabric.warn = function() { };
+fabric.warn = function() {};
 
 if (typeof console !== 'undefined') {
   if (typeof console.log !== 'undefined' && console.log.apply) {
@@ -3672,20 +3727,20 @@ if (typeof console !== 'undefined') {
     };
   }
 }
-(function(){
+(function() {
 
   /**
    * @private
    * @param {String} eventName
    * @param {Function} handler
    */
+
   function _removeEventListener(eventName, handler) {
     if (!this.__eventListeners[eventName]) return;
 
     if (handler) {
       fabric.util.removeFromArray(this.__eventListeners[eventName], handler);
-    }
-    else {
+    } else {
       this.__eventListeners[eventName].length = 0;
     }
   }
@@ -3700,19 +3755,19 @@ if (typeof console !== 'undefined') {
    * @return {Self} thisArg
    * @chainable
    */
+
   function observe(eventName, handler) {
     if (!this.__eventListeners) {
-      this.__eventListeners = { };
+      this.__eventListeners = {};
     }
     // one object with key/value pairs was passed
     if (arguments.length === 1) {
       for (var prop in eventName) {
         this.on(prop, eventName[prop]);
       }
-    }
-    else {
+    } else {
       if (!this.__eventListeners[eventName]) {
-        this.__eventListeners[eventName] = [ ];
+        this.__eventListeners[eventName] = [];
       }
       this.__eventListeners[eventName].push(handler);
     }
@@ -3729,6 +3784,7 @@ if (typeof console !== 'undefined') {
    * @return {Self} thisArg
    * @chainable
    */
+
   function stopObserving(eventName, handler) {
     if (!this.__eventListeners) return;
 
@@ -3737,8 +3793,7 @@ if (typeof console !== 'undefined') {
       for (var prop in eventName) {
         _removeEventListener.call(this, prop, eventName[prop]);
       }
-    }
-    else {
+    } else {
       _removeEventListener.call(this, eventName, handler);
     }
     return this;
@@ -3754,6 +3809,7 @@ if (typeof console !== 'undefined') {
    * @return {Self} thisArg
    * @chainable
    */
+
   function fire(eventName, options) {
     if (!this.__eventListeners) return;
 
@@ -3761,7 +3817,7 @@ if (typeof console !== 'undefined') {
     if (!listenersForEvent) return;
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
       // avoiding try/catch for perf. reasons
-      listenersForEvent[i].call(this, options || { });
+      listenersForEvent[i].call(this, options || {});
     }
     return this;
   }
@@ -3790,9 +3846,9 @@ fabric.Collection = {
    * @param [...] Zero or more fabric instances
    * @return {Self} thisArg
    */
-  add: function () {
+  add: function() {
     this._objects.push.apply(this._objects, arguments);
-    for (var i = arguments.length; i--; ) {
+    for (var i = arguments.length; i--;) {
       this._onObjectAdded(arguments[i]);
     }
     this.renderOnAddRemove && this.renderAll();
@@ -3807,12 +3863,11 @@ fabric.Collection = {
    * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
    * @return {Self} thisArg
    */
-  insertAt: function (object, index, nonSplicing) {
+  insertAt: function(object, index, nonSplicing) {
     var objects = this.getObjects();
     if (nonSplicing) {
       objects[index] = object;
-    }
-    else {
+    } else {
       objects.splice(index, 0, object);
     }
     this._onObjectAdded(object);
@@ -3827,7 +3882,7 @@ fabric.Collection = {
    */
   remove: function(object) {
     var objects = this.getObjects(),
-        index = objects.indexOf(object);
+      index = objects.indexOf(object);
 
     // only call onObjectRemoved if an object was actually removed
     if (index !== -1) {
@@ -3853,7 +3908,7 @@ fabric.Collection = {
    */
   forEachObject: function(callback, context) {
     var objects = this.getObjects(),
-        i = objects.length;
+      i = objects.length;
     while (i--) {
       callback.call(context, objects[i], i, objects);
     }
@@ -3865,7 +3920,7 @@ fabric.Collection = {
    * @param {Number} index
    * @return {Self} thisArg
    */
-  item: function (index) {
+  item: function(index) {
     return this.getObjects()[index];
   },
 
@@ -3873,7 +3928,7 @@ fabric.Collection = {
    * Returns true if collection contains no objects
    * @return {Boolean} true if collection is empty
    */
-  isEmpty: function () {
+  isEmpty: function() {
     return this.getObjects().length === 0;
   },
 
@@ -3898,8 +3953,8 @@ fabric.Collection = {
    * Returns number representation of a collection complexity
    * @return {Number} complexity
    */
-  complexity: function () {
-    return this.getObjects().reduce(function (memo, current) {
+  complexity: function() {
+    return this.getObjects().reduce(function(memo, current) {
       memo += current.complexity ? current.complexity() : 0;
       return memo;
     }, 0);
@@ -3918,12 +3973,12 @@ fabric.Collection = {
 (function() {
 
   var sqrt = Math.sqrt,
-      atan2 = Math.atan2;
+    atan2 = Math.atan2;
 
   /**
    * @namespace fabric.util
    */
-  fabric.util = { };
+  fabric.util = {};
 
   /**
    * Removes value from an array.
@@ -3934,6 +3989,7 @@ fabric.Collection = {
    * @param {Any} value
    * @return {Array} original array
    */
+
   function removeFromArray(array, value) {
     var idx = array.indexOf(value);
     if (idx !== -1) {
@@ -3950,6 +4006,7 @@ fabric.Collection = {
    * @param {Number} max upper limit
    * @return {Number} random value (between min and max)
    */
+
   function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -3963,6 +4020,7 @@ fabric.Collection = {
    * @param {Number} degrees value in degrees
    * @return {Number} value in radians
    */
+
   function degreesToRadians(degrees) {
     return degrees * PiBy180;
   }
@@ -3974,6 +4032,7 @@ fabric.Collection = {
    * @param {Number} radians value in radians
    * @return {Number} value in degrees
    */
+
   function radiansToDegrees(radians) {
     return radians / PiBy180;
   }
@@ -3987,9 +4046,10 @@ fabric.Collection = {
    * @param {Number} The radians of the angle for the rotation
    * @return {fabric.Point} The new rotated point
    */
+
   function rotatePoint(point, origin, radians) {
     var sin = Math.sin(radians),
-        cos = Math.cos(radians);
+      cos = Math.cos(radians);
 
     point.subtractEquals(origin);
 
@@ -4007,43 +4067,47 @@ fabric.Collection = {
    * @param {Number} fractionDigits number of fraction digits to "leave"
    * @return {Number}
    */
-   function toFixed(number, fractionDigits) {
-     return parseFloat(Number(number).toFixed(fractionDigits));
-   }
 
-   /**
-    * Function which always returns `false`.
-    * @static
-    * @memberOf fabric.util
-    * @return {Boolean}
-    */
-   function falseFunction() {
-     return false;
-   }
+  function toFixed(number, fractionDigits) {
+    return parseFloat(Number(number).toFixed(fractionDigits));
+  }
 
   /**
-    * Returns klass "Class" object of given namespace
-    * @memberOf fabric.util
-    * @param {String} type Type of object (eg. 'circle')
-    * @param {String} namespace Namespace to get klass "Class" object from
-    * @return {Object} klass "Class"
-    */
+   * Function which always returns `false`.
+   * @static
+   * @memberOf fabric.util
+   * @return {Boolean}
+   */
+
+  function falseFunction() {
+    return false;
+  }
+
+  /**
+   * Returns klass "Class" object of given namespace
+   * @memberOf fabric.util
+   * @param {String} type Type of object (eg. 'circle')
+   * @param {String} namespace Namespace to get klass "Class" object from
+   * @return {Object} klass "Class"
+   */
+
   function getKlass(type, namespace) {
     return resolveNamespace(namespace)[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
   }
 
   /**
-    * Returns object of given namespace
-    * @memberOf fabric.util
-    * @param {String} namespace Namespace string e.g. 'fabric.Image.filter' or 'fabric'
-    * @return {Object} Object for given namespace (default fabric)
-    */
+   * Returns object of given namespace
+   * @memberOf fabric.util
+   * @param {String} namespace Namespace string e.g. 'fabric.Image.filter' or 'fabric'
+   * @return {Object} Object for given namespace (default fabric)
+   */
+
   function resolveNamespace(namespace) {
     if (!namespace) return fabric;
 
     var parts = namespace.split('.'),
-        len = parts.length,
-        obj = fabric.window;
+      len = parts.length,
+      obj = fabric.window;
 
     for (var i = 0; i < len; ++i) {
       obj = obj[parts[i]];
@@ -4053,23 +4117,23 @@ fabric.Collection = {
   }
 
   /**
-    * Loads image element from given url and passes it to a callback
-    * @memberOf fabric.util
-    * @param {String} url URL representing an image
-    * @param {Function} callback Callback; invoked with loaded image
-    * @param {Any} context optional Context to invoke callback in
-    */
+   * Loads image element from given url and passes it to a callback
+   * @memberOf fabric.util
+   * @param {String} url URL representing an image
+   * @param {Function} callback Callback; invoked with loaded image
+   * @param {Any} context optional Context to invoke callback in
+   */
+
   function loadImage(url, callback, context) {
     if (url) {
       var img = fabric.util.createImage();
       /** @ignore */
-      img.onload = function () {
+      img.onload = function() {
         callback && callback.call(context, img);
         img = img.onload = null;
       };
       img.src = url;
-    }
-    else {
+    } else {
       callback && callback.call(context, url);
     }
   }
@@ -4082,6 +4146,7 @@ fabric.Collection = {
    * @param {Function} callback Callback to invoke when all objects are created
    * @param {Function} [reviver] Method for further parsing of object elements, called after each fabric object created.
    */
+
   function enlivenObjects(objects, callback, namespace, reviver) {
 
     function onLoaded() {
@@ -4092,25 +4157,24 @@ fabric.Collection = {
       }
     }
 
-    var enlivenedObjects = [ ],
-        numLoadedObjects = 0,
-        numTotalObjects = objects.length;
+    var enlivenedObjects = [],
+      numLoadedObjects = 0,
+      numTotalObjects = objects.length;
 
-    objects.forEach(function (o, index) {
+    objects.forEach(function(o, index) {
       if (!o.type) {
         return;
       }
       var klass = fabric.util.getKlass(o.type, namespace);
       if (klass.async) {
-        klass.fromObject(o, function (obj, error) {
+        klass.fromObject(o, function(obj, error) {
           if (!error) {
             enlivenedObjects[index] = obj;
             reviver && reviver(o, enlivenedObjects[index]);
           }
           onLoaded();
         });
-      }
-      else {
+      } else {
         enlivenedObjects[index] = klass.fromObject(o);
         reviver && reviver(o, enlivenedObjects[index]);
         onLoaded();
@@ -4126,13 +4190,13 @@ fabric.Collection = {
    * @param {Object} [options] Options object
    * @return {fabric.Object|fabric.PathGroup}
    */
+
   function groupSVGElements(elements, options, path) {
     var object;
 
     if (elements.length > 1) {
       object = new fabric.PathGroup(elements, options);
-    }
-    else {
+    } else {
       object = elements[0];
     }
 
@@ -4150,6 +4214,7 @@ fabric.Collection = {
    * @param {Object} destination Destination object
    * @return {Array} properties Propertie names to include
    */
+
   function populateWithProperties(source, destination, properties) {
     if (properties && Object.prototype.toString.call(properties) === '[object Array]') {
       for (var i = 0, len = properties.length; i < len; i++) {
@@ -4173,14 +4238,15 @@ fabric.Collection = {
    * @param y2 {Number} end y coordinate
    * @param da {Array} dash array pattern
    */
+
   function drawDashedLine(ctx, x, y, x2, y2, da) {
     var dx = x2 - x,
-        dy = y2 - y,
-        len = sqrt(dx*dx + dy*dy),
-        rot = atan2(dy, dx),
-        dc = da.length,
-        di = 0,
-        draw = true;
+      dy = y2 - y,
+      len = sqrt(dx * dx + dy * dy),
+      rot = atan2(dy, dx),
+      dc = da.length,
+      di = 0,
+      draw = true;
 
     ctx.save();
     ctx.translate(x, y);
@@ -4207,6 +4273,7 @@ fabric.Collection = {
    * @param {CanvasElement} [canvasEl] optional canvas element to initialize; when not given, element is created implicitly
    * @return {CanvasElement} initialized canvas element
    */
+
   function createCanvasElement(canvasEl) {
     canvasEl || (canvasEl = fabric.document.createElement('canvas'));
     if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
@@ -4221,10 +4288,9 @@ fabric.Collection = {
    * @memberOf fabric.util
    * @return {HTMLImageElement} HTML image element
    */
+
   function createImage() {
-    return fabric.isLikelyNode
-      ? new (require('canvas').Image)()
-      : fabric.document.createElement('img');
+    return fabric.isLikelyNode ? new(require('canvas').Image)() : fabric.document.createElement('img');
   }
 
   /**
@@ -4233,15 +4299,16 @@ fabric.Collection = {
    * @memberOf fabric.util
    * @param {Object} klass "Class" to create accessors for
    */
+
   function createAccessors(klass) {
     var proto = klass.prototype;
 
-    for (var i = proto.stateProperties.length; i--; ) {
+    for (var i = proto.stateProperties.length; i--;) {
 
       var propName = proto.stateProperties[i],
-          capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1),
-          setterName = 'set' + capitalizedPropName,
-          getterName = 'get' + capitalizedPropName;
+        capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1),
+        setterName = 'set' + capitalizedPropName,
+        getterName = 'get' + capitalizedPropName;
 
       // using `new Function` for better introspection
       if (!proto[getterName]) {
@@ -4263,6 +4330,7 @@ fabric.Collection = {
    * @param {fabric.Object} receiver Object implementing `clipTo` method
    * @param {CanvasRenderingContext2D} ctx Context to clip
    */
+
   function clipContext(receiver, ctx) {
     ctx.save();
     ctx.beginPath();
@@ -4278,27 +4346,28 @@ fabric.Collection = {
    * @param  {Array} matrixB Second transformMatrix
    * @return {Array} The product of the two transform matrices
    */
+
   function multiplyTransformMatrices(matrixA, matrixB) {
     // Matrix multiply matrixA * matrixB
     var a = [
       [matrixA[0], matrixA[2], matrixA[4]],
       [matrixA[1], matrixA[3], matrixA[5]],
-      [0         , 0         , 1         ]
+      [0, 0, 1]
     ];
 
     var b = [
       [matrixB[0], matrixB[2], matrixB[4]],
       [matrixB[1], matrixB[3], matrixB[5]],
-      [0         , 0         , 1         ]
+      [0, 0, 1]
     ];
 
     var result = [];
-    for (var r=0; r<3; r++) {
+    for (var r = 0; r < 3; r++) {
       result[r] = [];
-      for (var c=0; c<3; c++) {
+      for (var c = 0; c < 3; c++) {
         var sum = 0;
-        for (var k=0; k<3; k++) {
-          sum += a[r][k]*b[k][c];
+        for (var k = 0; k < 3; k++) {
+          sum += a[r][k] * b[k][c];
         }
 
         result[r][c] = sum;
@@ -4328,32 +4397,33 @@ fabric.Collection = {
     var ex = coords[5];
     var ey = coords[6];
     var segs = arcToSegments(ex, ey, rx, ry, large, sweep, rot, x, y);
-    for (var i=0; i<segs.length; i++) {
-     var bez = segmentToBezier.apply(this, segs[i]);
-     ctx.bezierCurveTo.apply(ctx, bez);
+    for (var i = 0; i < segs.length; i++) {
+      var bez = segmentToBezier.apply(this, segs[i]);
+      ctx.bezierCurveTo.apply(ctx, bez);
     }
   }
 
-  var arcToSegmentsCache = { },
-      segmentToBezierCache = { },
-      _join = Array.prototype.join,
-      argsString;
+  var arcToSegmentsCache = {},
+    segmentToBezierCache = {},
+    _join = Array.prototype.join,
+    argsString;
 
   // Generous contribution by Raph Levien, from libsvg-0.1.0.tar.gz
+
   function arcToSegments(x, y, rx, ry, large, sweep, rotateX, ox, oy) {
     argsString = _join.call(arguments);
     if (arcToSegmentsCache[argsString]) {
       return arcToSegmentsCache[argsString];
     }
 
-    var th = rotateX * (Math.PI/180);
+    var th = rotateX * (Math.PI / 180);
     var sin_th = Math.sin(th);
     var cos_th = Math.cos(th);
     rx = Math.abs(rx);
     ry = Math.abs(ry);
     var px = cos_th * (ox - x) * 0.5 + sin_th * (oy - y) * 0.5;
     var py = cos_th * (oy - y) * 0.5 - sin_th * (ox - x) * 0.5;
-    var pl = (px*px) / (rx*rx) + (py*py) / (ry*ry);
+    var pl = (px * px) / (rx * rx) + (py * py) / (ry * ry);
     if (pl > 1) {
       pl = Math.sqrt(pl);
       rx *= pl;
@@ -4369,29 +4439,29 @@ fabric.Collection = {
     var x1 = a00 * x + a01 * y;
     var y1 = a10 * x + a11 * y;
 
-    var d = (x1-x0) * (x1-x0) + (y1-y0) * (y1-y0);
+    var d = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0);
     var sfactor_sq = 1 / d - 0.25;
     if (sfactor_sq < 0) sfactor_sq = 0;
     var sfactor = Math.sqrt(sfactor_sq);
     if (sweep === large) sfactor = -sfactor;
-    var xc = 0.5 * (x0 + x1) - sfactor * (y1-y0);
-    var yc = 0.5 * (y0 + y1) + sfactor * (x1-x0);
+    var xc = 0.5 * (x0 + x1) - sfactor * (y1 - y0);
+    var yc = 0.5 * (y0 + y1) + sfactor * (x1 - x0);
 
-    var th0 = Math.atan2(y0-yc, x0-xc);
-    var th1 = Math.atan2(y1-yc, x1-xc);
+    var th0 = Math.atan2(y0 - yc, x0 - xc);
+    var th1 = Math.atan2(y1 - yc, x1 - xc);
 
-    var th_arc = th1-th0;
-    if (th_arc < 0 && sweep === 1){
-      th_arc += 2*Math.PI;
+    var th_arc = th1 - th0;
+    if (th_arc < 0 && sweep === 1) {
+      th_arc += 2 * Math.PI;
     } else if (th_arc > 0 && sweep === 0) {
       th_arc -= 2 * Math.PI;
     }
 
     var segments = Math.ceil(Math.abs(th_arc / (Math.PI * 0.5 + 0.001)));
     var result = [];
-    for (var i=0; i<segments; i++) {
+    for (var i = 0; i < segments; i++) {
       var th2 = th0 + i * th_arc / segments;
-      var th3 = th0 + (i+1) * th_arc / segments;
+      var th3 = th0 + (i + 1) * th_arc / segments;
       result[i] = [xc, yc, th2, th3, rx, ry, sin_th, cos_th];
     }
 
@@ -4411,7 +4481,7 @@ fabric.Collection = {
     var a11 = cos_th * ry;
 
     var th_half = 0.5 * (th1 - th0);
-    var t = (8/3) * Math.sin(th_half * 0.5) * Math.sin(th_half * 0.5) / Math.sin(th_half);
+    var t = (8 / 3) * Math.sin(th_half * 0.5) * Math.sin(th_half * 0.5) / Math.sin(th_half);
     var x1 = cx + Math.cos(th0) - t * Math.sin(th0);
     var y1 = cy + Math.sin(th0) + t * Math.cos(th0);
     var x3 = cx + Math.cos(th1);
@@ -4420,9 +4490,9 @@ fabric.Collection = {
     var y2 = y3 - t * Math.cos(th1);
 
     segmentToBezierCache[argsString] = [
-      a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
-      a00 * x2 + a01 * y2,      a10 * x2 + a11 * y2,
-      a00 * x3 + a01 * y3,      a10 * x3 + a11 * y3
+      a00 * x1 + a01 * y1, a10 * x1 + a11 * y1,
+      a00 * x2 + a01 * y2, a10 * x2 + a11 * y2,
+      a00 * x3 + a01 * y3, a10 * x3 + a11 * y3
     ];
 
     return segmentToBezierCache[argsString];
@@ -4464,11 +4534,12 @@ fabric.Collection = {
      * @param {Number} [fromIndex]
      * @return {Number}
      */
-    Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
+    Array.prototype.indexOf = function(searchElement /*, fromIndex */ ) {
       if (this === void 0 || this === null) {
         throw new TypeError();
       }
-      var t = Object(this), len = t.length >>> 0;
+      var t = Object(this),
+        len = t.length >>> 0;
       if (len === 0) {
         return -1;
       }
@@ -4477,8 +4548,7 @@ fabric.Collection = {
         n = Number(arguments[1]);
         if (n !== n) { // shortcut for verifying if it's NaN
           n = 0;
-        }
-        else if (n !== 0 && n !== Number.POSITIVE_INFINITY && n !== Number.NEGATIVE_INFINITY) {
+        } else if (n !== 0 && n !== Number.POSITIVE_INFINITY && n !== Number.NEGATIVE_INFINITY) {
           n = (n > 0 || -1) * Math.floor(Math.abs(n));
         }
       }
@@ -4519,7 +4589,7 @@ fabric.Collection = {
      * @return {Array}
      */
     Array.prototype.map = function(fn, context) {
-      var result = [ ];
+      var result = [];
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
         if (i in this) {
           result[i] = fn.call(context, this[i], i, this);
@@ -4571,7 +4641,8 @@ fabric.Collection = {
      * @return {Array}
      */
     Array.prototype.filter = function(fn, context) {
-      var result = [ ], val;
+      var result = [],
+        val;
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
         if (i in this) {
           val = this[i]; // in case fn mutates this
@@ -4591,15 +4662,14 @@ fabric.Collection = {
      * @param {Object} [context] Context to invoke callback in
      * @return {Any}
      */
-    Array.prototype.reduce = function(fn /*, initial*/) {
+    Array.prototype.reduce = function(fn /*, initial*/ ) {
       var len = this.length >>> 0,
-          i = 0,
-          rv;
+        i = 0,
+        rv;
 
       if (arguments.length > 1) {
         rv = arguments[1];
-      }
-      else {
+      } else {
         do {
           if (i in this) {
             rv = this[i++];
@@ -4630,8 +4700,10 @@ fabric.Collection = {
    * @param {String} method Name of a method to invoke
    * @return {Array}
    */
+
   function invoke(array, method) {
-    var args = slice.call(arguments, 2), result = [ ];
+    var args = slice.call(arguments, 2),
+      result = [];
     for (var i = 0, len = array.length; i < len; i++) {
       result[i] = args.length ? array[i][method].apply(array[i], args) : array[i][method].call(array[i]);
     }
@@ -4645,19 +4717,19 @@ fabric.Collection = {
    * @param {String} byProperty
    * @return {Any}
    */
+
   function max(array, byProperty) {
     if (!array || array.length === 0) return undefined;
 
     var i = array.length - 1,
-        result = byProperty ? array[i][byProperty] : array[i];
+      result = byProperty ? array[i][byProperty] : array[i];
     if (byProperty) {
       while (i--) {
         if (array[i][byProperty] >= result) {
           result = array[i][byProperty];
         }
       }
-    }
-    else {
+    } else {
       while (i--) {
         if (array[i] >= result) {
           result = array[i];
@@ -4674,11 +4746,12 @@ fabric.Collection = {
    * @param {String} byProperty
    * @return {Any}
    */
+
   function min(array, byProperty) {
     if (!array || array.length === 0) return undefined;
 
     var i = array.length - 1,
-        result = byProperty ? array[i][byProperty] : array[i];
+      result = byProperty ? array[i][byProperty] : array[i];
 
     if (byProperty) {
       while (i--) {
@@ -4686,8 +4759,7 @@ fabric.Collection = {
           result = array[i][byProperty];
         }
       }
-    }
-    else {
+    } else {
       while (i--) {
         if (array[i] < result) {
           result = array[i];
@@ -4707,7 +4779,7 @@ fabric.Collection = {
   };
 
 })();
-(function(){
+(function() {
 
   /**
    * Copies all enumerable properties of one object to another
@@ -4716,6 +4788,7 @@ fabric.Collection = {
    * @param {Object} source Where to copy from
    * @return {Object}
    */
+
   function extend(destination, source) {
     // JScript DontEnum bug is not taken care of
     for (var property in source) {
@@ -4730,8 +4803,9 @@ fabric.Collection = {
    * @param {Object} object Object to clone
    * @return {Object}
    */
+
   function clone(object) {
-    return extend({ }, object);
+    return extend({}, object);
   }
 
   /** @namespace fabric.util.object */
@@ -4743,72 +4817,75 @@ fabric.Collection = {
 })();
 (function() {
 
-/* _ES5_COMPAT_START_ */
-if (!String.prototype.trim) {
+  /* _ES5_COMPAT_START_ */
+  if (!String.prototype.trim) {
+    /**
+     * Trims a string (removing whitespace from the beginning and the end)
+     * @function external:String#trim
+     * @see <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/Trim">String#trim on MDN</a>
+     */
+    String.prototype.trim = function() {
+      // this trim is not fully ES3 or ES5 compliant, but it should cover most cases for now
+      return this.replace(/^[\s\xA0]+/, '').replace(/[\s\xA0]+$/, '');
+    };
+  }
+  /* _ES5_COMPAT_END_ */
+
   /**
-   * Trims a string (removing whitespace from the beginning and the end)
-   * @function external:String#trim
-   * @see <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/Trim">String#trim on MDN</a>
+   * Camelizes a string
+   * @memberOf fabric.util.string
+   * @param {String} string String to camelize
+   * @return {String} Camelized version of a string
    */
-  String.prototype.trim = function () {
-    // this trim is not fully ES3 or ES5 compliant, but it should cover most cases for now
-    return this.replace(/^[\s\xA0]+/, '').replace(/[\s\xA0]+$/, '');
+
+  function camelize(string) {
+    return string.replace(/-+(.)?/g, function(match, character) {
+      return character ? character.toUpperCase() : '';
+    });
+  }
+
+  /**
+   * Capitalizes a string
+   * @memberOf fabric.util.string
+   * @param {String} string String to capitalize
+   * @return {String} Capitalized version of a string
+   */
+
+  function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  }
+
+  /**
+   * Escapes XML in a string
+   * @memberOf fabric.util.string
+   * @param {String} string String to escape
+   * @return {String} Escaped version of a string
+   */
+
+  function escapeXml(string) {
+    return string.replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  /**
+   * String utilities
+   * @namespace fabric.util.string
+   */
+  fabric.util.string = {
+    camelize: camelize,
+    capitalize: capitalize,
+    escapeXml: escapeXml
   };
-}
-/* _ES5_COMPAT_END_ */
-
-/**
- * Camelizes a string
- * @memberOf fabric.util.string
- * @param {String} string String to camelize
- * @return {String} Camelized version of a string
- */
-function camelize(string) {
-  return string.replace(/-+(.)?/g, function(match, character) {
-    return character ? character.toUpperCase() : '';
-  });
-}
-
-/**
- * Capitalizes a string
- * @memberOf fabric.util.string
- * @param {String} string String to capitalize
- * @return {String} Capitalized version of a string
- */
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-}
-
-/**
- * Escapes XML in a string
- * @memberOf fabric.util.string
- * @param {String} string String to escape
- * @return {String} Escaped version of a string
- */
-function escapeXml(string) {
-  return string.replace(/&/g, '&amp;')
-     .replace(/"/g, '&quot;')
-     .replace(/'/g, '&apos;')
-     .replace(/</g, '&lt;')
-     .replace(/>/g, '&gt;');
-}
-
-/**
- * String utilities
- * @namespace fabric.util.string
- */
-fabric.util.string = {
-  camelize: camelize,
-  capitalize: capitalize,
-  escapeXml: escapeXml
-};
 }());
 /* _ES5_COMPAT_START_ */
 (function() {
 
   var slice = Array.prototype.slice,
-      apply = Function.prototype.apply,
-      Dummy = function() { };
+    apply = Function.prototype.apply,
+    Dummy = function() {};
 
   if (!Function.prototype.bind) {
     /**
@@ -4819,13 +4896,14 @@ fabric.util.string = {
      * @return {Function}
      */
     Function.prototype.bind = function(thisArg) {
-      var fn = this, args = slice.call(arguments, 1), bound;
+      var fn = this,
+        args = slice.call(arguments, 1),
+        bound;
       if (args.length) {
         bound = function() {
           return apply.call(fn, this instanceof Dummy ? this : thisArg, args.concat(slice.call(arguments)));
         };
-      }
-      else {
+      } else {
         /** @ignore */
         bound = function() {
           return apply.call(fn, this instanceof Dummy ? this : thisArg, arguments);
@@ -4842,10 +4920,13 @@ fabric.util.string = {
 /* _ES5_COMPAT_END_ */
 (function() {
 
-  var slice = Array.prototype.slice, emptyFunction = function() { };
+  var slice = Array.prototype.slice,
+    emptyFunction = function() {};
 
-  var IS_DONTENUM_BUGGY = (function(){
-    for (var p in { toString: 1 }) {
+  var IS_DONTENUM_BUGGY = (function() {
+    for (var p in {
+      toString: 1
+    }) {
       if (p === 'toString') return false;
     }
     return true;
@@ -4856,8 +4937,8 @@ fabric.util.string = {
     for (var property in source) {
 
       if (property in klass.prototype &&
-          typeof klass.prototype[property] === 'function' &&
-          (source[property] + '').indexOf('callSuper') > -1) {
+        typeof klass.prototype[property] === 'function' &&
+        (source[property] + '').indexOf('callSuper') > -1) {
 
         klass.prototype[property] = (function(property) {
           return function() {
@@ -4872,8 +4953,7 @@ fabric.util.string = {
             }
           };
         })(property);
-      }
-      else {
+      } else {
         klass.prototype[property] = source[property];
       }
 
@@ -4888,13 +4968,11 @@ fabric.util.string = {
     }
   };
 
-  function Subclass() { }
+  function Subclass() {}
 
   function callSuper(methodName) {
     var fn = this.constructor.superclass.prototype[methodName];
-    return (arguments.length > 1)
-      ? fn.apply(this, slice.call(arguments, 1))
-      : fn.call(this);
+    return (arguments.length > 1) ? fn.apply(this, slice.call(arguments, 1)) : fn.call(this);
   }
 
   /**
@@ -4904,19 +4982,21 @@ fabric.util.string = {
    * @param properties Properties shared by all instances of this class
    *                  (be careful modifying objects defined here as this would affect all instances)
    */
+
   function createClass() {
     var parent = null,
-        properties = slice.call(arguments, 0);
+      properties = slice.call(arguments, 0);
 
     if (typeof properties[0] === 'function') {
       parent = properties.shift();
     }
+
     function klass() {
       this.initialize.apply(this, arguments);
     }
 
     klass.superclass = parent;
-    klass.subclasses = [ ];
+    klass.subclasses = [];
 
     if (parent) {
       Subclass.prototype = parent.prototype;
@@ -4936,22 +5016,22 @@ fabric.util.string = {
 
   fabric.util.createClass = createClass;
 })();
-(function () {
+(function() {
 
   /* EVENT HANDLING */
 
   function areHostMethods(object) {
     var methodNames = Array.prototype.slice.call(arguments, 1),
-        t, i, len = methodNames.length;
+      t, i, len = methodNames.length;
     for (i = 0; i < len; i++) {
       t = typeof object[methodNames[i]];
       if (!(/^(?:function|object|unknown)$/).test(t)) return false;
     }
     return true;
   }
-  var getUniqueId = (function () {
+  var getUniqueId = (function() {
     var uid = 0;
-    return function (element) {
+    return function(element) {
       return element.__uniqueID || (element.__uniqueID = 'uniqueID__' + uid++);
     };
   })();
@@ -4959,14 +5039,14 @@ fabric.util.string = {
   /** @ignore */
   var getElement, setElement;
 
-  (function () {
-    var elements = { };
+  (function() {
+    var elements = {};
     /** @ignore */
-    getElement = function (uid) {
+    getElement = function(uid) {
       return elements[uid];
     };
     /** @ignore */
-    setElement = function (uid, element) {
+    setElement = function(uid, element) {
       elements[uid] = element;
     };
   })();
@@ -4979,13 +5059,13 @@ fabric.util.string = {
   }
 
   function createWrappedHandler(uid, handler) {
-    return function (e) {
+    return function(e) {
       handler.call(getElement(uid), e || fabric.window.event);
     };
   }
 
   function createDispatcher(uid, eventName) {
-    return function (e) {
+    return function(e) {
       if (handlers[uid] && handlers[uid][eventName]) {
         var handlersForEvent = handlers[uid][eventName];
         for (var i = 0, len = handlersForEvent.length; i < len; i++) {
@@ -4996,42 +5076,40 @@ fabric.util.string = {
   }
 
   var shouldUseAddListenerRemoveListener = (
-        areHostMethods(fabric.document.documentElement, 'addEventListener', 'removeEventListener') &&
-        areHostMethods(fabric.window, 'addEventListener', 'removeEventListener')),
+    areHostMethods(fabric.document.documentElement, 'addEventListener', 'removeEventListener') &&
+    areHostMethods(fabric.window, 'addEventListener', 'removeEventListener')),
 
-      shouldUseAttachEventDetachEvent = (
-        areHostMethods(fabric.document.documentElement, 'attachEvent', 'detachEvent') &&
-        areHostMethods(fabric.window, 'attachEvent', 'detachEvent')),
+    shouldUseAttachEventDetachEvent = (
+      areHostMethods(fabric.document.documentElement, 'attachEvent', 'detachEvent') &&
+      areHostMethods(fabric.window, 'attachEvent', 'detachEvent')),
 
-      // IE branch
-      listeners = { },
+    // IE branch
+    listeners = {},
 
-      // DOM L0 branch
-      handlers = { },
+    // DOM L0 branch
+    handlers = {},
 
-      addListener, removeListener;
+    addListener, removeListener;
 
   if (shouldUseAddListenerRemoveListener) {
     /** @ignore */
-    addListener = function (element, eventName, handler) {
+    addListener = function(element, eventName, handler) {
       element.addEventListener(eventName, handler, false);
     };
     /** @ignore */
-    removeListener = function (element, eventName, handler) {
+    removeListener = function(element, eventName, handler) {
       element.removeEventListener(eventName, handler, false);
     };
-  }
-
-  else if (shouldUseAttachEventDetachEvent) {
+  } else if (shouldUseAttachEventDetachEvent) {
     /** @ignore */
-    addListener = function (element, eventName, handler) {
+    addListener = function(element, eventName, handler) {
       var uid = getUniqueId(element);
       setElement(uid, element);
       if (!listeners[uid]) {
-        listeners[uid] = { };
+        listeners[uid] = {};
       }
       if (!listeners[uid][eventName]) {
-        listeners[uid][eventName] = [ ];
+        listeners[uid][eventName] = [];
 
       }
       var listener = createListener(uid, handler);
@@ -5039,8 +5117,9 @@ fabric.util.string = {
       element.attachEvent('on' + eventName, listener.wrappedHandler);
     };
     /** @ignore */
-    removeListener = function (element, eventName, handler) {
-      var uid = getUniqueId(element), listener;
+    removeListener = function(element, eventName, handler) {
+      var uid = getUniqueId(element),
+        listener;
       if (listeners[uid] && listeners[uid][eventName]) {
         for (var i = 0, len = listeners[uid][eventName].length; i < len; i++) {
           listener = listeners[uid][eventName][i];
@@ -5051,16 +5130,15 @@ fabric.util.string = {
         }
       }
     };
-  }
-  else {
+  } else {
     /** @ignore */
-    addListener = function (element, eventName, handler) {
+    addListener = function(element, eventName, handler) {
       var uid = getUniqueId(element);
       if (!handlers[uid]) {
-        handlers[uid] = { };
+        handlers[uid] = {};
       }
       if (!handlers[uid][eventName]) {
-        handlers[uid][eventName] = [ ];
+        handlers[uid][eventName] = [];
         var existingHandler = element['on' + eventName];
         if (existingHandler) {
           handlers[uid][eventName].push(existingHandler);
@@ -5070,7 +5148,7 @@ fabric.util.string = {
       handlers[uid][eventName].push(handler);
     };
     /** @ignore */
-    removeListener = function (element, eventName, handler) {
+    removeListener = function(element, eventName, handler) {
       var uid = getUniqueId(element);
       if (handlers[uid] && handlers[uid][eventName]) {
         var handlersForEvent = handlers[uid][eventName];
@@ -5109,36 +5187,38 @@ fabric.util.string = {
    * @param {Event} event
    * @param {HTMLCanvasElement} upperCanvasEl &lt;canvas> element on which object selection is drawn
    */
+
   function getPointer(event, upperCanvasEl) {
     event || (event = fabric.window.event);
 
     var element = event.target || (typeof event.srcElement !== 'unknown' ? event.srcElement : null),
-        body = fabric.document.body || {scrollLeft: 0, scrollTop: 0},
-        docElement = fabric.document.documentElement,
-        orgElement = element,
-        scrollLeft = 0,
-        scrollTop = 0,
-        firstFixedAncestor;
+      body = fabric.document.body || {
+        scrollLeft: 0,
+        scrollTop: 0
+      },
+      docElement = fabric.document.documentElement,
+      orgElement = element,
+      scrollLeft = 0,
+      scrollTop = 0,
+      firstFixedAncestor;
 
     while (element && element.parentNode && !firstFixedAncestor) {
       element = element.parentNode;
 
       if (element !== fabric.document &&
-          fabric.util.getElementStyle(element, 'position') === 'fixed') {
+        fabric.util.getElementStyle(element, 'position') === 'fixed') {
         firstFixedAncestor = element;
       }
 
       if (element !== fabric.document &&
-          orgElement !== upperCanvasEl &&
-          fabric.util.getElementStyle(element, 'position') === 'absolute') {
+        orgElement !== upperCanvasEl &&
+        fabric.util.getElementStyle(element, 'position') === 'absolute') {
         scrollLeft = 0;
         scrollTop = 0;
-      }
-      else if (element === fabric.document) {
+      } else if (element === fabric.document) {
         scrollLeft = body.scrollLeft || docElement.scrollLeft || 0;
-        scrollTop = body.scrollTop ||  docElement.scrollTop || 0;
-      }
-      else {
+        scrollTop = body.scrollTop || docElement.scrollTop || 0;
+      } else {
         scrollLeft += element.scrollLeft || 0;
         scrollTop += element.scrollTop || 0;
       }
@@ -5167,16 +5247,13 @@ fabric.util.string = {
         return (event.touches && event.touches[0] ?
           (event.touches[0].pageX - (event.touches[0].pageX - event.touches[0].clientX)) || event.clientX : event.clientX);
       }
-      return (event.changedTouches && event.changedTouches[0]
-        ? (event.changedTouches[0].pageX - (event.changedTouches[0].pageX - event.changedTouches[0].clientX)) || event.clientX : event.clientX);
+      return (event.changedTouches && event.changedTouches[0] ? (event.changedTouches[0].pageX - (event.changedTouches[0].pageX - event.changedTouches[0].clientX)) || event.clientX : event.clientX);
     };
     pointerY = function(event) {
       if (event.type !== 'touchend') {
-        return (event.touches && event.touches[0]
-          ? (event.touches[0].pageY - (event.touches[0].pageY - event.touches[0].clientY)) || event.clientY : event.clientY);
+        return (event.touches && event.touches[0] ? (event.touches[0].pageY - (event.touches[0].pageY - event.touches[0].clientY)) || event.clientY : event.clientY);
       }
-      return (event.changedTouches && event.changedTouches[0]
-        ? (event.changedTouches[0].pageY - (event.changedTouches[0].pageY - event.changedTouches[0].clientY)) || event.clientY : event.clientY);
+      return (event.changedTouches && event.changedTouches[0] ? (event.changedTouches[0].pageY - (event.changedTouches[0].pageY - event.changedTouches[0].clientY)) || event.clientY : event.clientY);
     };
   }
 
@@ -5185,7 +5262,7 @@ fabric.util.string = {
   fabric.util.object.extend(fabric.util, fabric.Observable);
 
 })();
-(function () {
+(function() {
 
   /**
    * Cross-browser wrapper for setting element's style
@@ -5194,6 +5271,7 @@ fabric.util.string = {
    * @param {Object} styles
    * @return {HTMLElement} Element that was passed as a first argument
    */
+
   function setStyle(element, styles) {
     var elementStyle = element.style;
     if (!elementStyle) {
@@ -5201,18 +5279,13 @@ fabric.util.string = {
     }
     if (typeof styles === 'string') {
       element.style.cssText += ';' + styles;
-      return styles.indexOf('opacity') > -1
-        ? setOpacity(element, styles.match(/opacity:\s*(\d?\.?\d*)/)[1])
-        : element;
+      return styles.indexOf('opacity') > -1 ? setOpacity(element, styles.match(/opacity:\s*(\d?\.?\d*)/)[1]) : element;
     }
     for (var property in styles) {
       if (property === 'opacity') {
         setOpacity(element, styles[property]);
-      }
-      else {
-        var normalizedProperty = (property === 'float' || property === 'cssFloat')
-          ? (typeof elementStyle.styleFloat === 'undefined' ? 'cssFloat' : 'styleFloat')
-          : property;
+      } else {
+        var normalizedProperty = (property === 'float' || property === 'cssFloat') ? (typeof elementStyle.styleFloat === 'undefined' ? 'cssFloat' : 'styleFloat') : property;
         elementStyle[normalizedProperty] = styles[property];
       }
     }
@@ -5220,12 +5293,14 @@ fabric.util.string = {
   }
 
   var parseEl = fabric.document.createElement('div'),
-      supportsOpacity = typeof parseEl.style.opacity === 'string',
-      supportsFilters = typeof parseEl.style.filter === 'string',
-      reOpacity = /alpha\s*\(\s*opacity\s*=\s*([^\)]+)\)/,
+    supportsOpacity = typeof parseEl.style.opacity === 'string',
+    supportsFilters = typeof parseEl.style.filter === 'string',
+    reOpacity = /alpha\s*\(\s*opacity\s*=\s*([^\)]+)\)/,
 
-      /** @ignore */
-      setOpacity = function (element) { return element; };
+    /** @ignore */
+    setOpacity = function(element) {
+      return element;
+    };
 
   if (supportsOpacity) {
     /** @ignore */
@@ -5233,8 +5308,7 @@ fabric.util.string = {
       element.style.opacity = value;
       return element;
     };
-  }
-  else if (supportsFilters) {
+  } else if (supportsFilters) {
     /** @ignore */
     setOpacity = function(element, value) {
       var es = element.style;
@@ -5244,8 +5318,7 @@ fabric.util.string = {
       if (reOpacity.test(es.filter)) {
         value = value >= 0.9999 ? '' : ('alpha(opacity=' + (value * 100) + ')');
         es.filter = es.filter.replace(reOpacity, value);
-      }
-      else {
+      } else {
         es.filter += ' alpha(opacity=' + (value * 100) + ')';
       }
       return element;
@@ -5265,6 +5338,7 @@ fabric.util.string = {
    * @param {String|HTMLElement} id
    * @return {HTMLElement|null}
    */
+
   function getById(id) {
     return typeof id === 'string' ? fabric.document.getElementById(id) : id;
   }
@@ -5282,12 +5356,12 @@ fabric.util.string = {
   var sliceCanConvertNodelists;
   try {
     sliceCanConvertNodelists = toArray(fabric.document.childNodes) instanceof Array;
-  }
-  catch(err) { }
+  } catch (err) {}
 
   if (!sliceCanConvertNodelists) {
     toArray = function(arrayLike) {
-      var arr = new Array(arrayLike.length), i = arrayLike.length;
+      var arr = new Array(arrayLike.length),
+        i = arrayLike.length;
       while (i--) {
         arr[i] = arrayLike[i];
       }
@@ -5302,16 +5376,15 @@ fabric.util.string = {
    * @param {Object} [attributes] Attributes to set on an element
    * @return {HTMLElement} Newly created element
    */
+
   function makeElement(tagName, attributes) {
     var el = fabric.document.createElement(tagName);
     for (var prop in attributes) {
       if (prop === 'class') {
         el.className = attributes[prop];
-      }
-      else if (prop === 'for') {
+      } else if (prop === 'for') {
         el.htmlFor = attributes[prop];
-      }
-      else {
+      } else {
         el.setAttribute(prop, attributes[prop]);
       }
     }
@@ -5324,6 +5397,7 @@ fabric.util.string = {
    * @param {HTMLElement} element Element to add class to
    * @param {String} className Class to add to an element
    */
+
   function addClass(element, className) {
     if ((' ' + element.className + ' ').indexOf(' ' + className + ' ') === -1) {
       element.className += (element.className ? ' ' : '') + className;
@@ -5338,6 +5412,7 @@ fabric.util.string = {
    * @param {Object} [attributes] Attributes to set on a wrapper
    * @return {HTMLElement} wrapper
    */
+
   function wrapElement(element, wrapper, attributes) {
     if (typeof wrapper === 'string') {
       wrapper = makeElement(wrapper, attributes);
@@ -5356,20 +5431,30 @@ fabric.util.string = {
    * @param {HTMLElement} element Element to get offset for
    * @return {Object} Object with "left" and "top" properties
    */
+
   function getElementOffset(element) {
     var docElem, win,
-        box = {left: 0, top: 0},
-        doc = element && element.ownerDocument,
-        offset = {left: 0, top: 0},
-        offsetAttributes = {
-           'borderLeftWidth': 'left',
-           'borderTopWidth':  'top',
-           'paddingLeft':     'left',
-           'paddingTop':      'top'
-        };
+      box = {
+        left: 0,
+        top: 0
+      },
+      doc = element && element.ownerDocument,
+      offset = {
+        left: 0,
+        top: 0
+      },
+      offsetAttributes = {
+        'borderLeftWidth': 'left',
+        'borderTopWidth': 'top',
+        'paddingLeft': 'left',
+        'paddingTop': 'top'
+      };
 
-    if (!doc){
-      return {left: 0, top: 0};
+    if (!doc) {
+      return {
+        left: 0,
+        top: 0
+      };
     }
 
     for (var attr in offsetAttributes) {
@@ -5377,54 +5462,46 @@ fabric.util.string = {
     }
 
     docElem = doc.documentElement;
-    if ( typeof element.getBoundingClientRect !== "undefined" ) {
+    if (typeof element.getBoundingClientRect !== "undefined") {
       box = element.getBoundingClientRect();
     }
-    if(doc != null && doc === doc.window){
+    if (doc != null && doc === doc.window) {
       win = doc;
     } else {
       win = doc.nodeType === 9 && (doc.defaultView || doc.parentWindow);
     }
     return {
       left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0) + offset.left,
-      top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0)  + offset.top
+      top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0) + offset.top
     };
   }
 
   /**
-  * Returns style attribute value of a given element
-  * @memberOf fabric.util
-  * @param {HTMLElement} element Element to get style attribute for
-  * @param {String} attr Style attribute to get for element
-  * @return {String} Style attribute value of the given element.
-  */
+   * Returns style attribute value of a given element
+   * @memberOf fabric.util
+   * @param {HTMLElement} element Element to get style attribute for
+   * @param {String} attr Style attribute to get for element
+   * @return {String} Style attribute value of the given element.
+   */
+
   function getElementStyle(element, attr) {
     if (!element.style) {
-      element.style = { };
+      element.style = {};
     }
 
     if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
       return fabric.document.defaultView.getComputedStyle(element, null)[attr];
-    }
-    else {
+    } else {
       var value = element.style[attr];
       if (!value && element.currentStyle) value = element.currentStyle[attr];
       return value;
     }
   }
 
-  (function () {
+  (function() {
     var style = fabric.document.documentElement.style;
 
-    var selectProp = 'userSelect' in style
-      ? 'userSelect'
-      : 'MozUserSelect' in style
-        ? 'MozUserSelect'
-        : 'WebkitUserSelect' in style
-          ? 'WebkitUserSelect'
-          : 'KhtmlUserSelect' in style
-            ? 'KhtmlUserSelect'
-            : '';
+    var selectProp = 'userSelect' in style ? 'userSelect' : 'MozUserSelect' in style ? 'MozUserSelect' : 'WebkitUserSelect' in style ? 'WebkitUserSelect' : 'KhtmlUserSelect' in style ? 'KhtmlUserSelect' : '';
 
     /**
      * Makes element unselectable
@@ -5432,14 +5509,14 @@ fabric.util.string = {
      * @param {HTMLElement} element Element to make unselectable
      * @return {HTMLElement} Element that was passed in
      */
+
     function makeElementUnselectable(element) {
       if (typeof element.onselectstart !== 'undefined') {
         element.onselectstart = fabric.util.falseFunction;
       }
       if (selectProp) {
         element.style[selectProp] = 'none';
-      }
-      else if (typeof element.unselectable === 'string') {
+      } else if (typeof element.unselectable === 'string') {
         element.unselectable = 'on';
       }
       return element;
@@ -5451,14 +5528,14 @@ fabric.util.string = {
      * @param {HTMLElement} element Element to make selectable
      * @return {HTMLElement} Element that was passed in
      */
+
     function makeElementSelectable(element) {
       if (typeof element.onselectstart !== 'undefined') {
         element.onselectstart = null;
       }
       if (selectProp) {
         element.style[selectProp] = '';
-      }
-      else if (typeof element.unselectable === 'string') {
+      } else if (typeof element.unselectable === 'string') {
         element.unselectable = '';
       }
       return element;
@@ -5476,17 +5553,18 @@ fabric.util.string = {
      * @param {String} url URL of a script to load
      * @param {Function} callback Callback to execute when script is finished loading
      */
+
     function getScript(url, callback) {
       var headEl = fabric.document.getElementsByTagName("head")[0],
-          scriptEl = fabric.document.createElement('script'),
-          loading = true;
+        scriptEl = fabric.document.createElement('script'),
+        loading = true;
 
       /** @ignore */
       scriptEl.onload = /** @ignore */ scriptEl.onreadystatechange = function(e) {
         if (loading) {
           if (typeof this.readyState === 'string' &&
-              this.readyState !== 'loaded' &&
-              this.readyState !== 'complete') return;
+            this.readyState !== 'loaded' &&
+            this.readyState !== 'complete') return;
           loading = false;
           callback(e || fabric.window.event);
           scriptEl = scriptEl.onload = scriptEl.onreadystatechange = null;
@@ -5510,7 +5588,7 @@ fabric.util.string = {
   fabric.util.getElementStyle = getElementStyle;
 
 })();
-(function(){
+(function() {
 
   function addParamToUrl(url, param) {
     return url + (/\?/.test(url) ? '&' : '?') + param;
@@ -5518,23 +5596,30 @@ fabric.util.string = {
 
   var makeXHR = (function() {
     var factories = [
-      function() { return new ActiveXObject("Microsoft.XMLHTTP"); },
-      function() { return new ActiveXObject("Msxml2.XMLHTTP"); },
-      function() { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); },
-      function() { return new XMLHttpRequest(); }
+      function() {
+        return new ActiveXObject("Microsoft.XMLHTTP");
+      },
+      function() {
+        return new ActiveXObject("Msxml2.XMLHTTP");
+      },
+      function() {
+        return new ActiveXObject("Msxml2.XMLHTTP.3.0");
+      },
+      function() {
+        return new XMLHttpRequest();
+      }
     ];
-    for (var i = factories.length; i--; ) {
+    for (var i = factories.length; i--;) {
       try {
         var req = factories[i]();
         if (req) {
           return factories[i];
         }
-      }
-      catch (err) { }
+      } catch (err) {}
     }
   })();
 
-  function emptyFn() { }
+  function emptyFn() {}
 
   /**
    * Cross-browser abstraction for sending XMLHttpRequest
@@ -5545,14 +5630,15 @@ fabric.util.string = {
    * @param {Function} options.onComplete Callback to invoke when request is completed
    * @return {XMLHttpRequest} request
    */
+
   function request(url, options) {
 
-    options || (options = { });
+    options || (options = {});
 
     var method = options.method ? options.method.toUpperCase() : 'GET',
-        onComplete = options.onComplete || function() { },
-        xhr = makeXHR(),
-        body;
+      onComplete = options.onComplete || function() {},
+      xhr = makeXHR(),
+      body;
 
     /** @ignore */
     xhr.onreadystatechange = function() {
@@ -5583,28 +5669,34 @@ fabric.util.string = {
 })();
 (function() {
 
-   /**
-    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
-    * @memberOf fabric.util
-    * @param {Object} [options] Animation options
-    * @param {Function} [options.onChange] Callback; invoked on every value change
-    * @param {Function} [options.onComplete] Callback; invoked when value change is completed
-    * @param {Number} [options.startValue=0] Starting value
-    * @param {Number} [options.endValue=100] Ending value
-    * @param {Number} [options.byValue=100] Value to modify the property by
-    * @param {Function} [options.easing] Easing function
-    * @param {Number} [options.duration=500] Duration of change
-    */
+  /**
+   * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
+   * @memberOf fabric.util
+   * @param {Object} [options] Animation options
+   * @param {Function} [options.onChange] Callback; invoked on every value change
+   * @param {Function} [options.onComplete] Callback; invoked when value change is completed
+   * @param {Number} [options.startValue=0] Starting value
+   * @param {Number} [options.endValue=100] Ending value
+   * @param {Number} [options.byValue=100] Value to modify the property by
+   * @param {Function} [options.easing] Easing function
+   * @param {Number} [options.duration=500] Duration of change
+   */
+
   function animate(options) {
 
-    options || (options = { });
+    options || (options = {});
 
     var start = +new Date(),
       duration = options.duration || 500,
-      finish = start + duration, time,
-      onChange = options.onChange || function() { },
-      abort = options.abort || function() { return false; },
-      easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t/d * (Math.PI/2)) + c + b;},
+      finish = start + duration,
+      time,
+      onChange = options.onChange || function() {},
+      abort = options.abort || function() {
+        return false;
+      },
+      easing = options.easing || function(t, b, c, d) {
+        return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+      },
       startValue = 'startValue' in options ? options.startValue : 0,
       endValue = 'endValue' in options ? options.endValue : 100,
       byValue = options.byValue || endValue - startValue;
@@ -5627,20 +5719,20 @@ fabric.util.string = {
     })();
   }
 
-  var _requestAnimFrame = fabric.window.requestAnimationFrame       ||
-                          fabric.window.webkitRequestAnimationFrame ||
-                          fabric.window.mozRequestAnimationFrame    ||
-                          fabric.window.oRequestAnimationFrame      ||
-                          fabric.window.msRequestAnimationFrame     ||
-                          function(callback) {
-                            fabric.window.setTimeout(callback, 1000 / 60);
-                          };
+  var _requestAnimFrame = fabric.window.requestAnimationFrame ||
+    fabric.window.webkitRequestAnimationFrame ||
+    fabric.window.mozRequestAnimationFrame ||
+    fabric.window.oRequestAnimationFrame ||
+    fabric.window.msRequestAnimationFrame ||
+      function(callback) {
+        fabric.window.setTimeout(callback, 1000 / 60);
+    };
   /**
-    * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-    * @memberOf fabric.util
-    * @param {Function} callback Callback to invoke
-    * @param {DOMElement} element optional Element to associate with animation
-    */
+   * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+   * @memberOf fabric.util
+   * @param {Function} callback Callback to invoke
+   * @param {DOMElement} element optional Element to associate with animation
+   */
   var requestAnimFrame = function() {
     return _requestAnimFrame.apply(fabric.window, arguments);
   };
@@ -5655,280 +5747,321 @@ fabric.util.string = {
    * Quadratic easing in
    * @memberOf fabric.util.ease
    */
+
   function easeInQuad(t, b, c, d) {
-    return c*(t/=d)*t + b;
+    return c * (t /= d) * t + b;
   }
 
   /**
    * Quadratic easing out
    * @memberOf fabric.util.ease
    */
+
   function easeOutQuad(t, b, c, d) {
-    return -c *(t/=d)*(t-2) + b;
+    return -c * (t /= d) * (t - 2) + b;
   }
 
   /**
    * Quadratic easing in and out
    * @memberOf fabric.util.ease
    */
+
   function easeInOutQuad(t, b, c, d) {
-    t /= (d/2);
-    if (t < 1) return c/2*t*t + b;
-    return -c/2 * ((--t)*(t-2) - 1) + b;
+    t /= (d / 2);
+    if (t < 1) return c / 2 * t * t + b;
+    return -c / 2 * ((--t) * (t - 2) - 1) + b;
   }
 
   /**
    * Cubic easing in
    * @memberOf fabric.util.ease
    */
+
   function easeInCubic(t, b, c, d) {
-    return c*(t/=d)*t*t + b;
+    return c * (t /= d) * t * t + b;
   }
 
   /**
    * Cubic easing out
    * @memberOf fabric.util.ease
    */
+
   function easeOutCubic(t, b, c, d) {
-    return c*((t=t/d-1)*t*t + 1) + b;
+    return c * ((t = t / d - 1) * t * t + 1) + b;
   }
 
   /**
    * Cubic easing in and out
    * @memberOf fabric.util.ease
    */
+
   function easeInOutCubic(t, b, c, d) {
-    t /= d/2;
-    if (t < 1) return c/2*t*t*t + b;
-    return c/2*((t-=2)*t*t + 2) + b;
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t * t + b;
+    return c / 2 * ((t -= 2) * t * t + 2) + b;
   }
 
   /**
    * Quartic easing in
    * @memberOf fabric.util.ease
    */
+
   function easeInQuart(t, b, c, d) {
-    return c*(t/=d)*t*t*t + b;
+    return c * (t /= d) * t * t * t + b;
   }
 
   /**
    * Quartic easing out
    * @memberOf fabric.util.ease
    */
+
   function easeOutQuart(t, b, c, d) {
-    return -c * ((t=t/d-1)*t*t*t - 1) + b;
+    return -c * ((t = t / d - 1) * t * t * t - 1) + b;
   }
 
   /**
    * Quartic easing in and out
    * @memberOf fabric.util.ease
    */
+
   function easeInOutQuart(t, b, c, d) {
-    t /= d/2;
-    if (t < 1) return c/2*t*t*t*t + b;
-    return -c/2 * ((t-=2)*t*t*t - 2) + b;
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t * t * t + b;
+    return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
   }
 
   /**
    * Quintic easing in
    * @memberOf fabric.util.ease
    */
+
   function easeInQuint(t, b, c, d) {
-    return c*(t/=d)*t*t*t*t + b;
+    return c * (t /= d) * t * t * t * t + b;
   }
 
   /**
    * Quintic easing out
    * @memberOf fabric.util.ease
    */
+
   function easeOutQuint(t, b, c, d) {
-    return c*((t=t/d-1)*t*t*t*t + 1) + b;
+    return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
   }
 
   /**
    * Quintic easing in and out
    * @memberOf fabric.util.ease
    */
+
   function easeInOutQuint(t, b, c, d) {
-    t /= d/2;
-    if (t < 1) return c/2*t*t*t*t*t + b;
-    return c/2*((t-=2)*t*t*t*t + 2) + b;
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t * t * t * t + b;
+    return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
   }
 
   /**
    * Sinusoidal easing in
    * @memberOf fabric.util.ease
    */
+
   function easeInSine(t, b, c, d) {
-    return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
+    return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
   }
 
   /**
    * Sinusoidal easing out
    * @memberOf fabric.util.ease
    */
+
   function easeOutSine(t, b, c, d) {
-    return c * Math.sin(t/d * (Math.PI/2)) + b;
+    return c * Math.sin(t / d * (Math.PI / 2)) + b;
   }
 
   /**
    * Sinusoidal easing in and out
    * @memberOf fabric.util.ease
    */
+
   function easeInOutSine(t, b, c, d) {
-    return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
+    return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
   }
 
   /**
    * Exponential easing in
    * @memberOf fabric.util.ease
    */
+
   function easeInExpo(t, b, c, d) {
-    return (t===0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
+    return (t === 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
   }
 
   /**
    * Exponential easing out
    * @memberOf fabric.util.ease
    */
+
   function easeOutExpo(t, b, c, d) {
-    return (t===d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
+    return (t === d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
   }
 
   /**
    * Exponential easing in and out
    * @memberOf fabric.util.ease
    */
+
   function easeInOutExpo(t, b, c, d) {
-    if (t===0) return b;
-    if (t===d) return b+c;
-    t /= d/2;
-    if (t < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
-    return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
+    if (t === 0) return b;
+    if (t === d) return b + c;
+    t /= d / 2;
+    if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+    return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
   }
 
   /**
    * Circular easing in
    * @memberOf fabric.util.ease
    */
+
   function easeInCirc(t, b, c, d) {
-    return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
+    return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
   }
 
   /**
    * Circular easing out
    * @memberOf fabric.util.ease
    */
+
   function easeOutCirc(t, b, c, d) {
-    return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
+    return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
   }
 
   /**
    * Circular easing in and out
    * @memberOf fabric.util.ease
    */
+
   function easeInOutCirc(t, b, c, d) {
-    t /= d/2;
-    if (t < 1) return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
-    return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
+    t /= d / 2;
+    if (t < 1) return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+    return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
   }
 
   /**
    * Elastic easing in
    * @memberOf fabric.util.ease
    */
+
   function easeInElastic(t, b, c, d) {
-    var s=1.70158;var p=0;var a=c;
-    if (t===0) return b;
+    var s = 1.70158;
+    var p = 0;
+    var a = c;
+    if (t === 0) return b;
     t /= d;
-    if (t===1) return b+c;
-    if (!p) p=d*0.3;
-    if (a < Math.abs(c)) { a=c; s=p/4; }
-    else s = p/(2*Math.PI) * Math.asin (c/a);
-    return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+    if (t === 1) return b + c;
+    if (!p) p = d * 0.3;
+    if (a < Math.abs(c)) {
+      a = c;
+      s = p / 4;
+    } else s = p / (2 * Math.PI) * Math.asin(c / a);
+    return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
   }
 
   /**
    * Elastic easing out
    * @memberOf fabric.util.ease
    */
+
   function easeOutElastic(t, b, c, d) {
-    var s=1.70158;var p=0;var a=c;
-    if (t===0) return b;
+    var s = 1.70158;
+    var p = 0;
+    var a = c;
+    if (t === 0) return b;
     t /= d;
-    if (t===1) return b+c;
-    if (!p) p=d*0.3;
-    if (a < Math.abs(c)) { a=c; s=p/4; }
-    else s = p/(2*Math.PI) * Math.asin (c/a);
-    return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
+    if (t === 1) return b + c;
+    if (!p) p = d * 0.3;
+    if (a < Math.abs(c)) {
+      a = c;
+      s = p / 4;
+    } else s = p / (2 * Math.PI) * Math.asin(c / a);
+    return a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b;
   }
 
   /**
    * Elastic easing in and out
    * @memberOf fabric.util.ease
    */
+
   function easeInOutElastic(t, b, c, d) {
-    var s=1.70158;var p=0;var a=c;
-    if (t===0) return b;
-    t /= d/2;
-    if (t===2) return b+c;
-    if (!p) p=d*(0.3*1.5);
-    if (a < Math.abs(c)) { a=c; s=p/4; }
-    else s = p/(2*Math.PI) * Math.asin (c/a);
-    if (t < 1) return -0.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
-    return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*0.5 + c + b;
+    var s = 1.70158;
+    var p = 0;
+    var a = c;
+    if (t === 0) return b;
+    t /= d / 2;
+    if (t === 2) return b + c;
+    if (!p) p = d * (0.3 * 1.5);
+    if (a < Math.abs(c)) {
+      a = c;
+      s = p / 4;
+    } else s = p / (2 * Math.PI) * Math.asin(c / a);
+    if (t < 1) return -0.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+    return a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
   }
 
   /**
    * Backwards easing in
    * @memberOf fabric.util.ease
    */
+
   function easeInBack(t, b, c, d, s) {
     if (s === undefined) s = 1.70158;
-    return c*(t/=d)*t*((s+1)*t - s) + b;
+    return c * (t /= d) * t * ((s + 1) * t - s) + b;
   }
 
   /**
    * Backwards easing out
    * @memberOf fabric.util.ease
    */
+
   function easeOutBack(t, b, c, d, s) {
     if (s === undefined) s = 1.70158;
-    return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
+    return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
   }
 
   /**
    * Backwards easing in and out
    * @memberOf fabric.util.ease
    */
+
   function easeInOutBack(t, b, c, d, s) {
     if (s === undefined) s = 1.70158;
-    t /= d/2;
-    if (t < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
-    return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
+    t /= d / 2;
+    if (t < 1) return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
+    return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
   }
 
   /**
    * Bouncing easing in
    * @memberOf fabric.util.ease
    */
+
   function easeInBounce(t, b, c, d) {
-    return c - easeOutBounce (d-t, 0, c, d) + b;
+    return c - easeOutBounce(d - t, 0, c, d) + b;
   }
 
   /**
    * Bouncing easing out
    * @memberOf fabric.util.ease
    */
+
   function easeOutBounce(t, b, c, d) {
-    if ((t/=d) < (1/2.75)) {
-      return c*(7.5625*t*t) + b;
-    } else if (t < (2/2.75)) {
-      return c*(7.5625*(t-=(1.5/2.75))*t + 0.75) + b;
-    } else if (t < (2.5/2.75)) {
-      return c*(7.5625*(t-=(2.25/2.75))*t + 0.9375) + b;
+    if ((t /= d) < (1 / 2.75)) {
+      return c * (7.5625 * t * t) + b;
+    } else if (t < (2 / 2.75)) {
+      return c * (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75) + b;
+    } else if (t < (2.5 / 2.75)) {
+      return c * (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375) + b;
     } else {
-      return c*(7.5625*(t-=(2.625/2.75))*t + 0.984375) + b;
+      return c * (7.5625 * (t -= (2.625 / 2.75)) * t + 0.984375) + b;
     }
   }
 
@@ -5936,9 +6069,10 @@ fabric.util.string = {
    * Bouncing easing in and out
    * @memberOf fabric.util.ease
    */
+
   function easeInOutBounce(t, b, c, d) {
-    if (t < d/2) return easeInBounce (t*2, 0, c, d) * 0.5 + b;
-    return easeOutBounce (t*2-d, 0, c, d) * 0.5 + c*0.5 + b;
+    if (t < d / 2) return easeInBounce(t * 2, 0, c, d) * 0.5 + b;
+    return easeOutBounce(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
   }
 
   /**
@@ -5989,12 +6123,12 @@ fabric.util.string = {
    * @namespace
    */
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      capitalize = fabric.util.string.capitalize,
-      clone = fabric.util.object.clone,
-      toFixed = fabric.util.toFixed,
-      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend,
+    capitalize = fabric.util.string.capitalize,
+    clone = fabric.util.object.clone,
+    toFixed = fabric.util.toFixed,
+    multiplyTransformMatrices = fabric.util.multiplyTransformMatrices;
 
   fabric.SHARED_ATTRIBUTES = [
     "transform",
@@ -6004,30 +6138,30 @@ fabric.util.string = {
   ];
 
   var attributesMap = {
-    'fill-opacity':     'fillOpacity',
-    'fill-rule':        'fillRule',
-    'font-family':      'fontFamily',
-    'font-size':        'fontSize',
-    'font-style':       'fontStyle',
-    'font-weight':      'fontWeight',
-    'cx':               'left',
-    'x':                'left',
-    'r':                'radius',
+    'fill-opacity': 'fillOpacity',
+    'fill-rule': 'fillRule',
+    'font-family': 'fontFamily',
+    'font-size': 'fontSize',
+    'font-style': 'fontStyle',
+    'font-weight': 'fontWeight',
+    'cx': 'left',
+    'x': 'left',
+    'r': 'radius',
     'stroke-dasharray': 'strokeDashArray',
-    'stroke-linecap':   'strokeLineCap',
-    'stroke-linejoin':  'strokeLineJoin',
-    'stroke-miterlimit':'strokeMiterLimit',
-    'stroke-opacity':   'strokeOpacity',
-    'stroke-width':     'strokeWidth',
-    'text-decoration':  'textDecoration',
-    'cy':               'top',
-    'y':                'top',
-    'transform':        'transformMatrix'
+    'stroke-linecap': 'strokeLineCap',
+    'stroke-linejoin': 'strokeLineJoin',
+    'stroke-miterlimit': 'strokeMiterLimit',
+    'stroke-opacity': 'strokeOpacity',
+    'stroke-width': 'strokeWidth',
+    'text-decoration': 'textDecoration',
+    'cy': 'top',
+    'y': 'top',
+    'transform': 'transformMatrix'
   };
 
   var colorAttributes = {
     'stroke': 'strokeOpacity',
-    'fill':   'fillOpacity'
+    'fill': 'fillOpacity'
   };
 
   function normalizeAttr(attr) {
@@ -6043,19 +6177,15 @@ fabric.util.string = {
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
       value = '';
-    }
-    else if (attr === 'fillRule') {
+    } else if (attr === 'fillRule') {
       value = (value === 'evenodd') ? 'destination-over' : value;
-    }
-    else if (attr === 'strokeDashArray') {
+    } else if (attr === 'strokeDashArray') {
       value = value.replace(/,/g, ' ').split(/\s+/);
-    }
-    else if (attr === 'transformMatrix') {
+    } else if (attr === 'transformMatrix') {
       if (parentAttributes && parentAttributes.transformMatrix) {
         value = multiplyTransformMatrices(
           parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
-      }
-      else {
+      } else {
         value = fabric.parseTransformAttribute(value);
       }
     }
@@ -6072,6 +6202,7 @@ fabric.util.string = {
    * @private
    * @param {Object} attributes Array of attributes to parse
    */
+
   function _setStrokeFillOpacity(attributes) {
     for (var attr in colorAttributes) {
 
@@ -6096,6 +6227,7 @@ fabric.util.string = {
    * @param {Array} attributes Array of attributes to parse
    * @return {Object} object containing parsed attributes' names/values
    */
+
   function parseAttributes(element, attributes) {
 
     if (!element) {
@@ -6103,7 +6235,7 @@ fabric.util.string = {
     }
 
     var value,
-        parentAttributes = { };
+      parentAttributes = {};
 
     // if there's a parent container (`g` node), parse its attributes recursively upwards
     if (element.parentNode && /^g$/i.test(element.parentNode.nodeName)) {
@@ -6119,7 +6251,7 @@ fabric.util.string = {
         memo[attr] = value;
       }
       return memo;
-    }, { });
+    }, {});
 
     // add values parsed from style, which take precedence over attributes
     // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
@@ -6149,7 +6281,7 @@ fabric.util.string = {
 
     function scaleMatrix(matrix, args) {
       var multiplierX = args[0],
-          multiplierY = (args.length === 2) ? args[1] : args[0];
+        multiplierY = (args.length === 2) ? args[1] : args[0];
 
       matrix[0] = multiplierX;
       matrix[3] = multiplierY;
@@ -6172,57 +6304,57 @@ fabric.util.string = {
 
     // identity matrix
     var iMatrix = [
-          1, // a
-          0, // b
-          0, // c
-          1, // d
-          0, // e
-          0  // f
-        ],
+      1, // a
+      0, // b
+      0, // c
+      1, // d
+      0, // e
+      0 // f
+    ],
 
-        // == begin transform regexp
-        number = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
-        comma_wsp = '(?:\\s+,?\\s*|,\\s*)',
+      // == begin transform regexp
+      number = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
+      comma_wsp = '(?:\\s+,?\\s*|,\\s*)',
 
-        skewX = '(?:(skewX)\\s*\\(\\s*(' + number + ')\\s*\\))',
-        skewY = '(?:(skewY)\\s*\\(\\s*(' + number + ')\\s*\\))',
-        rotate = '(?:(rotate)\\s*\\(\\s*(' + number + ')(?:' + comma_wsp + '(' + number + ')' + comma_wsp + '(' + number + '))?\\s*\\))',
-        scale = '(?:(scale)\\s*\\(\\s*(' + number + ')(?:' + comma_wsp + '(' + number + '))?\\s*\\))',
-        translate = '(?:(translate)\\s*\\(\\s*(' + number + ')(?:' + comma_wsp + '(' + number + '))?\\s*\\))',
+      skewX = '(?:(skewX)\\s*\\(\\s*(' + number + ')\\s*\\))',
+      skewY = '(?:(skewY)\\s*\\(\\s*(' + number + ')\\s*\\))',
+      rotate = '(?:(rotate)\\s*\\(\\s*(' + number + ')(?:' + comma_wsp + '(' + number + ')' + comma_wsp + '(' + number + '))?\\s*\\))',
+      scale = '(?:(scale)\\s*\\(\\s*(' + number + ')(?:' + comma_wsp + '(' + number + '))?\\s*\\))',
+      translate = '(?:(translate)\\s*\\(\\s*(' + number + ')(?:' + comma_wsp + '(' + number + '))?\\s*\\))',
 
-        matrix = '(?:(matrix)\\s*\\(\\s*' +
-                  '(' + number + ')' + comma_wsp +
-                  '(' + number + ')' + comma_wsp +
-                  '(' + number + ')' + comma_wsp +
-                  '(' + number + ')' + comma_wsp +
-                  '(' + number + ')' + comma_wsp +
-                  '(' + number + ')' +
-                  '\\s*\\))',
+      matrix = '(?:(matrix)\\s*\\(\\s*' +
+        '(' + number + ')' + comma_wsp +
+        '(' + number + ')' + comma_wsp +
+        '(' + number + ')' + comma_wsp +
+        '(' + number + ')' + comma_wsp +
+        '(' + number + ')' + comma_wsp +
+        '(' + number + ')' +
+        '\\s*\\))',
 
-        transform = '(?:' +
-                    matrix + '|' +
-                    translate + '|' +
-                    scale + '|' +
-                    rotate + '|' +
-                    skewX + '|' +
-                    skewY +
-                    ')',
+      transform = '(?:' +
+        matrix + '|' +
+        translate + '|' +
+        scale + '|' +
+        rotate + '|' +
+        skewX + '|' +
+        skewY +
+        ')',
 
-        transforms = '(?:' + transform + '(?:' + comma_wsp + transform + ')*' + ')',
+      transforms = '(?:' + transform + '(?:' + comma_wsp + transform + ')*' + ')',
 
-        transform_list = '^\\s*(?:' + transforms + '?)\\s*$',
+      transform_list = '^\\s*(?:' + transforms + '?)\\s*$',
 
-        // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
-        reTransformList = new RegExp(transform_list),
-        // == end transform regexp
+      // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
+      reTransformList = new RegExp(transform_list),
+      // == end transform regexp
 
-        reTransform = new RegExp(transform, 'g');
+      reTransform = new RegExp(transform, 'g');
 
     return function(attributeValue) {
 
       // start with identity matrix
       var matrix = iMatrix.concat();
-      var matrices = [ ];
+      var matrices = [];
 
       // return if no argument was given or
       // an argument does not match transform attribute regexp
@@ -6232,13 +6364,13 @@ fabric.util.string = {
 
       attributeValue.replace(reTransform, function(match) {
 
-        var m = new RegExp(transform).exec(match).filter(function (match) {
-              return (match !== '' && match != null);
-            }),
-            operation = m[1],
-            args = m.slice(2).map(parseFloat);
+        var m = new RegExp(transform).exec(match).filter(function(match) {
+          return (match !== '' && match != null);
+        }),
+          operation = m[1],
+          args = m.slice(2).map(parseFloat);
 
-        switch(operation) {
+        switch (operation) {
           case 'translate':
             translateMatrix(matrix, args);
             break;
@@ -6281,6 +6413,7 @@ fabric.util.string = {
    * @param points {String} points attribute string
    * @return {Array} array of points
    */
+
   function parsePointsAttribute(points) {
 
     // points attribute is required and must not be empty
@@ -6290,7 +6423,8 @@ fabric.util.string = {
     var asPairs = points.indexOf(',') > -1;
 
     points = points.split(/\s+/);
-    var parsedPoints = [ ], i, len;
+    var parsedPoints = [],
+      i, len;
 
     // points could look like "10,20 30,40" or "10 20 30 40"
     if (asPairs) {
@@ -6298,14 +6432,19 @@ fabric.util.string = {
       len = points.length;
       for (; i < len; i++) {
         var pair = points[i].split(',');
-        parsedPoints.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
+        parsedPoints.push({
+          x: parseFloat(pair[0]),
+          y: parseFloat(pair[1])
+        });
       }
-    }
-    else {
+    } else {
       i = 0;
       len = points.length;
-      for (; i < len; i+=2) {
-        parsedPoints.push({ x: parseFloat(points[i]), y: parseFloat(points[i+1]) });
+      for (; i < len; i += 2) {
+        parsedPoints.push({
+          x: parseFloat(points[i]),
+          y: parseFloat(points[i + 1])
+        });
       }
     }
 
@@ -6356,15 +6495,16 @@ fabric.util.string = {
    * @param {SVGElement} element Element to parse
    * @return {Object} Objects with values parsed from style attribute of an element
    */
+
   function parseStyleAttribute(element) {
-    var oStyle = { },
-        style = element.getAttribute('style'),
-        attr, value;
+    var oStyle = {},
+      style = element.getAttribute('style'),
+      attr, value;
 
     if (!style) return oStyle;
 
     if (typeof style === 'string') {
-      style.replace(/;$/, '').split(';').forEach(function (chunk) {
+      style.replace(/;$/, '').split(';').forEach(function(chunk) {
         var pair = chunk.split(':');
 
         attr = normalizeAttr(pair[0].trim().toLowerCase());
@@ -6372,13 +6512,11 @@ fabric.util.string = {
 
         if (attr === 'font') {
           parseFontDeclaration(value, oStyle);
-        }
-        else {
+        } else {
           oStyle[attr] = value;
         }
       });
-    }
-    else {
+    } else {
       for (var prop in style) {
         if (typeof style[prop] === 'undefined') continue;
 
@@ -6387,8 +6525,7 @@ fabric.util.string = {
 
         if (attr === 'font') {
           parseFontDeclaration(value, oStyle);
-        }
-        else {
+        } else {
           oStyle[attr] = value;
         }
       }
@@ -6398,7 +6535,7 @@ fabric.util.string = {
   }
 
   function resolveGradients(instances) {
-    for (var i = instances.length; i--; ) {
+    for (var i = instances.length; i--;) {
       var instanceFillValue = instances[i].get('fill');
 
       if (/^url\(/.test(instanceFillValue)) {
@@ -6422,8 +6559,10 @@ fabric.util.string = {
    * @param {Object} [options] Options object
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
+
   function parseElements(elements, callback, options, reviver) {
-    var instances = new Array(elements.length), i = elements.length;
+    var instances = new Array(elements.length),
+      i = elements.length;
 
     function checkIfDone() {
       if (--i === 0) {
@@ -6448,19 +6587,16 @@ fabric.util.string = {
                 checkIfDone();
               };
             })(index, el), options);
-          }
-          else {
+          } else {
             var obj = klass.fromElement(el, options);
             reviver && reviver(el, obj);
             instances.splice(index, 0, obj);
             checkIfDone();
           }
-        }
-        catch(err) {
+        } catch (err) {
           fabric.log(err);
         }
-      }
-      else {
+      } else {
         checkIfDone();
       }
     }
@@ -6474,10 +6610,11 @@ fabric.util.string = {
    * @param {SVGDocument} doc SVG document to parse
    * @return {Object} CSS rules of this document
    */
+
   function getCSSRules(doc) {
     var styles = doc.getElementsByTagName('style'),
-        allRules = { },
-        rules;
+      allRules = {},
+      rules;
 
     // very crude parsing of style contents
     for (var i = 0, len = styles.length; i < len; i++) {
@@ -6487,22 +6624,24 @@ fabric.util.string = {
       styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
 
       rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
-      rules = rules.map(function(rule) { return rule.trim(); });
+      rules = rules.map(function(rule) {
+        return rule.trim();
+      });
 
       rules.forEach(function(rule) {
         var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/);
         rule = match[1];
         var declaration = match[2].trim(),
-            propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
+          propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
 
         if (!allRules[rule]) {
-          allRules[rule] = { };
+          allRules[rule] = {};
         }
 
         for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
           var pair = propertyValuePairs[i].split(/\s*:\s*/),
-              property = pair[0],
-              value = pair[1];
+            property = pair[0],
+            value = pair[1];
 
           allRules[rule][property] = value;
         }
@@ -6515,16 +6654,17 @@ fabric.util.string = {
   /**
    * @private
    */
+
   function getGlobalStylesForElement(element) {
     var nodeName = element.nodeName,
-        className = element.getAttribute('class'),
-        id = element.getAttribute('id'),
-        styles = { };
+      className = element.getAttribute('class'),
+      id = element.getAttribute('id'),
+      styles = {};
 
     for (var rule in fabric.cssRules) {
       var ruleMatchesElement = (className && new RegExp('^\\.' + className).test(rule)) ||
-                               (id && new RegExp('^#' + id).test(rule)) ||
-                               (new RegExp('^' + nodeName).test(rule));
+        (id && new RegExp('^#' + id).test(rule)) ||
+        (new RegExp('^' + nodeName).test(rule));
 
       if (ruleMatchesElement) {
         for (var property in fabric.cssRules[rule]) {
@@ -6577,13 +6717,13 @@ fabric.util.string = {
       if (!doc) return;
 
       var startTime = new Date(),
-          descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
+        descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
       if (descendants.length === 0) {
         // we're likely in node, where "o3-xml" library fails to gEBTN("*")
         // https://github.com/ajaxorg/node-o3-xml/issues/21
         descendants = doc.selectNodes("//*[name(.)!='svg']");
-        var arr = [ ];
+        var arr = [];
         for (var i = 0, len = descendants.length; i < len; i++) {
           arr[i] = descendants[i];
         }
@@ -6591,19 +6731,18 @@ fabric.util.string = {
       }
 
       var elements = descendants.filter(function(el) {
-        return reAllowedSVGTagNames.test(el.tagName) &&
-              !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
+        return reAllowedSVGTagNames.test(el.tagName) && !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
       if (!elements || (elements && !elements.length)) return;
 
       var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = doc.getAttribute('width'),
-          heightAttr = doc.getAttribute('height'),
-          width = null,
-          height = null,
-          minX,
-          minY;
+        widthAttr = doc.getAttribute('width'),
+        heightAttr = doc.getAttribute('height'),
+        width = null,
+        height = null,
+        minX,
+        minY;
 
       if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
         minX = parseInt(viewBoxAttr[1], 10);
@@ -6635,106 +6774,111 @@ fabric.util.string = {
     };
   })();
 
-   /**
-    * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
-    * @namespace
-    */
-   var svgCache = {
+  /**
+   * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
+   * @namespace
+   */
+  var svgCache = {
 
-     /**
-      * @param {String} name
-      * @param {Function} callback
-      */
-     has: function (name, callback) {
-       callback(false);
-     },
+    /**
+     * @param {String} name
+     * @param {Function} callback
+     */
+    has: function(name, callback) {
+      callback(false);
+    },
 
-     /**
-      * @param {String} url
-      * @param {Function} callback
-      */
-     get: function () {
-       /* NOOP */
-     },
+    /**
+     * @param {String} url
+     * @param {Function} callback
+     */
+    get: function() {
+      /* NOOP */
+    },
 
-     /**
-      * @param {String} url
-      * @param {Object} object
-      */
-     set: function () {
-       /* NOOP */
-     }
-   };
+    /**
+     * @param {String} url
+     * @param {Object} object
+     */
+    set: function() {
+      /* NOOP */
+    }
+  };
 
-   /**
-    * Takes url corresponding to an SVG document, and parses it into a set of fabric objects. Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
-    * @memberof fabric
-    * @param {String} url
-    * @param {Function} callback
-    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
-    */
-   function loadSVGFromURL(url, callback, reviver) {
+  /**
+   * Takes url corresponding to an SVG document, and parses it into a set of fabric objects. Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
+   * @memberof fabric
+   * @param {String} url
+   * @param {Function} callback
+   * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
+   */
 
-     url = url.replace(/^\n\s*/, '').trim();
+  function loadSVGFromURL(url, callback, reviver) {
 
-     svgCache.has(url, function (hasUrl) {
-       if (hasUrl) {
-         svgCache.get(url, function (value) {
-           var enlivedRecord = _enlivenCachedObject(value);
-           callback(enlivedRecord.objects, enlivedRecord.options);
-         });
-       }
-       else {
-         new fabric.util.request(url, {
-           method: 'get',
-           onComplete: onComplete
-         });
-       }
-     });
+    url = url.replace(/^\n\s*/, '').trim();
 
-     function onComplete(r) {
+    svgCache.has(url, function(hasUrl) {
+      if (hasUrl) {
+        svgCache.get(url, function(value) {
+          var enlivedRecord = _enlivenCachedObject(value);
+          callback(enlivedRecord.objects, enlivedRecord.options);
+        });
+      } else {
+        new fabric.util.request(url, {
+          method: 'get',
+          onComplete: onComplete
+        });
+      }
+    });
 
-       var xml = r.responseXML;
-       if (!xml.documentElement && fabric.window.ActiveXObject && r.responseText) {
-         xml = new ActiveXObject('Microsoft.XMLDOM');
-         xml.async = 'false';
-         //IE chokes on DOCTYPE
-         xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
-       }
-       if (!xml.documentElement) return;
+    function onComplete(r) {
 
-       fabric.parseSVGDocument(xml.documentElement, function (results, options) {
-         svgCache.set(url, {
-           objects: fabric.util.array.invoke(results, 'toObject'),
-           options: options
-         });
-         callback(results, options);
-       }, reviver);
-     }
-   }
+      var xml = r.responseXML;
+      if (!xml.documentElement && fabric.window.ActiveXObject && r.responseText) {
+        xml = new ActiveXObject('Microsoft.XMLDOM');
+        xml.async = 'false';
+        //IE chokes on DOCTYPE
+        xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
+      }
+      if (!xml.documentElement) return;
+
+      fabric.parseSVGDocument(xml.documentElement, function(results, options) {
+        svgCache.set(url, {
+          objects: fabric.util.array.invoke(results, 'toObject'),
+          options: options
+        });
+        callback(results, options);
+      }, reviver);
+    }
+  }
 
   /**
    * @private
    */
+
   function _enlivenCachedObject(cachedObject) {
 
-   var objects = cachedObject.objects,
-       options = cachedObject.options;
+    var objects = cachedObject.objects,
+      options = cachedObject.options;
 
-   objects = objects.map(function (o) {
-     return fabric[capitalize(o.type)].fromObject(o);
-   });
+    objects = objects.map(function(o) {
+      return fabric[capitalize(o.type)].fromObject(o);
+    });
 
-   return ({ objects: objects, options: options });
+    return ({
+      objects: objects,
+      options: options
+    });
   }
 
   /**
-    * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
-    * @memberof fabric
-    * @param {String} string
-    * @param {Function} callback
-    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
-    */
+   * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
+   * @memberof fabric
+   * @param {String} string
+   * @param {Function} callback
+   * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
+   */
+
   function loadSVGFromString(string, callback, reviver) {
     string = string.trim();
     var doc;
@@ -6743,15 +6887,14 @@ fabric.util.string = {
       if (parser && parser.parseFromString) {
         doc = parser.parseFromString(string, 'text/xml');
       }
-    }
-    else if (fabric.window.ActiveXObject) {
+    } else if (fabric.window.ActiveXObject) {
       doc = new ActiveXObject('Microsoft.XMLDOM');
       doc.async = 'false';
       //IE chokes on DOCTYPE
-      doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
+      doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
     }
 
-    fabric.parseSVGDocument(doc.documentElement, function (results, options) {
+    fabric.parseSVGDocument(doc.documentElement, function(results, options) {
       callback(results, options);
     }, reviver);
   }
@@ -6761,6 +6904,7 @@ fabric.util.string = {
    * @param {Array} objects Array of fabric objects
    * @return {String}
    */
+
   function createSVGFontFacesMarkup(objects) {
     var markup = '';
 
@@ -6769,8 +6913,8 @@ fabric.util.string = {
 
       markup += [
         '@font-face {',
-          'font-family: ', objects[i].fontFamily, '; ',
-          'src: url(\'', objects[i].path, '\')',
+        'font-family: ', objects[i].fontFamily, '; ',
+        'src: url(\'', objects[i].path, '\')',
         '}'
       ].join('');
     }
@@ -6778,9 +6922,9 @@ fabric.util.string = {
     if (markup) {
       markup = [
         '<style type="text/css">',
-          '<![CDATA[',
-            markup,
-          ']]>',
+        '<![CDATA[',
+        markup,
+        ']]>',
         '</style>'
       ].join('');
     }
@@ -6793,15 +6937,16 @@ fabric.util.string = {
    * @param {fabric.Canvas} canvas instance of fabric.Canvas
    * @return {String}
    */
+
   function createSVGRefElementsMarkup(canvas) {
     var markup = '';
 
     if (canvas.backgroundColor && canvas.backgroundColor.source) {
       markup = [
         '<pattern x="0" y="0" id="backgroundColorPattern" ',
-          'width="', canvas.backgroundColor.source.width,
-          '" height="', canvas.backgroundColor.source.height,
-          '" patternUnits="userSpaceOnUse">',
+        'width="', canvas.backgroundColor.source.width,
+        '" height="', canvas.backgroundColor.source.height,
+        '" patternUnits="userSpaceOnUse">',
         '<image x="0" y="0" ',
         'width="', canvas.backgroundColor.source.width,
         '" height="', canvas.backgroundColor.source.height,
@@ -6821,20 +6966,21 @@ fabric.util.string = {
    * @param {SVGDocument} doc SVG document to parse
    * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
    */
+
   function getGradientDefs(doc) {
     var linearGradientEls = doc.getElementsByTagName('linearGradient'),
-        radialGradientEls = doc.getElementsByTagName('radialGradient'),
-        el, i,
-        gradientDefs = { };
+      radialGradientEls = doc.getElementsByTagName('radialGradient'),
+      el, i,
+      gradientDefs = {};
 
     i = linearGradientEls.length;
-    for (; i--; ) {
+    for (; i--;) {
       el = linearGradientEls[i];
       gradientDefs[el.getAttribute('id')] = el;
     }
 
     i = radialGradientEls.length;
-    for (; i--; ) {
+    for (; i--;) {
       el = radialGradientEls[i];
       gradientDefs[el.getAttribute('id')] = el;
     }
@@ -6844,19 +6990,19 @@ fabric.util.string = {
 
   extend(fabric, {
 
-    parseAttributes:            parseAttributes,
-    parseElements:              parseElements,
-    parseStyleAttribute:        parseStyleAttribute,
-    parsePointsAttribute:       parsePointsAttribute,
-    getCSSRules:                getCSSRules,
+    parseAttributes: parseAttributes,
+    parseElements: parseElements,
+    parseStyleAttribute: parseStyleAttribute,
+    parsePointsAttribute: parsePointsAttribute,
+    getCSSRules: getCSSRules,
 
-    loadSVGFromURL:             loadSVGFromURL,
-    loadSVGFromString:          loadSVGFromString,
+    loadSVGFromURL: loadSVGFromURL,
+    loadSVGFromString: loadSVGFromString,
 
-    createSVGFontFacesMarkup:   createSVGFontFacesMarkup,
+    createSVGFontFacesMarkup: createSVGFontFacesMarkup,
     createSVGRefElementsMarkup: createSVGRefElementsMarkup,
 
-    getGradientDefs:            getGradientDefs
+    getGradientDefs: getGradientDefs
   });
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -6866,7 +7012,7 @@ fabric.util.string = {
 
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {});
 
   if (fabric.Point) {
     fabric.warn('fabric.Point is already defined');
@@ -6884,6 +7030,7 @@ fabric.util.string = {
    * @param {Number} y
    * @return {fabric.Point} thisArg
    */
+
   function Point(x, y) {
     this.x = x;
     this.y = y;
@@ -6898,7 +7045,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {fabric.Point} new Point instance with added values
      */
-    add: function (that) {
+    add: function(that) {
       return new Point(this.x + that.x, this.y + that.y);
     },
 
@@ -6907,7 +7054,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {fabric.Point} thisArg
      */
-    addEquals: function (that) {
+    addEquals: function(that) {
       this.x += that.x;
       this.y += that.y;
       return this;
@@ -6918,7 +7065,7 @@ fabric.util.string = {
      * @param {Number} scalar
      * @return {fabric.Point} new Point with added value
      */
-    scalarAdd: function (scalar) {
+    scalarAdd: function(scalar) {
       return new Point(this.x + scalar, this.y + scalar);
     },
 
@@ -6927,7 +7074,7 @@ fabric.util.string = {
      * @param {Number} scalar
      * @param {fabric.Point} thisArg
      */
-    scalarAddEquals: function (scalar) {
+    scalarAddEquals: function(scalar) {
       this.x += scalar;
       this.y += scalar;
       return this;
@@ -6938,7 +7085,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {fabric.Point} new Point object with subtracted values
      */
-    subtract: function (that) {
+    subtract: function(that) {
       return new Point(this.x - that.x, this.y - that.y);
     },
 
@@ -6947,7 +7094,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {fabric.Point} thisArg
      */
-    subtractEquals: function (that) {
+    subtractEquals: function(that) {
       this.x -= that.x;
       this.y -= that.y;
       return this;
@@ -6958,7 +7105,7 @@ fabric.util.string = {
      * @param {Number} scalar
      * @return {fabric.Point}
      */
-    scalarSubtract: function (scalar) {
+    scalarSubtract: function(scalar) {
       return new Point(this.x - scalar, this.y - scalar);
     },
 
@@ -6967,7 +7114,7 @@ fabric.util.string = {
      * @param {Number} scalar
      * @return {fabric.Point} thisArg
      */
-    scalarSubtractEquals: function (scalar) {
+    scalarSubtractEquals: function(scalar) {
       this.x -= scalar;
       this.y -= scalar;
       return this;
@@ -6978,7 +7125,7 @@ fabric.util.string = {
      * @param {Number} scalar
      * @return {fabric.Point}
      */
-    multiply: function (scalar) {
+    multiply: function(scalar) {
       return new Point(this.x * scalar, this.y * scalar);
     },
 
@@ -6987,7 +7134,7 @@ fabric.util.string = {
      * @param {Number} scalar
      * @return {fabric.Point} thisArg
      */
-    multiplyEquals: function (scalar) {
+    multiplyEquals: function(scalar) {
       this.x *= scalar;
       this.y *= scalar;
       return this;
@@ -6998,7 +7145,7 @@ fabric.util.string = {
      * @param {Number} scalar
      * @return {fabric.Point}
      */
-    divide: function (scalar) {
+    divide: function(scalar) {
       return new Point(this.x / scalar, this.y / scalar);
     },
 
@@ -7007,7 +7154,7 @@ fabric.util.string = {
      * @param {Number} scalar
      * @return {fabric.Point} thisArg
      */
-    divideEquals: function (scalar) {
+    divideEquals: function(scalar) {
       this.x /= scalar;
       this.y /= scalar;
       return this;
@@ -7018,7 +7165,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {Boolean}
      */
-    eq: function (that) {
+    eq: function(that) {
       return (this.x === that.x && this.y === that.y);
     },
 
@@ -7027,7 +7174,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {Boolean}
      */
-    lt: function (that) {
+    lt: function(that) {
       return (this.x < that.x && this.y < that.y);
     },
 
@@ -7036,7 +7183,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {Boolean}
      */
-    lte: function (that) {
+    lte: function(that) {
       return (this.x <= that.x && this.y <= that.y);
     },
 
@@ -7046,7 +7193,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {Boolean}
      */
-    gt: function (that) {
+    gt: function(that) {
       return (this.x > that.x && this.y > that.y);
     },
 
@@ -7055,7 +7202,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {Boolean}
      */
-    gte: function (that) {
+    gte: function(that) {
       return (this.x >= that.x && this.y >= that.y);
     },
 
@@ -7065,7 +7212,7 @@ fabric.util.string = {
      * @param {Number} t
      * @return {fabric.Point}
      */
-    lerp: function (that, t) {
+    lerp: function(that, t) {
       return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
     },
 
@@ -7074,9 +7221,9 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {Number}
      */
-    distanceFrom: function (that) {
+    distanceFrom: function(that) {
       var dx = this.x - that.x,
-          dy = this.y - that.y;
+        dy = this.y - that.y;
       return Math.sqrt(dx * dx + dy * dy);
     },
 
@@ -7085,8 +7232,8 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {fabric.Point}
      */
-    midPointFrom: function (that) {
-      return new Point(this.x + (that.x - this.x)/2, this.y + (that.y - this.y)/2);
+    midPointFrom: function(that) {
+      return new Point(this.x + (that.x - this.x) / 2, this.y + (that.y - this.y) / 2);
     },
 
     /**
@@ -7094,7 +7241,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {fabric.Point}
      */
-    min: function (that) {
+    min: function(that) {
       return new Point(Math.min(this.x, that.x), Math.min(this.y, that.y));
     },
 
@@ -7103,7 +7250,7 @@ fabric.util.string = {
      * @param {fabric.Point} that
      * @return {fabric.Point}
      */
-    max: function (that) {
+    max: function(that) {
       return new Point(Math.max(this.x, that.x), Math.max(this.y, that.y));
     },
 
@@ -7111,7 +7258,7 @@ fabric.util.string = {
      * Returns string representation of this point
      * @return {String}
      */
-    toString: function () {
+    toString: function() {
       return this.x + "," + this.y;
     },
 
@@ -7120,7 +7267,7 @@ fabric.util.string = {
      * @param {Number} x
      * @return {Number} y
      */
-    setXY: function (x, y) {
+    setXY: function(x, y) {
       this.x = x;
       this.y = y;
     },
@@ -7129,7 +7276,7 @@ fabric.util.string = {
      * Sets x/y of this point from another point
      * @param {fabric.Point} that
      */
-    setFromPoint: function (that) {
+    setFromPoint: function(that) {
       this.x = that.x;
       this.y = that.y;
     },
@@ -7138,9 +7285,9 @@ fabric.util.string = {
      * Swaps x/y of this point and another point
      * @param {fabric.Point} that
      */
-    swap: function (that) {
+    swap: function(that) {
       var x = this.x,
-          y = this.y;
+        y = this.y;
       this.x = that.x;
       this.y = that.y;
       that.x = x;
@@ -7155,7 +7302,7 @@ fabric.util.string = {
 
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {});
 
   if (fabric.Intersection) {
     fabric.warn('fabric.Intersection is already defined');
@@ -7168,6 +7315,7 @@ fabric.util.string = {
    * @memberOf fabric
    * @constructor
    */
+
   function Intersection(status) {
     this.status = status;
     this.points = [];
@@ -7181,7 +7329,7 @@ fabric.util.string = {
      * Appends a point to intersection
      * @param {fabric.Point} point
      */
-    appendPoint: function (point) {
+    appendPoint: function(point) {
       this.points.push(point);
     },
 
@@ -7189,7 +7337,7 @@ fabric.util.string = {
      * Appends points to intersection
      * @param {Array} points
      */
-    appendPoints: function (points) {
+    appendPoints: function(points) {
       this.points = this.points.concat(points);
     }
   };
@@ -7203,27 +7351,24 @@ fabric.util.string = {
    * @param {fabric.Point} b2
    * @return {fabric.Intersection}
    */
-  fabric.Intersection.intersectLineLine = function (a1, a2, b1, b2) {
+  fabric.Intersection.intersectLineLine = function(a1, a2, b1, b2) {
     var result,
-        ua_t = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
-        ub_t = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
-        u_b = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
+      ua_t = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
+      ub_t = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
+      u_b = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
     if (u_b !== 0) {
       var ua = ua_t / u_b,
-          ub = ub_t / u_b;
+        ub = ub_t / u_b;
       if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
         result = new Intersection("Intersection");
         result.points.push(new fabric.Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
-      }
-      else {
+      } else {
         result = new Intersection();
       }
-    }
-    else {
+    } else {
       if (ua_t === 0 || ub_t === 0) {
         result = new Intersection("Coincident");
-      }
-      else {
+      } else {
         result = new Intersection("Parallel");
       }
     }
@@ -7238,14 +7383,14 @@ fabric.util.string = {
    * @param {Array} points
    * @return {fabric.Intersection}
    */
-  fabric.Intersection.intersectLinePolygon = function(a1,a2,points){
+  fabric.Intersection.intersectLinePolygon = function(a1, a2, points) {
     var result = new Intersection(),
-        length = points.length;
+      length = points.length;
 
     for (var i = 0; i < length; i++) {
       var b1 = points[i],
-          b2 = points[(i+1) % length],
-          inter = Intersection.intersectLineLine(a1, a2, b1, b2);
+        b2 = points[(i + 1) % length],
+        inter = Intersection.intersectLineLine(a1, a2, b1, b2);
 
       result.appendPoints(inter.points);
     }
@@ -7262,14 +7407,14 @@ fabric.util.string = {
    * @param {Array} points2
    * @return {fabric.Intersection}
    */
-  fabric.Intersection.intersectPolygonPolygon = function (points1, points2) {
+  fabric.Intersection.intersectPolygonPolygon = function(points1, points2) {
     var result = new Intersection(),
-        length = points1.length;
+      length = points1.length;
 
     for (var i = 0; i < length; i++) {
       var a1 = points1[i],
-          a2 = points1[(i+1) % length],
-          inter = Intersection.intersectLinePolygon(a1, a2, points2);
+        a2 = points1[(i + 1) % length],
+        inter = Intersection.intersectLinePolygon(a1, a2, points2);
 
       result.appendPoints(inter.points);
     }
@@ -7287,16 +7432,16 @@ fabric.util.string = {
    * @param {Number} r2
    * @return {fabric.Intersection}
    */
-  fabric.Intersection.intersectPolygonRectangle = function (points, r1, r2) {
+  fabric.Intersection.intersectPolygonRectangle = function(points, r1, r2) {
     var min = r1.min(r2),
-        max = r1.max(r2),
-        topRight = new fabric.Point(max.x, min.y),
-        bottomLeft = new fabric.Point(min.x, max.y),
-        inter1 = Intersection.intersectLinePolygon(min, topRight, points),
-        inter2 = Intersection.intersectLinePolygon(topRight, max, points),
-        inter3 = Intersection.intersectLinePolygon(max, bottomLeft, points),
-        inter4 = Intersection.intersectLinePolygon(bottomLeft, min, points),
-        result = new Intersection();
+      max = r1.max(r2),
+      topRight = new fabric.Point(max.x, min.y),
+      bottomLeft = new fabric.Point(min.x, max.y),
+      inter1 = Intersection.intersectLinePolygon(min, topRight, points),
+      inter2 = Intersection.intersectLinePolygon(topRight, max, points),
+      inter3 = Intersection.intersectLinePolygon(max, bottomLeft, points),
+      inter4 = Intersection.intersectLinePolygon(bottomLeft, min, points),
+      result = new Intersection();
 
     result.appendPoints(inter1.points);
     result.appendPoints(inter2.points);
@@ -7314,7 +7459,7 @@ fabric.util.string = {
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {});
 
   if (fabric.Color) {
     fabric.warn('fabric.Color is already defined.');
@@ -7330,11 +7475,11 @@ fabric.util.string = {
    * @param {String} color optional in hex or rgb(a) format
    * @return {fabric.Color} thisArg
    */
+
   function Color(color) {
     if (!color) {
       this.setSource([0, 0, 0, 1]);
-    }
-    else {
+    } else {
       this._tryParsingColor(color);
     }
   }
@@ -7379,15 +7524,14 @@ fabric.util.string = {
       r /= 255, g /= 255, b /= 255;
 
       var h, s, l,
-          max = fabric.util.array.max([r, g, b]),
-          min = fabric.util.array.min([r, g, b]);
+        max = fabric.util.array.max([r, g, b]),
+        min = fabric.util.array.min([r, g, b]);
 
       l = (max + min) / 2;
 
       if (max === min) {
         h = s = 0; // achromatic
-      }
-      else {
+      } else {
         var d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
         switch (max) {
@@ -7451,7 +7595,7 @@ fabric.util.string = {
      */
     toHsl: function() {
       var source = this.getSource(),
-          hsl = this._rgbToHsl(source[0], source[1], source[2]);
+        hsl = this._rgbToHsl(source[0], source[1], source[2]);
 
       return 'hsl(' + hsl[0] + ',' + hsl[1] + '%,' + hsl[2] + '%)';
     },
@@ -7462,7 +7606,7 @@ fabric.util.string = {
      */
     toHsla: function() {
       var source = this.getSource(),
-          hsl = this._rgbToHsl(source[0], source[1], source[2]);
+        hsl = this._rgbToHsl(source[0], source[1], source[2]);
 
       return 'hsla(' + hsl[0] + ',' + hsl[1] + '%,' + hsl[2] + '%,' + source[3] + ')';
     },
@@ -7512,8 +7656,8 @@ fabric.util.string = {
      */
     toGrayscale: function() {
       var source = this.getSource(),
-          average = parseInt((source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11).toFixed(0), 10),
-          currentAlpha = source[3];
+        average = parseInt((source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11).toFixed(0), 10),
+        currentAlpha = source[3];
       this.setSource([average, average, average, currentAlpha]);
       return this;
     },
@@ -7525,8 +7669,8 @@ fabric.util.string = {
      */
     toBlackWhite: function(threshold) {
       var source = this.getSource(),
-          average = (source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11).toFixed(0),
-          currentAlpha = source[3];
+        average = (source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11).toFixed(0),
+        currentAlpha = source[3];
 
       threshold = threshold || 127;
 
@@ -7546,10 +7690,10 @@ fabric.util.string = {
       }
 
       var result = [],
-          alpha = this.getAlpha(),
-          otherAlpha = 0.5,
-          source = this.getSource(),
-          otherSource = otherColor.getSource();
+        alpha = this.getAlpha(),
+        otherAlpha = 0.5,
+        source = this.getSource(),
+        otherSource = otherColor.getSource();
 
       for (var i = 0; i < 3; i++) {
         result.push(Math.round((source[i] * (1 - otherAlpha)) + (otherSource[i] * otherAlpha)));
@@ -7593,23 +7737,23 @@ fabric.util.string = {
    * @see: http://www.w3.org/TR/CSS2/syndata.html#color-units
    */
   fabric.Color.colorNameMap = {
-    'aqua':    '#00FFFF',
-    'black':   '#000000',
-    'blue':    '#0000FF',
+    'aqua': '#00FFFF',
+    'black': '#000000',
+    'blue': '#0000FF',
     'fuchsia': '#FF00FF',
-    'gray':    '#808080',
-    'green':   '#008000',
-    'lime':    '#00FF00',
-    'maroon':  '#800000',
-    'navy':    '#000080',
-    'olive':   '#808000',
-    'orange':  '#FFA500',
-    'purple':  '#800080',
-    'red':     '#FF0000',
-    'silver':  '#C0C0C0',
-    'teal':    '#008080',
-    'white':   '#FFFFFF',
-    'yellow':  '#FFFF00'
+    'gray': '#808080',
+    'green': '#008000',
+    'lime': '#00FF00',
+    'maroon': '#800000',
+    'navy': '#000080',
+    'olive': '#808000',
+    'orange': '#FFA500',
+    'purple': '#800080',
+    'red': '#FF0000',
+    'silver': '#C0C0C0',
+    'teal': '#008080',
+    'white': '#FFFFFF',
+    'yellow': '#FFFF00'
   };
 
   /**
@@ -7619,12 +7763,13 @@ fabric.util.string = {
    * @param {Number} t
    * @return {Number}
    */
-  function hue2rgb(p, q, t){
+
+  function hue2rgb(p, q, t) {
     if (t < 0) t += 1;
     if (t > 1) t -= 1;
-    if (t < 1/6) return p + (q - p) * 6 * t;
-    if (t < 1/2) return q;
-    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
     return p;
   }
 
@@ -7648,8 +7793,8 @@ fabric.util.string = {
     var match = color.match(Color.reRGBa);
     if (match) {
       var r = parseInt(match[1], 10) / (/%$/.test(match[1]) ? 100 : 1) * (/%$/.test(match[1]) ? 255 : 1),
-          g = parseInt(match[2], 10) / (/%$/.test(match[2]) ? 100 : 1) * (/%$/.test(match[2]) ? 255 : 1),
-          b = parseInt(match[3], 10) / (/%$/.test(match[3]) ? 100 : 1) * (/%$/.test(match[3]) ? 255 : 1);
+        g = parseInt(match[2], 10) / (/%$/.test(match[2]) ? 100 : 1) * (/%$/.test(match[2]) ? 255 : 1),
+        b = parseInt(match[3], 10) / (/%$/.test(match[3]) ? 100 : 1) * (/%$/.test(match[3]) ? 255 : 1);
 
       return [
         parseInt(r, 10),
@@ -7693,20 +7838,19 @@ fabric.util.string = {
     if (!match) return;
 
     var h = (((parseFloat(match[1]) % 360) + 360) % 360) / 360,
-        s = parseFloat(match[2]) / (/%$/.test(match[2]) ? 100 : 1),
-        l = parseFloat(match[3]) / (/%$/.test(match[3]) ? 100 : 1),
-        r, g, b;
+      s = parseFloat(match[2]) / (/%$/.test(match[2]) ? 100 : 1),
+      l = parseFloat(match[3]) / (/%$/.test(match[3]) ? 100 : 1),
+      r, g, b;
 
     if (s === 0) {
       r = g = b = l;
-    }
-    else {
+    } else {
       var q = l <= 0.5 ? l * (s + 1) : l + s - l * s;
       var p = l * 2 - q;
 
-      r = hue2rgb(p, q, h + 1/3);
+      r = hue2rgb(p, q, h + 1 / 3);
       g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1/3);
+      b = hue2rgb(p, q, h - 1 / 3);
     }
 
     return [
@@ -7748,10 +7892,10 @@ fabric.util.string = {
   fabric.Color.sourceFromHex = function(color) {
     if (color.match(Color.reHex)) {
       var value = color.slice(color.indexOf('#') + 1),
-          isShortNotation = (value.length === 3),
-          r = isShortNotation ? (value.charAt(0) + value.charAt(0)) : value.substring(0, 2),
-          g = isShortNotation ? (value.charAt(1) + value.charAt(1)) : value.substring(2, 4),
-          b = isShortNotation ? (value.charAt(2) + value.charAt(2)) : value.substring(4, 6);
+        isShortNotation = (value.length === 3),
+        r = isShortNotation ? (value.charAt(0) + value.charAt(0)) : value.substring(0, 2),
+        g = isShortNotation ? (value.charAt(1) + value.charAt(1)) : value.substring(2, 4),
+        b = isShortNotation ? (value.charAt(2) + value.charAt(2)) : value.substring(4, 6);
 
       return [
         parseInt(r, 16),
@@ -7779,10 +7923,11 @@ fabric.util.string = {
 (function() {
 
   /* _FROM_SVG_START_ */
+
   function getColorStop(el) {
     var style = el.getAttribute('style'),
-        offset = el.getAttribute('offset'),
-        color, opacity;
+      offset = el.getAttribute('offset'),
+      color, opacity;
 
     // convert percents to absolute values
     offset = parseFloat(offset) / (/%$/.test(offset) ? 100 : 1);
@@ -7790,20 +7935,19 @@ fabric.util.string = {
     if (style) {
       var keyValuePairs = style.split(/\s*;\s*/);
 
-      if (keyValuePairs[keyValuePairs.length-1] === '') {
+      if (keyValuePairs[keyValuePairs.length - 1] === '') {
         keyValuePairs.pop();
       }
 
-      for (var i = keyValuePairs.length; i--; ) {
+      for (var i = keyValuePairs.length; i--;) {
 
         var split = keyValuePairs[i].split(/\s*:\s*/),
-            key = split[0].trim(),
-            value = split[1].trim();
+          key = split[0].trim(),
+          value = split[1].trim();
 
         if (key === 'stop-color') {
           color = value;
-        }
-        else if (key === 'stop-opacity') {
+        } else if (key === 'stop-opacity') {
           opacity = value;
         }
       }
@@ -7831,7 +7975,7 @@ fabric.util.string = {
    * Gradient class
    * @class fabric.Gradient
    */
-  fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
+  fabric.Gradient = fabric.util.createClass( /** @lends fabric.Gradient.prototype */ {
 
     /**
      * Constructor
@@ -7839,9 +7983,9 @@ fabric.util.string = {
      * @return {fabric.Gradient} thisArg
      */
     initialize: function(options) {
-      options || (options = { });
+      options || (options = {});
 
-      var coords = { };
+      var coords = {};
 
       this.id = fabric.Object.__uid++;
       this.type = options.type || 'linear';
@@ -7871,7 +8015,11 @@ fabric.util.string = {
     addColorStop: function(colorStop) {
       for (var position in colorStop) {
         var color = new fabric.Color(colorStop[position]);
-        this.colorStops.push({offset: position, color: color.toRgb(), opacity: color.getAlpha()});
+        this.colorStops.push({
+          offset: position,
+          color: color.toRgb(),
+          opacity: color.getAlpha()
+        });
       }
       return this;
     },
@@ -7898,7 +8046,7 @@ fabric.util.string = {
      */
     toSVG: function(object, normalize) {
       var coords = fabric.util.object.clone(this.coords),
-          markup;
+        markup;
 
       // colorStops must be sorted ascending
       this.colorStops.sort(function(a, b) {
@@ -7910,33 +8058,31 @@ fabric.util.string = {
         coords.y1 += object.height / 2;
         coords.x2 += object.width / 2;
         coords.y2 += object.height / 2;
-      }
-      else if (this.gradientUnits === 'objectBoundingBox') {
+      } else if (this.gradientUnits === 'objectBoundingBox') {
         _convertValuesToPercentUnits(object, coords);
       }
 
       if (this.type === 'linear') {
         markup = [
           '<linearGradient ',
-            'id="SVGID_', this.id,
-            '" gradientUnits="', this.gradientUnits,
-            '" x1="', coords.x1,
-            '" y1="', coords.y1,
-            '" x2="', coords.x2,
-            '" y2="', coords.y2,
+          'id="SVGID_', this.id,
+          '" gradientUnits="', this.gradientUnits,
+          '" x1="', coords.x1,
+          '" y1="', coords.y1,
+          '" x2="', coords.x2,
+          '" y2="', coords.y2,
           '">'
         ];
-      }
-      else if (this.type === 'radial') {
+      } else if (this.type === 'radial') {
         markup = [
           '<radialGradient ',
-            'id="SVGID_', this.id,
-            '" gradientUnits="', this.gradientUnits,
-            '" cx="', coords.x2,
-            '" cy="', coords.y2,
-            '" r="', coords.r2,
-            '" fx="', coords.x1,
-            '" fy="', coords.y1,
+          'id="SVGID_', this.id,
+          '" gradientUnits="', this.gradientUnits,
+          '" cx="', coords.x2,
+          '" cy="', coords.y2,
+          '" r="', coords.r2,
+          '" fx="', coords.x1,
+          '" fy="', coords.y1,
           '">'
         ];
       }
@@ -7944,9 +8090,8 @@ fabric.util.string = {
       for (var i = 0; i < this.colorStops.length; i++) {
         markup.push(
           '<stop ',
-            'offset="', (this.colorStops[i].offset * 100) + '%',
-            '" style="stop-color:', this.colorStops[i].color,
-            (this.colorStops[i].opacity ? ';stop-opacity: ' + this.colorStops[i].opacity : ';'),
+          'offset="', (this.colorStops[i].offset * 100) + '%',
+          '" style="stop-color:', this.colorStops[i].color, (this.colorStops[i].opacity ? ';stop-opacity: ' + this.colorStops[i].opacity : ';'),
           '"/>'
         );
       }
@@ -7970,16 +8115,15 @@ fabric.util.string = {
       if (this.type === 'linear') {
         gradient = ctx.createLinearGradient(
           this.coords.x1, this.coords.y1, this.coords.x2, this.coords.y2);
-      }
-      else if (this.type === 'radial') {
+      } else if (this.type === 'radial') {
         gradient = ctx.createRadialGradient(
           this.coords.x1, this.coords.y1, this.coords.r1, this.coords.x2, this.coords.y2, this.coords.r2);
       }
 
       for (var i = 0, len = this.colorStops.length; i < len; i++) {
         var color = this.colorStops[i].color,
-            opacity = this.colorStops[i].opacity,
-            offset = this.colorStops[i].offset;
+          opacity = this.colorStops[i].opacity,
+          offset = this.colorStops[i].offset;
 
         if (typeof opacity !== 'undefined') {
           color = new fabric.Color(color).setAlpha(opacity).toRgba();
@@ -8040,10 +8184,10 @@ fabric.util.string = {
        */
 
       var colorStopEls = el.getElementsByTagName('stop'),
-          type = (el.nodeName === 'linearGradient' ? 'linear' : 'radial'),
-          gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
-          colorStops = [],
-          coords = { };
+        type = (el.nodeName === 'linearGradient' ? 'linear' : 'radial'),
+        gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
+        colorStops = [],
+        coords = {};
 
       if (type === 'linear') {
         coords = {
@@ -8052,8 +8196,7 @@ fabric.util.string = {
           x2: el.getAttribute('x2') || '100%',
           y2: el.getAttribute('y2') || 0
         };
-      }
-      else if (type === 'radial') {
+      } else if (type === 'radial') {
         coords = {
           x1: el.getAttribute('fx') || el.getAttribute('cx') || '50%',
           y1: el.getAttribute('fy') || el.getAttribute('cy') || '50%',
@@ -8064,7 +8207,7 @@ fabric.util.string = {
         };
       }
 
-      for (var i = colorStopEls.length; i--; ) {
+      for (var i = colorStopEls.length; i--;) {
         colorStops.push(getColorStop(colorStopEls[i]));
       }
 
@@ -8087,7 +8230,7 @@ fabric.util.string = {
      * @param {Object} [options] Options object
      */
     forObject: function(obj, options) {
-      options || (options = { });
+      options || (options = {});
       _convertPercentUnitsToValues(obj, options);
       return new fabric.Gradient(options);
     }
@@ -8096,22 +8239,21 @@ fabric.util.string = {
   /**
    * @private
    */
+
   function _convertPercentUnitsToValues(object, options) {
     for (var prop in options) {
       if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
         var percents = parseFloat(options[prop], 10);
         if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
           options[prop] = fabric.util.toFixed(object.width * percents / 100, 2);
-        }
-        else if (prop === 'y1' || prop === 'y2') {
+        } else if (prop === 'y1' || prop === 'y2') {
           options[prop] = fabric.util.toFixed(object.height * percents / 100, 2);
         }
       }
       // normalize rendering point (should be from top/left corner rather than center of the shape)
       if (prop === 'x1' || prop === 'x2') {
         options[prop] -= fabric.util.toFixed(object.width / 2, 2);
-      }
-      else if (prop === 'y1' || prop === 'y2') {
+      } else if (prop === 'y1' || prop === 'y2') {
         options[prop] -= fabric.util.toFixed(object.height / 2, 2);
       }
     }
@@ -8121,20 +8263,19 @@ fabric.util.string = {
   /**
    * @private
    */
+
   function _convertValuesToPercentUnits(object, options) {
     for (var prop in options) {
       // normalize rendering point (should be from center rather than top/left corner of the shape)
       if (prop === 'x1' || prop === 'x2') {
         options[prop] += fabric.util.toFixed(object.width / 2, 2);
-      }
-      else if (prop === 'y1' || prop === 'y2') {
+      } else if (prop === 'y1' || prop === 'y2') {
         options[prop] += fabric.util.toFixed(object.height / 2, 2);
       }
       // convert to percent units
       if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
         options[prop] = fabric.util.toFixed(options[prop] / object.width * 100, 2) + '%';
-      }
-      else if (prop === 'y1' || prop === 'y2') {
+      } else if (prop === 'y1' || prop === 'y2') {
         options[prop] = fabric.util.toFixed(options[prop] / object.height * 100, 2) + '%';
       }
     }
@@ -8146,7 +8287,7 @@ fabric.util.string = {
  * Pattern class
  * @class fabric.Pattern
  */
-fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ {
+fabric.Pattern = fabric.util.createClass( /** @lends fabric.Pattern.prototype */ {
 
   /**
    * Repeat property of a pattern (one of repeat, repeat-x, repeat-y or no-repeat)
@@ -8175,7 +8316,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    * @return {fabric.Pattern} thisArg
    */
   initialize: function(options) {
-    options || (options = { });
+    options || (options = {});
 
     this.id = fabric.Object.__uid++;
 
@@ -8184,8 +8325,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
         // function string
         if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
           this.source = new Function(fabric.util.getFunctionBody(options.source));
-        }
-        else {
+        } else {
           // img src string
           var _this = this;
           this.source = fabric.util.createImage();
@@ -8193,8 +8333,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
             _this.source = img;
           });
         }
-      }
-      else {
+      } else {
         // img element
         this.source = options.source;
       }
@@ -8249,22 +8388,21 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     if (patternSource.src) {
       patternImgSrc = patternSource.src;
-    }
-    else if (patternSource.toDataURL) {
+    } else if (patternSource.toDataURL) {
       patternImgSrc = patternSource.toDataURL();
     }
 
     return '<pattern id="SVGID_' + this.id +
-                  '" x="' + this.offsetX +
-                  '" y="' + this.offsetY +
-                  '" width="' + patternWidth +
-                  '" height="' + patternHeight + '">' +
-             '<image x="0" y="0"' +
-                    ' width="' + patternSource.width +
-                    '" height="' + patternSource.height +
-                    '" xlink:href="' + patternImgSrc +
-             '"></image>' +
-           '</pattern>';
+      '" x="' + this.offsetX +
+      '" y="' + this.offsetY +
+      '" width="' + patternWidth +
+      '" height="' + patternHeight + '">' +
+      '<image x="0" y="0"' +
+      ' width="' + patternSource.width +
+      '" height="' + patternSource.height +
+      '" xlink:href="' + patternImgSrc +
+      '"></image>' +
+      '</pattern>';
   },
   /* _TO_SVG_END_ */
 
@@ -8282,7 +8420,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {});
 
   if (fabric.Shadow) {
     fabric.warn('fabric.Shadow is already defined.');
@@ -8293,7 +8431,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    * Shadow class
    * @class fabric.Shadow
    */
-  fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
+  fabric.Shadow = fabric.util.createClass( /** @lends fabric.Shadow.prototype */ {
 
     /**
      * Shadow color
@@ -8354,8 +8492,8 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     _parseShadow: function(shadow) {
       var shadowStr = shadow.trim();
 
-      var offsetsAndBlur = fabric.Shadow.reOffsetsAndBlur.exec(shadowStr) || [ ],
-          color = shadowStr.replace(fabric.Shadow.reOffsetsAndBlur, '') || 'rgb(0,0,0)';
+      var offsetsAndBlur = fabric.Shadow.reOffsetsAndBlur.exec(shadowStr) || [],
+        color = shadowStr.replace(fabric.Shadow.reOffsetsAndBlur, '') || 'rgb(0,0,0)';
 
       return {
         color: color.trim(),
@@ -8389,14 +8527,14 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
       return (
         '<filter id="SVGID_' + this.id + '" y="-40%" height="180%">' +
-          '<feGaussianBlur in="' + mode + '" stdDeviation="' +
-            (this.blur ? this.blur / 3 : 0) +
-          '"></feGaussianBlur>' +
-          '<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>' +
-          '<feMerge>' +
-            '<feMergeNode></feMergeNode>' +
-            '<feMergeNode in="SourceGraphic"></feMergeNode>' +
-          '</feMerge>' +
+        '<feGaussianBlur in="' + mode + '" stdDeviation="' +
+        (this.blur ? this.blur / 3 : 0) +
+        '"></feGaussianBlur>' +
+        '<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>' +
+        '<feMerge>' +
+        '<feMergeNode></feMergeNode>' +
+        '<feMergeNode in="SourceGraphic"></feMergeNode>' +
+        '</feMerge>' +
         '</filter>');
     },
     /* _TO_SVG_END_ */
@@ -8424,7 +8562,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   fabric.Shadow.reOffsetsAndBlur = /(?:\s|^)(-?\d+(?:px)?(?:\s?|$))?(-?\d+(?:px)?(?:\s?|$))?(\d+(?:px)?)?(?:\s?|$)(?:$|\s)/;
 
 })(typeof exports !== 'undefined' ? exports : this);
-(function () {
+(function() {
 
   "use strict";
 
@@ -8435,11 +8573,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
   // aliases for faster resolution
   var extend = fabric.util.object.extend,
-      getElementOffset = fabric.util.getElementOffset,
-      removeFromArray = fabric.util.removeFromArray,
-      removeListener = fabric.util.removeListener,
+    getElementOffset = fabric.util.getElementOffset,
+    removeFromArray = fabric.util.removeFromArray,
+    removeListener = fabric.util.removeListener,
 
-      CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
+    CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
 
   /**
    * Static canvas class
@@ -8447,7 +8585,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    * @mixes fabric.Collection
    * @mixes fabric.Observable
    */
-  fabric.StaticCanvas = fabric.util.createClass(/** @lends fabric.StaticCanvas.prototype */ {
+  fabric.StaticCanvas = fabric.util.createClass( /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
      * Constructor
@@ -8456,7 +8594,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {Object} thisArg
      */
     initialize: function(el, options) {
-      options || (options = { });
+      options || (options = {});
 
       this._initStatic(el, options);
       fabric.StaticCanvas.activeInstance = this;
@@ -8557,13 +8695,13 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @type Boolean
      * @default
      */
-     allowTouchScrolling: false,
+    allowTouchScrolling: false,
 
     /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @param {fabric.Object} target Object that's about to be scaled/rotated
      */
-    onBeforeScaleRotate: function () {
+    onBeforeScaleRotate: function() {
       /* NOOP */
     },
 
@@ -8596,7 +8734,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} instance
      * @chainable
      */
-    calcOffset: function () {
+    calcOffset: function() {
       this._offset = getElementOffset(this.lowerCanvasEl);
       return this;
     },
@@ -8611,7 +8749,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setOverlayImage: function (url, callback, options) { // TODO (kangax): test callback
+    setOverlayImage: function(url, callback, options) { // TODO (kangax): test callback
       fabric.util.loadImage(url, function(img) {
         this.overlayImage = img;
         if (options && ('overlayImageLeft' in options)) {
@@ -8636,7 +8774,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setBackgroundImage: function (url, callback, options) {
+    setBackgroundImage: function(url, callback, options) {
       fabric.util.loadImage(url, function(img) {
         this.backgroundImage = img;
         if (options && ('backgroundImageOpacity' in options)) {
@@ -8668,8 +8806,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           });
           callback && callback();
         });
-      }
-      else {
+      } else {
         this.backgroundColor = backgroundColor;
         callback && callback();
       }
@@ -8683,7 +8820,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     _createCanvasElement: function() {
       var element = fabric.document.createElement('canvas');
       if (!element.style) {
-        element.style = { };
+        element.style = {};
       }
       if (!element) {
         throw CANVAS_INIT_ERROR;
@@ -8708,7 +8845,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @private
      * @param {Object} [options] Options object
      */
-    _initOptions: function (options) {
+    _initOptions: function(options) {
       for (var prop in options) {
         this[prop] = options[prop];
       }
@@ -8727,7 +8864,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @private
      * @param {HTMLElement} [canvasEl]
      */
-    _createLowerCanvas: function (canvasEl) {
+    _createLowerCanvas: function(canvasEl) {
       this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
       this._initCanvasElement(this.lowerCanvasEl);
 
@@ -8744,7 +8881,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * Returns canvas width (in px)
      * @return {Number}
      */
-    getWidth: function () {
+    getWidth: function() {
       return this.width;
     },
 
@@ -8752,7 +8889,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * Returns canvas height (in px)
      * @return {Number}
      */
-    getHeight: function () {
+    getHeight: function() {
       return this.height;
     },
 
@@ -8762,7 +8899,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} instance
      * @chainable true
      */
-    setWidth: function (value) {
+    setWidth: function(value) {
       return this._setDimension('width', value);
     },
 
@@ -8772,7 +8909,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} instance
      * @chainable true
      */
-    setHeight: function (value) {
+    setHeight: function(value) {
       return this._setDimension('height', value);
     },
 
@@ -8799,7 +8936,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} instance
      * @chainable true
      */
-    _setDimension: function (prop, value) {
+    _setDimension: function(prop, value) {
       this.lowerCanvasEl[prop] = value;
       this.lowerCanvasEl.style[prop] = value + 'px';
 
@@ -8828,7 +8965,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * Returns &lt;canvas> element corresponding to this instance
      * @return {HTMLCanvasElement}
      */
-    getElement: function () {
+    getElement: function() {
       return this.lowerCanvasEl;
     },
 
@@ -8854,17 +8991,17 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @param {fabric.Object} object Object to render
      * @private
      */
-    _draw: function (ctx, object) {
+    _draw: function(ctx, object) {
       if (!object) return;
 
       if (this.controlsAboveOverlay) {
-        var hasBorders = object.hasBorders, hasControls = object.hasControls;
+        var hasBorders = object.hasBorders,
+          hasControls = object.hasControls;
         object.hasBorders = object.hasControls = false;
         object.render(ctx);
         object.hasBorders = hasBorders;
         object.hasControls = hasControls;
-      }
-      else {
+      } else {
         object.render(ctx);
       }
     },
@@ -8877,7 +9014,9 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       this.stateful && obj.setupState();
       obj.setCoords();
       obj.canvas = this;
-      this.fire('object:added', { target: obj });
+      this.fire('object:added', {
+        target: obj
+      });
       obj.fire('added');
     },
 
@@ -8886,7 +9025,9 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
-      this.fire('object:removed', { target: obj });
+      this.fire('object:removed', {
+        target: obj
+      });
       obj.fire('removed');
     },
 
@@ -8894,7 +9035,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * Returns an array of objects this instance has
      * @return {Array}
      */
-    getObjects: function () {
+    getObjects: function() {
       return this._objects;
     },
 
@@ -8913,7 +9054,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * Returns context of canvas where objects are drawn
      * @return {CanvasRenderingContext2D}
      */
-    getContext: function () {
+    getContext: function() {
       return this.contextContainer;
     },
 
@@ -8922,7 +9063,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    clear: function () {
+    clear: function() {
       this._objects.length = 0;
       if (this.discardActiveGroup) {
         this.discardActiveGroup();
@@ -8945,7 +9086,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} instance
      * @chainable
      */
-    renderAll: function (allOnTop) {
+    renderAll: function(allOnTop) {
 
       var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'];
 
@@ -8964,9 +9105,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       }
 
       if (this.backgroundColor) {
-        canvasToDrawOn.fillStyle = this.backgroundColor.toLive
-          ? this.backgroundColor.toLive(canvasToDrawOn)
-          : this.backgroundColor;
+        canvasToDrawOn.fillStyle = this.backgroundColor.toLive ? this.backgroundColor.toLive(canvasToDrawOn) : this.backgroundColor;
 
         canvasToDrawOn.fillRect(
           this.backgroundColor.offsetX || 0,
@@ -8982,7 +9121,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       var activeGroup = this.getActiveGroup();
       for (var i = 0, length = this._objects.length; i < length; ++i) {
         if (!activeGroup ||
-            (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
+          (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
           this._draw(canvasToDrawOn, this._objects[i]);
         }
       }
@@ -8991,10 +9130,10 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       if (activeGroup) {
         //Store objects in group preserving order, then replace
         var sortedObjects = [];
-        this.forEachObject(function (object) {
-            if (activeGroup.contains(object)) {
-                sortedObjects.push(object);
-            }
+        this.forEachObject(function(object) {
+          if (activeGroup.contains(object)) {
+            sortedObjects.push(object);
+          }
         });
         activeGroup._set('objects', sortedObjects);
         this._draw(canvasToDrawOn, activeGroup);
@@ -9027,8 +9166,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
       if (this.backgroundImageStretch) {
         canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
-      }
-      else {
+      } else {
         canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
       }
       canvasToDrawOn.restore();
@@ -9040,7 +9178,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    renderTop: function () {
+    renderTop: function() {
       var ctx = this.contextTop || this.contextContainer;
       this.clearContext(ctx);
 
@@ -9070,7 +9208,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * Returned value is an object with top and left properties
      * @return {Object} object with "top" and "left" number values
      */
-    getCenter: function () {
+    getCenter: function() {
       return {
         top: this.getHeight() / 2,
         left: this.getWidth() / 2
@@ -9083,7 +9221,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @param {fabric.Object} object Object to center
      * @return {fabric.Canvas} thisArg
      */
-    centerObjectH: function (object) {
+    centerObjectH: function(object) {
       object.set('left', this.getCenter().left);
       this.renderAll();
       return this;
@@ -9096,7 +9234,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    centerObjectV: function (object) {
+    centerObjectV: function(object) {
       object.set('top', this.getCenter().top);
       this.renderAll();
       return this;
@@ -9109,7 +9247,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    centerObject: function (object) {
+    centerObject: function(object) {
       return this.centerObjectH(object).centerObjectV(object);
     },
 
@@ -9118,7 +9256,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {String} json string
      */
-    toDatalessJSON: function (propertiesToInclude) {
+    toDatalessJSON: function(propertiesToInclude) {
       return this.toDatalessObject(propertiesToInclude);
     },
 
@@ -9127,7 +9265,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
-    toObject: function (propertiesToInclude) {
+    toObject: function(propertiesToInclude) {
       return this._toObjectMethod('toObject', propertiesToInclude);
     },
 
@@ -9136,21 +9274,21 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
-    toDatalessObject: function (propertiesToInclude) {
+    toDatalessObject: function(propertiesToInclude) {
       return this._toObjectMethod('toDatalessObject', propertiesToInclude);
     },
 
     /**
      * @private
      */
-    _toObjectMethod: function (methodName, propertiesToInclude) {
+    _toObjectMethod: function(methodName, propertiesToInclude) {
 
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         this.discardActiveGroup();
       }
       var data = {
-        objects: this.getObjects().map(function (instance) {
+        objects: this.getObjects().map(function(instance) {
           // TODO (kangax): figure out how to clean this up
           var originalValue;
           if (!this.includeDefaultValues) {
@@ -9163,9 +9301,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           }
           return object;
         }, this),
-        background: (this.backgroundColor && this.backgroundColor.toObject)
-                      ? this.backgroundColor.toObject()
-                      : this.backgroundColor
+        background: (this.backgroundColor && this.backgroundColor.toObject) ? this.backgroundColor.toObject() : this.backgroundColor
       };
       if (this.backgroundImage) {
         data.backgroundImage = this.backgroundImage.src;
@@ -9180,7 +9316,9 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       fabric.util.populateWithProperties(this, data, propertiesToInclude);
       if (activeGroup) {
         this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
-        activeGroup.forEachObject(function(o) { o.set('active', true) });
+        activeGroup.forEachObject(function(o) {
+          o.set('active', true)
+        });
       }
       return data;
     },
@@ -9200,36 +9338,34 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {String}
      */
     toSVG: function(options) {
-      options || (options = { });
+      options || (options = {});
       var markup = [];
 
       if (!options.suppressPreamble) {
         markup.push(
           '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>',
-            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
-              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
+          '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
+          '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
         );
       }
       markup.push(
-          '<svg ',
-            'xmlns="http://www.w3.org/2000/svg" ',
-            'xmlns:xlink="http://www.w3.org/1999/xlink" ',
-            'version="1.1" ',
-            'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
-            'height="', (options.viewBox ? options.viewBox.height : this.height), '" ',
-            (this.backgroundColor && !this.backgroundColor.source ? 'style="background-color: ' + this.backgroundColor +'" ' : null),
-            (options.viewBox ? 'viewBox="' + options.viewBox.x + ' ' + options.viewBox.y + ' ' + options.viewBox.width + ' ' + options.viewBox.height + '" ' : null),
-            'xml:space="preserve">',
-          '<desc>Created with Fabric.js ', fabric.version, '</desc>',
-          '<defs>', fabric.createSVGFontFacesMarkup(this.getObjects()), fabric.createSVGRefElementsMarkup(this), '</defs>'
+        '<svg ',
+        'xmlns="http://www.w3.org/2000/svg" ',
+        'xmlns:xlink="http://www.w3.org/1999/xlink" ',
+        'version="1.1" ',
+        'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
+        'height="', (options.viewBox ? options.viewBox.height : this.height), '" ', (this.backgroundColor && !this.backgroundColor.source ? 'style="background-color: ' + this.backgroundColor + '" ' : null), (options.viewBox ? 'viewBox="' + options.viewBox.x + ' ' + options.viewBox.y + ' ' + options.viewBox.width + ' ' + options.viewBox.height + '" ' : null),
+        'xml:space="preserve">',
+        '<desc>Created with Fabric.js ', fabric.version, '</desc>',
+        '<defs>', fabric.createSVGFontFacesMarkup(this.getObjects()), fabric.createSVGRefElementsMarkup(this), '</defs>'
       );
 
       if (this.backgroundColor && this.backgroundColor.source) {
         markup.push(
           '<rect x="0" y="0" ',
-            'width="', (this.backgroundColor.repeat === 'repeat-y' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.width : this.width),
-            '" height="', (this.backgroundColor.repeat === 'repeat-x' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.height : this.height),
-            '" fill="url(#backgroundColorPattern)"',
+          'width="', (this.backgroundColor.repeat === 'repeat-y' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.width : this.width),
+          '" height="', (this.backgroundColor.repeat === 'repeat-x' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.height : this.height),
+          '" fill="url(#backgroundColorPattern)"',
           '></rect>'
         );
       }
@@ -9237,11 +9373,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       if (this.backgroundImage) {
         markup.push(
           '<image x="0" y="0" ',
-            'width="', (this.backgroundImageStretch ? this.width : this.backgroundImage.width),
-            '" height="', (this.backgroundImageStretch ? this.height : this.backgroundImage.height),
-            '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
-            '" xlink:href="', this.backgroundImage.src,
-            '" style="opacity:', this.backgroundImageOpacity,
+          'width="', (this.backgroundImageStretch ? this.width : this.backgroundImage.width),
+          '" height="', (this.backgroundImageStretch ? this.height : this.backgroundImage.height),
+          '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
+          '" xlink:href="', this.backgroundImage.src,
+          '" style="opacity:', this.backgroundImageOpacity,
           '"></image>'
         );
       }
@@ -9249,10 +9385,10 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       if (this.overlayImage) {
         markup.push(
           '<image x="', this.overlayImageLeft,
-            '" y="', this.overlayImageTop,
-            '" width="', this.overlayImage.width,
-            '" height="', this.overlayImage.height,
-            '" xlink:href="', this.overlayImage.src,
+          '" y="', this.overlayImageTop,
+          '" width="', this.overlayImage.width,
+          '" height="', this.overlayImage.height,
+          '" xlink:href="', this.overlayImage.src,
           '"></image>'
         );
       }
@@ -9266,7 +9402,9 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       }
       if (activeGroup) {
         this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
-        activeGroup.forEachObject(function(o) { o.set('active', true) });
+        activeGroup.forEachObject(function(o) {
+          o.set('active', true)
+        });
       }
       markup.push('</svg>');
 
@@ -9279,10 +9417,12 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @param {fabric.Object} object Object to remove
      * @return {fabric.Object} removed object
      */
-    remove: function (object) {
+    remove: function(object) {
       // removing active object should fire "selection:cleared" events
       if (this.getActiveObject() === object) {
-        this.fire('before:selection:cleared', { target: object });
+        this.fire('before:selection:cleared', {
+          target: object
+        });
         this.discardActiveObject();
         this.fire('selection:cleared');
       }
@@ -9296,7 +9436,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    sendToBack: function (object) {
+    sendToBack: function(object) {
       removeFromArray(this._objects, object);
       this._objects.unshift(object);
       return this.renderAll && this.renderAll();
@@ -9308,7 +9448,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    bringToFront: function (object) {
+    bringToFront: function(object) {
       removeFromArray(this._objects, object);
       this._objects.push(object);
       return this.renderAll && this.renderAll();
@@ -9321,7 +9461,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    sendBackwards: function (object, intersecting) {
+    sendBackwards: function(object, intersecting) {
       var idx = this._objects.indexOf(object);
 
       // if object is not on the bottom of stack
@@ -9332,20 +9472,19 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           newIdx = idx;
 
           // traverse down the stack looking for the nearest intersecting object
-          for (var i=idx-1; i>=0; --i) {
+          for (var i = idx - 1; i >= 0; --i) {
 
             var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                                 object.isContainedWithinObject(this._objects[i]) ||
-                                 this._objects[i].isContainedWithinObject(object);
+              object.isContainedWithinObject(this._objects[i]) ||
+              this._objects[i].isContainedWithinObject(object);
 
             if (isIntersecting) {
               newIdx = i;
               break;
             }
           }
-        }
-        else {
-          newIdx = idx-1;
+        } else {
+          newIdx = idx - 1;
         }
 
         removeFromArray(this._objects, object);
@@ -9362,11 +9501,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    bringForward: function (object, intersecting) {
+    bringForward: function(object, intersecting) {
       var idx = this._objects.indexOf(object);
 
       // if object is not on top of stack (last item in an array)
-      if (idx !== this._objects.length-1) {
+      if (idx !== this._objects.length - 1) {
         var newIdx;
 
         if (intersecting) {
@@ -9376,17 +9515,16 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           for (var i = idx + 1; i < this._objects.length; ++i) {
 
             var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                                 object.isContainedWithinObject(this._objects[i]) ||
-                                 this._objects[i].isContainedWithinObject(object);
+              object.isContainedWithinObject(this._objects[i]) ||
+              this._objects[i].isContainedWithinObject(object);
 
             if (isIntersecting) {
               newIdx = i;
               break;
             }
           }
-        }
-        else {
-          newIdx = idx+1;
+        } else {
+          newIdx = idx + 1;
         }
 
         removeFromArray(this._objects, object);
@@ -9403,7 +9541,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    moveTo: function (object, index) {
+    moveTo: function(object, index) {
       removeFromArray(this._objects, object);
       this._objects.splice(index, 0, object);
       return this.renderAll && this.renderAll();
@@ -9414,7 +9552,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    dispose: function () {
+    dispose: function() {
       this.clear();
 
       if (!this.interactive) return this;
@@ -9425,8 +9563,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
         if (typeof Event !== 'undefined' && 'remove' in Event) {
           Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
         }
-      }
-      else {
+      } else {
         removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
         removeListener(fabric.window, 'resize', this._onResize);
@@ -9438,9 +9575,9 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * Returns a string representation of an instance
      * @return {String} string representation of an instance
      */
-    toString: function () {
-      return '#<fabric.Canvas (' + this.complexity() + '): '+
-               '{ objects: ' + this.getObjects().length + ' }>';
+    toString: function() {
+      return '#<fabric.Canvas (' + this.complexity() + '): ' +
+        '{ objects: ' + this.getObjects().length + ' }>';
     }
   });
 
@@ -9462,28 +9599,28 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @static
      * @param {HTMLCanvasElement} canvasEl
      */
-    toGrayscale: function (canvasEl) {
-       var context = canvasEl.getContext('2d'),
-           imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-           data = imageData.data,
-           iLen = imageData.width,
-           jLen = imageData.height,
-           index, average, i, j;
+    toGrayscale: function(canvasEl) {
+      var context = canvasEl.getContext('2d'),
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        iLen = imageData.width,
+        jLen = imageData.height,
+        index, average, i, j;
 
-       for (i = 0; i < iLen; i++) {
-         for (j = 0; j < jLen; j++) {
+      for (i = 0; i < iLen; i++) {
+        for (j = 0; j < jLen; j++) {
 
-           index = (i * 4) * jLen + (j * 4);
-           average = (data[index] + data[index + 1] + data[index + 2]) / 3;
+          index = (i * 4) * jLen + (j * 4);
+          average = (data[index] + data[index + 1] + data[index + 2]) / 3;
 
-           data[index]     = average;
-           data[index + 1] = average;
-           data[index + 2] = average;
-         }
-       }
+          data[index] = average;
+          data[index + 1] = average;
+          data[index + 2] = average;
+        }
+      }
 
-       context.putImageData(imageData, 0, 0);
-     },
+      context.putImageData(imageData, 0, 0);
+    },
 
     /**
      * Provides a way to check support of some of the canvas methods
@@ -9494,7 +9631,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {Boolean | null} `true` if method is supported (or at least exists),
      *                          `null` if canvas element or context can not be initialized
      */
-    supports: function (methodName) {
+    supports: function(methodName) {
       var el = fabric.util.createCanvasElement();
 
       if (!el || !el.getContext) {
@@ -9521,8 +9658,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           try {
             el.toDataURL('image/jpeg', 0);
             return true;
-          }
-          catch (e) { }
+          } catch (e) {}
           return false;
 
         default:
@@ -9544,21 +9680,21 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
  * BaseBrush class
  * @class fabric.BaseBrush
  */
-fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype */ {
+fabric.BaseBrush = fabric.util.createClass( /** @lends fabric.BaseBrush.prototype */ {
 
   /**
    * Color of a brush
    * @type String
    * @default
    */
-  color:            'rgb(0, 0, 0)',
+  color: 'rgb(0, 0, 0)',
 
   /**
    * Width of a brush
    * @type Number
    * @default
    */
-  width:            1,
+  width: 1,
 
   /**
    * Shadow object representing shadow of this shape.
@@ -9567,21 +9703,21 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @type fabric.Shadow
    * @default
    */
-  shadow:          null,
+  shadow: null,
 
   /**
    * Line endings style of a brush (one of "butt", "round", "square")
    * @type String
    * @default
    */
-  strokeLineCap:    'round',
+  strokeLineCap: 'round',
 
   /**
    * Corner style of a brush (one of "bevil", "round", "miter")
    * @type String
    * @default
    */
-  strokeLineJoin:   'round',
+  strokeLineJoin: 'round',
 
   /**
    * Sets shadow of an object
@@ -9636,7 +9772,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 (function() {
 
   var utilMin = fabric.util.array.min,
-      utilMax = fabric.util.array.max;
+    utilMax = fabric.util.array.max;
 
   /**
    * PencilBrush class
@@ -9652,7 +9788,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     initialize: function(canvas) {
       this.canvas = canvas;
-      this._points = [ ];
+      this._points = [];
     },
 
     /**
@@ -9738,7 +9874,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      * @private
      */
     _render: function() {
-      var ctx  = this.canvas.contextTop;
+      var ctx = this.canvas.contextTop;
       ctx.beginPath();
 
       var p1 = this._points[0];
@@ -9749,8 +9885,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       //then we should be drawing a dot. A path isn't drawn between two identical dots
       //that's why we set them apart a bit
       if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
-          p1.x -= 0.5;
-          p2.x += 0.5;
+        p1.x -= 0.5;
+        p2.x += 0.5;
       }
       ctx.moveTo(p1.x, p1.y);
 
@@ -9761,7 +9897,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
 
         p1 = this._points[i];
-        p2 = this._points[i+1];
+        p2 = this._points[i + 1];
       }
       // Draw last line as a straight line while
       // we wait for the next point to be able to calculate
@@ -9779,19 +9915,19 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       this.box = this.getPathBoundingBox(this._points);
       return this.convertPointsToSVGPath(
         this._points, this.box.minx, this.box.maxx, this.box.miny, this.box.maxy);
-     },
+    },
 
-     /**
-      * Returns bounding box of a path based on given points
-      * @param {Array} points
-      * @return {Object} object with minx, miny, maxx, maxy
-      */
-     getPathBoundingBox: function(points) {
+    /**
+     * Returns bounding box of a path based on given points
+     * @param {Array} points
+     * @return {Object} object with minx, miny, maxx, maxy
+     */
+    getPathBoundingBox: function(points) {
       var xBounds = [],
-          yBounds = [],
-          p1 = points[0],
-          p2 = points[1],
-          startPoint = p1;
+        yBounds = [],
+        p1 = points[0],
+        p2 = points[1],
+        startPoint = p1;
 
       for (var i = 1, len = points.length; i < len; i++) {
         var midPoint = p1.midPointFrom(p2);
@@ -9802,19 +9938,19 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         yBounds.push(midPoint.y);
 
         p1 = points[i];
-        p2 = points[i+1];
+        p2 = points[i + 1];
         startPoint = midPoint;
-     } // end for
+      } // end for
 
-     xBounds.push(p1.x);
-     yBounds.push(p1.y);
+      xBounds.push(p1.x);
+      yBounds.push(p1.y);
 
-     return {
-       minx: utilMin(xBounds),
-       miny: utilMin(yBounds),
-       maxx: utilMax(xBounds),
-       maxy: utilMax(yBounds)
-     };
+      return {
+        minx: utilMin(xBounds),
+        miny: utilMin(yBounds),
+        maxx: utilMax(xBounds),
+        maxy: utilMax(yBounds)
+      };
     },
 
     /**
@@ -9835,8 +9971,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         // start point is p(i-1) value.
         path.push('Q ', p1.x, ' ', p1.y, ' ', midPoint.x, ' ', midPoint.y, ' ');
         p1 = new fabric.Point(points[i].x - minX, points[i].y - minY);
-        if ((i+1) < points.length) {
-          p2 = new fabric.Point(points[i+1].x - minX, points[i+1].y - minY);
+        if ((i + 1) < points.length) {
+          p2 = new fabric.Point(points[i + 1].x - minX, points[i + 1].y - minY);
         }
       }
       path.push('L ', p1.x, ' ', p1.y, ' ');
@@ -9885,13 +10021,16 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       }
 
       // set path origin coordinates based on our bounding box
-      var originLeft = this.box.minx  + (this.box.maxx - this.box.minx) /2;
-      var originTop = this.box.miny  + (this.box.maxy - this.box.miny) /2;
+      var originLeft = this.box.minx + (this.box.maxx - this.box.minx) / 2;
+      var originTop = this.box.miny + (this.box.maxy - this.box.miny) / 2;
 
       this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2, false);
 
       var path = this.createPath(pathData);
-      path.set({ left: originLeft, top: originTop });
+      path.set({
+        left: originLeft,
+        top: originTop
+      });
 
       this.canvas.add(path);
       path.setCoords();
@@ -9901,7 +10040,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       this.canvas.renderAll();
 
       // fire event 'path' created
-      this.canvas.fire('path:created', { path: path });
+      this.canvas.fire('path:created', {
+        path: path
+      });
     }
   });
 })();
@@ -9925,12 +10066,12 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
    */
   initialize: function(canvas) {
     this.canvas = canvas;
-    this.points = [ ];
+    this.points = [];
   },
   /**
-  * Invoked inside on mouse down and mouse move
-  * @param {Object} pointer
-  */
+   * Invoked inside on mouse down and mouse move
+   * @param {Object} pointer
+   */
   drawDot: function(pointer) {
     var point = this.addPoint(pointer);
     var ctx = this.canvas.contextTop;
@@ -9967,7 +10108,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
 
-    var circles = [ ];
+    var circles = [];
 
     for (var i = 0, len = this.points.length; i < len; i++) {
       var point = this.points[i];
@@ -9985,7 +10126,9 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var group = new fabric.Group(circles);
 
     this.canvas.add(group);
-    this.canvas.fire('path:created', { path: group });
+    this.canvas.fire('path:created', {
+      path: group
+    });
 
     this.canvas.clearContext(this.canvas.contextTop);
     this._resetShadow();
@@ -10001,11 +10144,11 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var pointerPoint = new fabric.Point(pointer.x, pointer.y);
 
     var circleRadius = fabric.util.getRandomInt(
-                        Math.max(0, this.width - 20), this.width + 20) / 2;
+      Math.max(0, this.width - 20), this.width + 20) / 2;
 
     var circleColor = new fabric.Color(this.color)
-                        .setAlpha(fabric.util.getRandomInt(0, 100) / 100)
-                        .toRgba();
+      .setAlpha(fabric.util.getRandomInt(0, 100) / 100)
+      .toRgba();
 
     pointerPoint.radius = circleRadius;
     pointerPoint.fill = circleColor;
@@ -10019,42 +10162,42 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
  * SprayBrush class
  * @class fabric.SprayBrush
  */
-fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric.SprayBrush.prototype */ {
+fabric.SprayBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric.SprayBrush.prototype */ {
 
   /**
    * Width of a spray
    * @type Number
    * @default
    */
-  width:              10,
+  width: 10,
 
   /**
    * Density of a spray (number of dots per chunk)
    * @type Number
    * @default
    */
-  density:            20,
+  density: 20,
 
   /**
    * Width of spray dots
    * @type Number
    * @default
    */
-  dotWidth:           1,
+  dotWidth: 1,
 
   /**
    * Width variance of spray dots
    * @type Number
    * @default
    */
-  dotWidthVariance:   1,
+  dotWidthVariance: 1,
 
   /**
    * Whether opacity of a dot should be random
    * @type Boolean
    * @default
    */
-  randomOpacity:      false,
+  randomOpacity: false,
 
   /**
    * Constructor
@@ -10063,7 +10206,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    */
   initialize: function(canvas) {
     this.canvas = canvas;
-    this.sprayChunks = [ ];
+    this.sprayChunks = [];
   },
 
   /**
@@ -10095,7 +10238,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
 
-    var rects = [ ];
+    var rects = [];
 
     for (var i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
       var sprayChunk = this.sprayChunks[i];
@@ -10116,7 +10259,9 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     }
     var group = new fabric.Group(rects);
     this.canvas.add(group);
-    this.canvas.fire('path:created', { path: group });
+    this.canvas.fire('path:created', {
+      path: group
+    });
 
     this.canvas.clearContext(this.canvas.contextTop);
     this._resetShadow();
@@ -10146,7 +10291,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * @param {Object} pointer
    */
   addSprayChunk: function(pointer) {
-    this.sprayChunkPoints = [ ];
+    this.sprayChunkPoints = [];
 
     var x, y, width, radius = this.width / 2;
 
@@ -10160,12 +10305,15 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
           // bottom clamp width to 1
           Math.max(1, this.dotWidth - this.dotWidthVariance),
           this.dotWidth + this.dotWidthVariance);
-      }
-      else {
+      } else {
         width = this.dotWidth;
       }
 
-      var point = { x: x, y: y, width: width };
+      var point = {
+        x: x,
+        y: y,
+        width: width
+      };
 
       if (this.randomOpacity) {
         point.opacity = fabric.util.getRandomInt(0, 100) / 100;
@@ -10187,9 +10335,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
   getPatternSrc: function() {
 
     var dotWidth = 20,
-        dotDistance = 5,
-        patternCanvas = fabric.document.createElement('canvas'),
-        patternCtx = patternCanvas.getContext('2d');
+      dotDistance = 5,
+      patternCanvas = fabric.document.createElement('canvas'),
+      patternCtx = patternCanvas.getContext('2d');
 
     patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
 
@@ -10235,14 +10383,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 (function() {
 
   var getPointer = fabric.util.getPointer,
-      degreesToRadians = fabric.util.degreesToRadians,
-      radiansToDegrees = fabric.util.radiansToDegrees,
-      atan2 = Math.atan2,
-      abs = Math.abs,
-      min = Math.min,
-      max = Math.max,
+    degreesToRadians = fabric.util.degreesToRadians,
+    radiansToDegrees = fabric.util.radiansToDegrees,
+    atan2 = Math.atan2,
+    abs = Math.abs,
+    min = Math.min,
+    max = Math.max,
 
-      STROKE_OFFSET = 0.5;
+    STROKE_OFFSET = 0.5;
 
   /**
    * Canvas class
@@ -10258,7 +10406,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @return {Object} thisArg
      */
     initialize: function(el, options) {
-      options || (options = { });
+      options || (options = {});
 
       this._initStatic(el, options);
       this._initInteractive();
@@ -10272,112 +10420,112 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @type Boolean
      * @default
      */
-    uniScaleTransform:      false,
+    uniScaleTransform: false,
 
     /**
      * When true, objects use center point as the origin of transformation
      * @type Boolean
      * @default
      */
-    centerTransform:        false,
+    centerTransform: false,
 
     /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @type Boolean
      * @default
      */
-    interactive:            true,
+    interactive: true,
 
     /**
      * Indicates whether group selection should be enabled
      * @type Boolean
      * @default
      */
-    selection:              true,
+    selection: true,
 
     /**
      * Color of selection
      * @type String
      * @default
      */
-    selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
+    selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
 
     /**
      * Default dash array pattern
      * If not empty the selection border is dashed
      * @type Array
      */
-    selectionDashArray:      [ ],
+    selectionDashArray: [],
 
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
      * @type String
      * @default
      */
-    selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
+    selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
 
     /**
      * Width of a line used in object/group selection
      * @type Number
      * @default
      */
-    selectionLineWidth:     1,
+    selectionLineWidth: 1,
 
     /**
      * Default cursor value used when hovering over an object on canvas
      * @type String
      * @default
      */
-    hoverCursor:            'move',
+    hoverCursor: 'move',
 
     /**
      * Default cursor value used when moving an object on canvas
      * @type String
      * @default
      */
-    moveCursor:             'move',
+    moveCursor: 'move',
 
     /**
      * Default cursor value used for the entire canvas
      * @type String
      * @default
      */
-    defaultCursor:          'default',
+    defaultCursor: 'default',
 
     /**
      * Cursor value used during free drawing
      * @type String
      * @default
      */
-    freeDrawingCursor:      'crosshair',
+    freeDrawingCursor: 'crosshair',
 
     /**
      * Cursor value used for rotation point
      * @type String
      * @default
      */
-    rotationCursor:         'crosshair',
+    rotationCursor: 'crosshair',
 
     /**
      * Default element class that's given to wrapper (div) element of canvas
      * @type String
      * @default
      */
-    containerClass:        'canvas-container',
+    containerClass: 'canvas-container',
 
     /**
      * When true, object detection happens on per-pixel basis rather than on per-bounding-box
      * @type Boolean
      * @default
      */
-    perPixelTargetFind:     false,
+    perPixelTargetFind: false,
 
     /**
      * Number of pixels around target pixel to tolerate (consider active) during object detection
      * @type Number
      * @default
      */
-    targetFindTolerance:    0,
+    targetFindTolerance: 0,
 
     /**
      * When true, target detection is skipped when hovering over canvas. This can be used to improve performance.
@@ -10418,24 +10566,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         if (t.originX !== 'center') {
           if (t.originX === 'right') {
             t.mouseXSign = -1;
-          }
-          else {
+          } else {
             t.mouseXSign = 1;
           }
         }
         if (t.originY !== 'center') {
           if (t.originY === 'bottom') {
             t.mouseYSign = -1;
-          }
-          else {
+          } else {
             t.mouseYSign = 1;
           }
         }
 
         t.originX = 'center';
         t.originY = 'center';
-      }
-      else {
+      } else {
         t.originX = t.original.originX;
         t.originY = t.original.originY;
       }
@@ -10447,9 +10592,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {fabric.Object} target Object to test against
      * @return {Boolean} true if point is contained within an area of given object
      */
-    containsPoint: function (e, target) {
+    containsPoint: function(e, target) {
       var pointer = this.getPointer(e),
-          xy = this._normalizePointer(target, pointer);
+        xy = this._normalizePointer(target, pointer);
 
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
       // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
@@ -10459,10 +10604,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _normalizePointer: function (object, pointer) {
+    _normalizePointer: function(object, pointer) {
       var activeGroup = this.getActiveGroup(),
-          x = pointer.x,
-          y = pointer.y;
+        x = pointer.x,
+        y = pointer.y;
 
       var isObjectInGroup = (
         activeGroup &&
@@ -10474,7 +10619,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         x -= activeGroup.left;
         y -= activeGroup.top;
       }
-      return { x: x, y: y };
+      return {
+        x: x,
+        y: y
+      };
     },
 
     /**
@@ -10484,11 +10632,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Number} y Top coordinate
      * @return {Boolean}
      */
-    isTargetTransparent: function (target, x, y) {
+    isTargetTransparent: function(target, x, y) {
       var cacheContext = this.contextCache;
 
       var hasBorders = target.hasBorders,
-          transparentCorners = target.transparentCorners;
+        transparentCorners = target.transparentCorners;
 
       target.hasBorders = target.transparentCorners = false;
 
@@ -10501,14 +10649,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (this.targetFindTolerance > 0) {
         if (x > this.targetFindTolerance) {
           x -= this.targetFindTolerance;
-        }
-        else {
+        } else {
           x = 0;
         }
         if (y > this.targetFindTolerance) {
           y -= this.targetFindTolerance;
-        }
-        else {
+        } else {
           y = 0;
         }
       }
@@ -10535,19 +10681,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e
      * @param {fabric.Object} target
      */
-    _shouldClearSelection: function (e, target) {
+    _shouldClearSelection: function(e, target) {
       var activeGroup = this.getActiveGroup();
 
-      return (
-        !target || (
+      return (!target || (
         target &&
-        activeGroup &&
-        !activeGroup.contains(target) &&
-        activeGroup !== target &&
-        !e.shiftKey) || (
-        target &&
-        !target.selectable)
-      );
+        activeGroup && !activeGroup.contains(target) &&
+        activeGroup !== target && !e.shiftKey) || (
+        target && !target.selectable));
     },
 
     /**
@@ -10555,37 +10696,30 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e
      * @param {fabric.Object} target
      */
-    _setupCurrentTransform: function (e, target) {
+    _setupCurrentTransform: function(e, target) {
       if (!target) return;
 
       var action = 'drag',
-          corner,
-          pointer = getPointer(e, target.canvas.upperCanvasEl);
+        corner,
+        pointer = getPointer(e, target.canvas.upperCanvasEl);
 
       corner = target._findTargetCorner(e, this._offset);
       if (corner) {
-        action = (corner === 'ml' || corner === 'mr')
-          ? 'scaleX'
-          : (corner === 'mt' || corner === 'mb')
-            ? 'scaleY'
-            : corner === 'mtr'
-              ? 'rotate'
-              : 'scale';
+        action = (corner === 'ml' || corner === 'mr') ? 'scaleX' : (corner === 'mt' || corner === 'mb') ? 'scaleY' : corner === 'mtr' ? 'rotate' : 'scale';
       }
 
-      var originX = target.originX, originY = target.originY;
+      var originX = target.originX,
+        originY = target.originY;
 
       if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
         originX = "right";
-      }
-      else if (corner === 'mr' || corner === 'tr' || corner === 'br') {
+      } else if (corner === 'mr' || corner === 'tr' || corner === 'br') {
         originX = "left";
       }
 
       if (corner === 'tl' || corner === 'mt' || corner === 'tr') {
         originY = "bottom";
-      }
-      else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
+      } else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
         originY = "top";
       }
 
@@ -10635,8 +10769,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _shouldHandleGroupLogic: function(e, target) {
       var activeObject = this.getActiveObject();
       return e.shiftKey &&
-            (this.getActiveGroup() || (activeObject && activeObject !== target))
-            && this.selection;
+        (this.getActiveGroup() || (activeObject && activeObject !== target)) && this.selection;
     },
 
     /**
@@ -10644,7 +10777,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e
      * @param {fabric.Object} target
      */
-    _handleGroupLogic: function (e, target) {
+    _handleGroupLogic: function(e, target) {
       if (target === this.getActiveGroup()) {
         // if it's a group, find target again, this time skipping group
         target = this.findTarget(e, true);
@@ -10663,15 +10796,16 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             // remove group alltogether if after removal it only contains 1 object
             this.discardActiveGroup();
           }
-        }
-        else {
+        } else {
           activeGroup.addWithUpdate(target);
           this._resetObjectTransform(activeGroup);
         }
-        this.fire('selection:created', { target: activeGroup, e: e });
+        this.fire('selection:created', {
+          target: activeGroup,
+          e: e
+        });
         activeGroup.set('active', true);
-      }
-      else {
+      } else {
         // group does not exist
         if (this._activeObject) {
           // only if there's an active object
@@ -10680,12 +10814,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             var objects = this.getObjects();
             var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
             var group = new fabric.Group(
-              isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
+              isActiveLower ? [target, this._activeObject] : [this._activeObject, target]);
 
             this.setActiveGroup(group);
             this._activeObject = null;
             activeGroup = this.getActiveGroup();
-            this.fire('selection:created', { target: activeGroup, e: e });
+            this.fire('selection:created', {
+              target: activeGroup,
+              e: e
+            });
           }
         }
         // activate target object in any case
@@ -10703,7 +10840,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param x {Number} pointer's x coordinate
      * @param y {Number} pointer's y coordinate
      */
-    _translateObject: function (x, y) {
+    _translateObject: function(x, y) {
       var target = this._currentTransform.target;
 
       if (!target.get('lockMovementX')) {
@@ -10722,13 +10859,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param by {String} Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
      *                    When not provided, an object is scaled by both dimensions equally
      */
-    _scaleObject: function (x, y, by) {
+    _scaleObject: function(x, y, by) {
       var t = this._currentTransform,
-          offset = this._offset,
-          target = t.target;
+        offset = this._offset,
+        target = t.target;
 
       var lockScalingX = target.get('lockScalingX'),
-          lockScalingY = target.get('lockScalingY');
+        lockScalingY = target.get('lockScalingY');
 
       if (lockScalingX && lockScalingY) return;
 
@@ -10738,8 +10875,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       if (t.originX === 'right') {
         localMouse.x *= -1;
-      }
-      else if (t.originX === 'center') {
+      } else if (t.originX === 'center') {
         localMouse.x *= t.mouseXSign * 2;
 
         if (localMouse.x < 0) {
@@ -10749,8 +10885,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       if (t.originY === 'bottom') {
         localMouse.y *= -1;
-      }
-      else if (t.originY === 'center') {
+      } else if (t.originY === 'center') {
         localMouse.y *= t.mouseYSign * 2;
 
         if (localMouse.y < 0) {
@@ -10760,7 +10895,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       // adjust the mouse coordinates when dealing with padding
       if (abs(localMouse.x) > target.padding) {
-        if (localMouse.x < 0 ) {
+        if (localMouse.x < 0) {
           localMouse.x += target.padding;
         } else {
           localMouse.x -= target.padding;
@@ -10770,7 +10905,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       if (abs(localMouse.y) > target.padding) {
-        if (localMouse.y < 0 ) {
+        if (localMouse.y < 0) {
           localMouse.y += target.padding;
         } else {
           localMouse.y -= target.padding;
@@ -10780,46 +10915,42 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       // Actually scale the object
-      var newScaleX = target.scaleX, newScaleY = target.scaleY;
+      var newScaleX = target.scaleX,
+        newScaleY = target.scaleY;
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
         var dist = localMouse.y + localMouse.x;
         var lastDist = (target.height + (target.strokeWidth)) * t.original.scaleY +
-                       (target.width + (target.strokeWidth)) * t.original.scaleX;
+          (target.width + (target.strokeWidth)) * t.original.scaleX;
 
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
-        newScaleX = t.original.scaleX * dist/lastDist;
-        newScaleY = t.original.scaleY * dist/lastDist;
+        newScaleX = t.original.scaleX * dist / lastDist;
+        newScaleY = t.original.scaleY * dist / lastDist;
 
         target.set('scaleX', newScaleX);
         target.set('scaleY', newScaleY);
-      }
-      else if (!by) {
-        newScaleX = localMouse.x/(target.width+target.strokeWidth);
-        newScaleY = localMouse.y/(target.height+target.strokeWidth);
+      } else if (!by) {
+        newScaleX = localMouse.x / (target.width + target.strokeWidth);
+        newScaleY = localMouse.y / (target.height + target.strokeWidth);
 
         lockScalingX || target.set('scaleX', newScaleX);
         lockScalingY || target.set('scaleY', newScaleY);
-      }
-      else if (by === 'x' && !target.get('lockUniScaling')) {
-        newScaleX = localMouse.x/(target.width + target.strokeWidth);
+      } else if (by === 'x' && !target.get('lockUniScaling')) {
+        newScaleX = localMouse.x / (target.width + target.strokeWidth);
         lockScalingX || target.set('scaleX', newScaleX);
-      }
-      else if (by === 'y' && !target.get('lockUniScaling')) {
-        newScaleY = localMouse.y/(target.height + target.strokeWidth);
+      } else if (by === 'y' && !target.get('lockUniScaling')) {
+        newScaleY = localMouse.y / (target.height + target.strokeWidth);
         lockScalingY || target.set('scaleY', newScaleY);
       }
 
       // Check if we flipped
-      if (newScaleX < 0)
-      {
+      if (newScaleX < 0) {
         if (t.originX === 'left')
           t.originX = 'right';
         else if (t.originX === 'right')
           t.originX = 'left';
       }
 
-      if (newScaleY < 0)
-      {
+      if (newScaleY < 0) {
         if (t.originY === 'top')
           t.originY = 'bottom';
         else if (t.originY === 'bottom')
@@ -10836,16 +10967,16 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param x {Number} pointer's x coordinate
      * @param y {Number} pointer's y coordinate
      */
-    _rotateObject: function (x, y) {
+    _rotateObject: function(x, y) {
 
       var t = this._currentTransform,
-          o = this._offset;
+        o = this._offset;
 
       if (t.target.get('lockRotation')) return;
 
       var lastAngle = atan2(t.ey - t.top - o.top, t.ex - t.left - o.left),
-          curAngle = atan2(y - t.top - o.top, x - t.left - o.left),
-          angle = radiansToDegrees(curAngle - lastAngle + t.theta);
+        curAngle = atan2(y - t.top - o.top, x - t.left - o.left),
+        angle = radiansToDegrees(curAngle - lastAngle + t.theta);
 
       // normalize angle to positive value
       if (angle < 0) {
@@ -10858,14 +10989,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _setCursor: function (value) {
+    _setCursor: function(value) {
       this.upperCanvasEl.style.cursor = value;
     },
 
     /**
      * @private
      */
-    _resetObjectTransform: function (target) {
+    _resetObjectTransform: function(target) {
       target.scaleX = 1;
       target.scaleY = 1;
       target.setAngle(0);
@@ -10874,13 +11005,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _drawSelection: function () {
+    _drawSelection: function() {
       var ctx = this.contextTop,
-          groupSelector = this._groupSelector,
-          left = groupSelector.left,
-          top = groupSelector.top,
-          aleft = abs(left),
-          atop = abs(top);
+        groupSelector = this._groupSelector,
+        left = groupSelector.left,
+        top = groupSelector.top,
+        aleft = abs(left),
+        atop = abs(top);
 
       ctx.fillStyle = this.selectionColor;
 
@@ -10897,20 +11028,19 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // selection border
       if (this.selectionDashArray.length > 1) {
 
-        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft);
-        var py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
+        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft);
+        var py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop);
 
         ctx.beginPath();
 
-        fabric.util.drawDashedLine(ctx, px, py, px+aleft, py, this.selectionDashArray);
-        fabric.util.drawDashedLine(ctx, px, py+atop-1, px+aleft, py+atop-1, this.selectionDashArray);
-        fabric.util.drawDashedLine(ctx, px, py, px, py+atop, this.selectionDashArray);
-        fabric.util.drawDashedLine(ctx, px+aleft-1, py, px+aleft-1, py+atop, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px, py, px + aleft, py, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px, py + atop - 1, px + aleft, py + atop - 1, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px, py, px, py + atop, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px + aleft - 1, py, px + aleft - 1, py + atop, this.selectionDashArray);
 
         ctx.closePath();
         ctx.stroke();
-      }
-      else {
+      } else {
         ctx.strokeRect(
           groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
           groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
@@ -10923,26 +11053,26 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _findSelectedObjects: function (e) {
-      var group = [ ],
-          x1 = this._groupSelector.ex,
-          y1 = this._groupSelector.ey,
-          x2 = x1 + this._groupSelector.left,
-          y2 = y1 + this._groupSelector.top,
-          currentObject,
-          selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
-          selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2)),
-          isClick = x1 === x2 && y1 === y2;
+    _findSelectedObjects: function(e) {
+      var group = [],
+        x1 = this._groupSelector.ex,
+        y1 = this._groupSelector.ey,
+        x2 = x1 + this._groupSelector.left,
+        y2 = y1 + this._groupSelector.top,
+        currentObject,
+        selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
+        selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2)),
+        isClick = x1 === x2 && y1 === y2;
 
-      for (var i = this._objects.length; i--; ) {
+      for (var i = this._objects.length; i--;) {
         currentObject = this._objects[i];
 
         if (!currentObject) continue;
 
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) ||
-            currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2) ||
-            currentObject.containsPoint(selectionX1Y1) ||
-            currentObject.containsPoint(selectionX2Y2)) {
+          currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2) ||
+          currentObject.containsPoint(selectionX1Y1) ||
+          currentObject.containsPoint(selectionX2Y2)) {
 
           if (this.selection && currentObject.selectable) {
             currentObject.set('active', true);
@@ -10957,12 +11087,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // do not create group for 1 element only
       if (group.length === 1) {
         this.setActiveObject(group[0], e);
-      }
-      else if (group.length > 1) {
+      } else if (group.length > 1) {
         group = new fabric.Group(group.reverse());
         this.setActiveGroup(group);
         group.saveCoords();
-        this.fire('selection:created', { target: group });
+        this.fire('selection:created', {
+          target: group
+        });
         this.renderAll();
       }
     },
@@ -10972,17 +11103,17 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e mouse event
      * @param {Boolean} skipGroup when true, group is skipped and only objects are traversed through
      */
-    findTarget: function (e, skipGroup) {
+    findTarget: function(e, skipGroup) {
       if (this.skipTargetFind) return;
 
       var target,
-          pointer = this.getPointer(e);
+        pointer = this.getPointer(e);
 
       if (this.controlsAboveOverlay &&
-          this.lastRenderedObjectWithControlsAboveOverlay &&
-          this.lastRenderedObjectWithControlsAboveOverlay.visible &&
-          this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay) &&
-          this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(e, this._offset)) {
+        this.lastRenderedObjectWithControlsAboveOverlay &&
+        this.lastRenderedObjectWithControlsAboveOverlay.visible &&
+        this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay) &&
+        this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(e, this._offset)) {
         target = this.lastRenderedObjectWithControlsAboveOverlay;
         return target;
       }
@@ -10998,17 +11129,16 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // Cache all targets where their bounding box contains point.
       var possibleTargets = [];
 
-      for (var i = this._objects.length; i--; ) {
+      for (var i = this._objects.length; i--;) {
 
         if (this._objects[i] &&
-            this._objects[i].visible &&
-            this._objects[i].selectable &&
-            this.containsPoint(e, this._objects[i])) {
+          this._objects[i].visible &&
+          this._objects[i].selectable &&
+          this.containsPoint(e, this._objects[i])) {
 
           if (this.perPixelTargetFind || this._objects[i].perPixelTargetFind) {
             possibleTargets[possibleTargets.length] = this._objects[i];
-          }
-          else {
+          } else {
             target = this._objects[i];
             this.relatedTarget = target;
             break;
@@ -11033,7 +11163,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e
      * @return {Object} object with "x" and "y" number values
      */
-    getPointer: function (e) {
+    getPointer: function(e) {
       var pointer = getPointer(e, this.upperCanvasEl);
       return {
         x: pointer.x - this._offset.left,
@@ -11046,7 +11176,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {HTMLElement|String} canvasEl Canvas element
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
-    _createUpperCanvas: function () {
+    _createUpperCanvas: function() {
       var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, '');
 
       this.upperCanvasEl = this._createCanvasElement();
@@ -11062,7 +11192,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _createCacheCanvas: function () {
+    _createCacheCanvas: function() {
       this.cacheCanvasEl = this._createCanvasElement();
       this.cacheCanvasEl.setAttribute('width', this.width);
       this.cacheCanvasEl.setAttribute('height', this.height);
@@ -11074,7 +11204,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Number} width
      * @param {Number} height
      */
-    _initWrapperElement: function () {
+    _initWrapperElement: function() {
       this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
         'class': this.containerClass
       });
@@ -11090,9 +11220,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      * @param {Element} element
      */
-    _applyCanvasStyle: function (element) {
+    _applyCanvasStyle: function(element) {
       var width = this.getWidth() || element.width,
-          height = this.getHeight() || element.height;
+        height = this.getHeight() || element.height;
 
       fabric.util.setStyle(element, {
         position: 'absolute',
@@ -11112,7 +11242,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Element} fromEl Element style is copied from
      * @param {Element} toEl Element copied style is applied to
      */
-    _copyCanvasStyle: function (fromEl, toEl) {
+    _copyCanvasStyle: function(fromEl, toEl) {
       toEl.style.cssText = fromEl.style.cssText;
     },
 
@@ -11128,7 +11258,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Returns &lt;canvas> element on which object selection is drawn
      * @return {HTMLCanvasElement}
      */
-    getSelectionElement: function () {
+    getSelectionElement: function() {
       return this.upperCanvasEl;
     },
 
@@ -11139,7 +11269,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setActiveObject: function (object, e) {
+    setActiveObject: function(object, e) {
       if (this._activeObject) {
         this._activeObject.set('active', false);
       }
@@ -11148,8 +11278,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       this.renderAll();
 
-      this.fire('object:selected', { target: object, e: e });
-      object.fire('selected', { e: e });
+      this.fire('object:selected', {
+        target: object,
+        e: e
+      });
+      object.fire('selected', {
+        e: e
+      });
       return this;
     },
 
@@ -11157,7 +11292,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Returns currently active object
      * @return {fabric.Object} active object
      */
-    getActiveObject: function () {
+    getActiveObject: function() {
       return this._activeObject;
     },
 
@@ -11166,7 +11301,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    discardActiveObject: function () {
+    discardActiveObject: function() {
       if (this._activeObject) {
         this._activeObject.set('active', false);
       }
@@ -11180,7 +11315,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setActiveGroup: function (group) {
+    setActiveGroup: function(group) {
       this._activeGroup = group;
       if (group) {
         group.canvas = this;
@@ -11193,7 +11328,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Returns currently active group
      * @return {fabric.Group} Current group
      */
-    getActiveGroup: function () {
+    getActiveGroup: function() {
       return this._activeGroup;
     },
 
@@ -11201,7 +11336,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Removes currently active group
      * @return {fabric.Canvas} thisArg
      */
-    discardActiveGroup: function () {
+    discardActiveGroup: function() {
       var g = this.getActiveGroup();
       if (g) {
         g.destroy();
@@ -11213,11 +11348,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Deactivates all objects on canvas, removing any active group or object
      * @return {fabric.Canvas} thisArg
      */
-    deactivateAll: function () {
+    deactivateAll: function() {
       var allObjects = this.getObjects(),
-          i = 0,
-          len = allObjects.length;
-      for ( ; i < len; i++) {
+        i = 0,
+        len = allObjects.length;
+      for (; i < len; i++) {
         allObjects[i].set('active', false);
       }
       this.discardActiveGroup();
@@ -11229,10 +11364,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Deactivates all objects and dispatches appropriate events
      * @return {fabric.Canvas} thisArg
      */
-    deactivateAllWithDispatch: function () {
+    deactivateAllWithDispatch: function() {
       var activeObject = this.getActiveGroup() || this.getActiveObject();
       if (activeObject) {
-        this.fire('before:selection:cleared', { target: activeObject });
+        this.fire('before:selection:cleared', {
+          target: activeObject
+        });
       }
       this.deactivateAll();
       if (activeObject) {
@@ -11252,8 +11389,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         fabric.Group.prototype.transform.call(activeGroup, ctx);
         activeGroup.drawBorders(ctx).drawControls(ctx);
         ctx.restore();
-      }
-      else {
+      } else {
         for (var i = 0, len = this._objects.length; i < len; ++i) {
           if (!this._objects[i] || !this._objects[i].active) continue;
 
@@ -11278,7 +11414,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
   if (fabric.isTouchSupported) {
     /** @ignore */
-    fabric.Canvas.prototype._setCursorFromEvent = function() { };
+    fabric.Canvas.prototype._setCursorFromEvent = function() {};
   }
 
   /**
@@ -11289,31 +11425,31 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
    */
   fabric.Element = fabric.Canvas;
 })();
-(function(){
+(function() {
 
   var cursorMap = [
-      'n-resize',
-      'ne-resize',
-      'e-resize',
-      'se-resize',
-      's-resize',
-      'sw-resize',
-      'w-resize',
-      'nw-resize'
+    'n-resize',
+    'ne-resize',
+    'e-resize',
+    'se-resize',
+    's-resize',
+    'sw-resize',
+    'w-resize',
+    'nw-resize'
   ],
-  cursorOffset = {
-    'mt': 0, // n
-    'tr': 1, // ne
-    'mr': 2, // e
-    'br': 3, // se
-    'mb': 4, // s
-    'bl': 5, // sw
-    'ml': 6, // w
-    'tl': 7 // nw
-  },
-  addListener = fabric.util.addListener,
-  removeListener = fabric.util.removeListener,
-  getPointer = fabric.util.getPointer;
+    cursorOffset = {
+      'mt': 0, // n
+      'tr': 1, // ne
+      'mr': 2, // e
+      'br': 3, // se
+      'mb': 4, // s
+      'bl': 5, // sw
+      'ml': 6, // w
+      'tl': 7 // nw
+    },
+    addListener = fabric.util.addListener,
+    removeListener = fabric.util.removeListener,
+    getPointer = fabric.util.getPointer;
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
 
@@ -11321,7 +11457,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Adds mouse listeners to canvas
      * @private
      */
-    _initEvents: function () {
+    _initEvents: function() {
       var _this = this;
 
       this._onMouseDown = this._onMouseDown.bind(this);
@@ -11342,8 +11478,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         if (typeof Event !== 'undefined' && 'add' in Event) {
           Event.add(this.upperCanvasEl, 'gesture', this._onGesture);
         }
-      }
-      else {
+      } else {
         addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       }
@@ -11353,7 +11488,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      * @param {Event} e Event object fired on mousedown
      */
-    _onMouseDown: function (e) {
+    _onMouseDown: function(e) {
       this.__onMouseDown(e);
 
       !fabric.isTouchSupported && addListener(fabric.document, 'mouseup', this._onMouseUp);
@@ -11370,7 +11505,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      * @param {Event} e Event object fired on mouseup
      */
-    _onMouseUp: function (e) {
+    _onMouseUp: function(e) {
       this.__onMouseUp(e);
 
       !fabric.isTouchSupported && removeListener(fabric.document, 'mouseup', this._onMouseUp);
@@ -11387,7 +11522,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      * @param {Event} e Event object fired on mousemove
      */
-    _onMouseMove: function (e) {
+    _onMouseMove: function(e) {
       !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
     },
@@ -11395,7 +11530,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _onResize: function () {
+    _onResize: function() {
       this.calcOffset();
     },
 
@@ -11410,14 +11545,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       return (
         (target && (
-        target.isMoving ||
-        target !== activeObject)) ||
+          target.isMoving ||
+          target !== activeObject)) ||
         (!target && activeObject) ||
         (pointer &&
-        this._previousPointer &&
-        this.selection && (
-        pointer.x !== this._previousPointer.x ||
-        pointer.y !== this._previousPointer.y))
+          this._previousPointer &&
+          this.selection && (
+            pointer.x !== this._previousPointer.x ||
+            pointer.y !== this._previousPointer.y))
       );
     },
 
@@ -11428,11 +11563,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      * @param {Event} e Event object fired on mouseup
      */
-    __onMouseUp: function (e) {
+    __onMouseUp: function(e) {
 
       var target,
-          pointer,
-          render;
+        pointer,
+        render;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._isCurrentlyDrawing = false;
@@ -11440,7 +11575,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           this.contextTop.restore();
         }
         this.freeDrawingBrush.onMouseUp();
-        this.fire('mouse:up', { e: e });
+        this.fire('mouse:up', {
+          e: e
+        });
         return;
       }
 
@@ -11457,7 +11594,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
         if (this.stateful && target.hasStateChanged()) {
-          this.fire('object:modified', { target: target });
+          this.fire('object:modified', {
+            target: target
+          });
           target.fire('modified');
         }
 
@@ -11477,8 +11616,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           this._previousOriginX = null;
           this._previousOriginY = null;
         }
-      }
-      else {
+      } else {
         pointer = this.getPointer(e);
       }
 
@@ -11509,12 +11647,17 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._setCursorFromEvent(e, target);
 
       var _this = this;
-      setTimeout(function () {
+      setTimeout(function() {
         _this._setCursorFromEvent(e, target);
       }, 50);
 
-      this.fire('mouse:up', { target: target, e: e });
-      target && target.fire('mouseup', { e: e });
+      this.fire('mouse:up', {
+        target: target,
+        e: e
+      });
+      target && target.fire('mouseup', {
+        e: e
+      });
     },
 
     /**
@@ -11528,7 +11671,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         fabric.util.clipContext(this, this.contextTop);
       }
       this.freeDrawingBrush.onMouseDown(this.getPointer(e));
-      this.fire('mouse:down', { e: e });
+      this.fire('mouse:down', {
+        e: e
+      });
     },
 
     /**
@@ -11539,10 +11684,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      * @param {Event} e Event object fired on mousedown
      */
-    __onMouseDown: function (e) {
+    __onMouseDown: function(e) {
 
       // accept only left clicks
-      var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
+      var isLeftClick = 'which' in e ? e.which === 1 : e.button === 1;
       if (!isLeftClick && !fabric.isTouchSupported) return;
 
       if (this.isDrawingMode) {
@@ -11554,9 +11699,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (this._currentTransform) return;
 
       var target = this.findTarget(e),
-          pointer = this.getPointer(e),
-          corner,
-          render;
+        pointer = this.getPointer(e),
+        corner,
+        render;
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
@@ -11574,12 +11719,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         }
         this.deactivateAllWithDispatch();
         target && target.selectable && this.setActiveObject(target, e);
-      }
-      else if (this._shouldHandleGroupLogic(e, target)) {
+      } else if (this._shouldHandleGroupLogic(e, target)) {
         this._handleGroupLogic(e, target);
         target = this.getActiveGroup();
-      }
-      else {
+      } else {
         // determine if it's a drag or rotate case
         this.stateful && target.saveState();
 
@@ -11597,8 +11740,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // we must renderAll so that active image is placed on the top canvas
       render && this.renderAll();
 
-      this.fire('mouse:down', { target: target, e: e });
-      target && target.fire('mousedown', { e: e });
+      this.fire('mouse:down', {
+        target: target,
+        e: e
+      });
+      target && target.fire('mousedown', {
+        e: e
+      });
 
       if (corner === 'mtr' && target.centerTransform) {
         this._setOriginToCenter(target);
@@ -11626,15 +11774,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
-      * Method that defines the actions when mouse is hovering the canvas.
-      * The currentTransform parameter will definde whether the user is rotating/scaling/translating
-      * an image or neither of them (only hovering). A group selection is also possible and would cancel
-      * all any other type of action.
-      * In case of an image transformation only the top canvas will be rendered.
-      * @private
-      * @param {Event} e Event object fired on mousemove
-      */
-    __onMouseMove: function (e) {
+     * Method that defines the actions when mouse is hovering the canvas.
+     * The currentTransform parameter will definde whether the user is rotating/scaling/translating
+     * an image or neither of them (only hovering). A group selection is also possible and would cancel
+     * all any other type of action.
+     * In case of an image transformation only the top canvas will be rendered.
+     * @private
+     * @param {Event} e Event object fired on mousemove
+     */
+    __onMouseMove: function(e) {
 
       var target, pointer;
 
@@ -11644,7 +11792,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           this.freeDrawingBrush.onMouseMove(pointer);
         }
         this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
-        this.fire('mouse:move', { e: e });
+        this.fire('mouse:move', {
+          e: e
+        });
         return;
       }
 
@@ -11657,8 +11807,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
         groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
         this.renderTop();
-      }
-      else if (!this._currentTransform) {
+      } else if (!this._currentTransform) {
 
         // alias style to elimintate unnecessary lookup
         var style = this.upperCanvasEl.style;
@@ -11672,29 +11821,27 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         if (!target || target && !target.selectable) {
           // no target - set default cursor
           style.cursor = this.defaultCursor;
-        }
-        else {
+        } else {
           // set proper cursor
           this._setCursorFromEvent(e, target);
         }
-      }
-      else {
+      } else {
         // object is being transformed (scaled/rotated/moved/etc.)
         pointer = getPointer(e, this.upperCanvasEl);
 
         var x = pointer.x,
-            y = pointer.y,
-            reset = false,
-            transform = this._currentTransform;
+          y = pointer.y,
+          reset = false,
+          transform = this._currentTransform;
 
         target = transform.target;
         target.isMoving = true;
 
         if ((transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') &&
-           // Switch from a normal resize to center-based
-           ((e.altKey && (transform.originX !== 'center' || transform.originY !== 'center')) ||
-           // Switch from center-based resize to normal one
-           (!e.altKey && transform.originX === 'center' && transform.originY === 'center'))
+          // Switch from a normal resize to center-based
+          ((e.altKey && (transform.originX !== 'center' || transform.originY !== 'center')) ||
+            // Switch from center-based resize to normal one
+            (!e.altKey && transform.originX === 'center' && transform.originY === 'center'))
         ) {
           this._resetCurrentTransform(e);
           reset = true;
@@ -11703,17 +11850,20 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         if (transform.action === 'rotate') {
           this._rotateObject(x, y);
 
-          this.fire('object:rotating', { target: target, e: e });
-          target.fire('rotating', { e: e });
-        }
-        else if (transform.action === 'scale') {
+          this.fire('object:rotating', {
+            target: target,
+            e: e
+          });
+          target.fire('rotating', {
+            e: e
+          });
+        } else if (transform.action === 'scale') {
           // rotate object only if shift key is not pressed
           // and if it is not a group we are transforming
           if ((e.shiftKey || this.uniScaleTransform) && !target.get('lockUniScaling')) {
             transform.currentAction = 'scale';
             this._scaleObject(x, y);
-          }
-          else {
+          } else {
             // Switch from a normal resize to proportional
             if (!reset && transform.currentAction === 'scale') {
               this._resetCurrentTransform(e);
@@ -11723,33 +11873,55 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             this._scaleObject(x, y, 'equally');
           }
 
-          this.fire('object:scaling', { target: target, e: e });
-          target.fire('scaling', { e: e });
-        }
-        else if (transform.action === 'scaleX') {
+          this.fire('object:scaling', {
+            target: target,
+            e: e
+          });
+          target.fire('scaling', {
+            e: e
+          });
+        } else if (transform.action === 'scaleX') {
           this._scaleObject(x, y, 'x');
 
-          this.fire('object:scaling', { target: target, e: e});
-          target.fire('scaling', { e: e });
-        }
-        else if (transform.action === 'scaleY') {
+          this.fire('object:scaling', {
+            target: target,
+            e: e
+          });
+          target.fire('scaling', {
+            e: e
+          });
+        } else if (transform.action === 'scaleY') {
           this._scaleObject(x, y, 'y');
 
-          this.fire('object:scaling', { target: target, e: e});
-          target.fire('scaling', { e: e });
-        }
-        else {
+          this.fire('object:scaling', {
+            target: target,
+            e: e
+          });
+          target.fire('scaling', {
+            e: e
+          });
+        } else {
           this._translateObject(x, y);
 
-          this.fire('object:moving', { target: target, e: e});
-          target.fire('moving', { e: e });
+          this.fire('object:moving', {
+            target: target,
+            e: e
+          });
+          target.fire('moving', {
+            e: e
+          });
           this._setCursor(this.moveCursor);
         }
 
         this.renderAll();
       }
-      this.fire('mouse:move', { target: target, e: e });
-      target && target.fire('mousemove', { e: e });
+      this.fire('mouse:move', {
+        target: target,
+        e: e
+      });
+      target && target.fire('mousemove', {
+        e: e
+      });
     },
 
     /**
@@ -11758,37 +11930,31 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object
      * @param {Object} target Object that the mouse is hovering, if so.
      */
-    _setCursorFromEvent: function (e, target) {
+    _setCursorFromEvent: function(e, target) {
       var s = this.upperCanvasEl.style;
       if (!target) {
         s.cursor = this.defaultCursor;
         return false;
-      }
-      else {
+      } else {
         var activeGroup = this.getActiveGroup();
         // only show proper corner when group selection is not active
-        var corner = target._findTargetCorner
-                      && (!activeGroup || !activeGroup.contains(target))
-                      && target._findTargetCorner(e, this._offset);
+        var corner = target._findTargetCorner && (!activeGroup || !activeGroup.contains(target)) && target._findTargetCorner(e, this._offset);
 
         if (!corner) {
           s.cursor = target.hoverCursor || this.hoverCursor;
-        }
-        else {
+        } else {
           if (corner in cursorOffset) {
             var n = Math.round((target.getAngle() % 360) / 45);
-            if (n<0) {
+            if (n < 0) {
               n += 8; // full circle ahead
             }
             n += cursorOffset[corner];
             // normalize n to be from 0 to 7
             n %= 8;
             s.cursor = cursorMap[n];
-          }
-          else if (corner === 'mtr' && target.hasRotatingPoint) {
+          } else if (corner === 'mtr' && target.hasRotatingPoint) {
             s.cursor = this.rotationCursor;
-          }
-          else {
+          } else {
             s.cursor = this.defaultCursor;
             return false;
           }
@@ -11812,23 +11978,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Number} [options.height] Cropping height
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
-  toDataURL: function (options) {
-    options || (options = { });
+  toDataURL: function(options) {
+    options || (options = {});
 
     var format = options.format || 'png',
-        quality = options.quality || 1,
-        multiplier = options.multiplier || 1,
-        cropping = {
-          left: options.left,
-          top: options.top,
-          width: options.width,
-          height: options.height
-        };
+      quality = options.quality || 1,
+      multiplier = options.multiplier || 1,
+      cropping = {
+        left: options.left,
+        top: options.top,
+        width: options.width,
+        height: options.height
+      };
 
     if (multiplier !== 1) {
       return this.__toDataURLWithMultiplier(format, quality, cropping, multiplier);
-    }
-    else {
+    } else {
       return this.__toDataURL(format, quality, cropping);
     }
   },
@@ -11848,9 +12013,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       format = 'jpeg';
     }
 
-    var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
-              ? (croppedCanvasEl || canvasEl).toDataURL('image/' + format, quality)
-              : (croppedCanvasEl || canvasEl).toDataURL('image/' + format);
+    var data = (fabric.StaticCanvas.supports('toDataURLWithQuality')) ? (croppedCanvasEl || canvasEl).toDataURL('image/' + format, quality) : (croppedCanvasEl || canvasEl).toDataURL('image/' + format);
 
     this.contextTop && this.clearContext(this.contextTop);
     this.renderAll();
@@ -11868,12 +12031,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   __getCroppedCanvas: function(canvasEl, cropping) {
 
     var croppedCanvasEl,
-        croppedCtx;
+      croppedCtx;
 
     var shouldCrop = 'left' in cropping ||
-                     'top' in cropping ||
-                     'width' in cropping ||
-                     'height' in cropping;
+      'top' in cropping ||
+      'width' in cropping ||
+      'height' in cropping;
 
     if (shouldCrop) {
 
@@ -11895,13 +12058,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   __toDataURLWithMultiplier: function(format, quality, cropping, multiplier) {
 
     var origWidth = this.getWidth(),
-        origHeight = this.getHeight(),
-        scaledWidth = origWidth * multiplier,
-        scaledHeight = origHeight * multiplier,
-        activeObject = this.getActiveObject(),
-        activeGroup = this.getActiveGroup(),
+      origHeight = this.getHeight(),
+      scaledWidth = origWidth * multiplier,
+      scaledHeight = origHeight * multiplier,
+      activeObject = this.getActiveObject(),
+      activeGroup = this.getActiveGroup(),
 
-        ctx = this.contextTop || this.contextContainer;
+      ctx = this.contextTop || this.contextContainer;
 
     this.setWidth(scaledWidth).setHeight(scaledHeight);
     ctx.scale(multiplier, multiplier);
@@ -11922,8 +12085,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     if (activeGroup) {
       // not removing group due to complications with restoring it with correct state afterwords
       this._tempRemoveBordersControlsFromGroup(activeGroup);
-    }
-    else if (activeObject && this.deactivateAll) {
+    } else if (activeObject && this.deactivateAll) {
       this.deactivateAll();
     }
 
@@ -11936,13 +12098,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     var data = this.__toDataURL(format, quality, cropping);
 
-    ctx.scale(1 / multiplier,  1 / multiplier);
+    ctx.scale(1 / multiplier, 1 / multiplier);
     this.setWidth(origWidth).setHeight(origHeight);
 
     if (activeGroup) {
       this._restoreBordersControlsOnGroup(activeGroup);
-    }
-    else if (activeObject && this.setActiveObject) {
+    } else if (activeObject && this.setActiveObject) {
       this.setActiveObject(activeObject);
     }
 
@@ -11960,7 +12121,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Number} quality (0..1)
    * @return {String}
    */
-  toDataURLWithMultiplier: function (format, multiplier, quality) {
+  toDataURLWithMultiplier: function(format, multiplier, quality) {
     return this.toDataURL({
       format: format,
       multiplier: multiplier,
@@ -12011,7 +12172,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @return {fabric.Canvas} instance
    * @chainable
    */
-  loadFromDatalessJSON: function (json, callback, reviver) {
+  loadFromDatalessJSON: function(json, callback, reviver) {
     return this.loadFromJSON(json, callback, reviver);
   },
 
@@ -12026,18 +12187,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @return {fabric.Canvas} instance
    * @chainable
    */
-  loadFromJSON: function (json, callback, reviver) {
+  loadFromJSON: function(json, callback, reviver) {
     if (!json) return;
 
     // serialize if it wasn't already
-    var serialized = (typeof json === 'string')
-      ? JSON.parse(json)
-      : json;
+    var serialized = (typeof json === 'string') ? JSON.parse(json) : json;
 
     this.clear();
 
     var _this = this;
-    this._enlivenObjects(serialized.objects, function () {
+    this._enlivenObjects(serialized.objects, function() {
       _this._setBgOverlayImages(serialized, callback);
     }, reviver);
 
@@ -12047,11 +12206,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   _setBgOverlayImages: function(serialized, callback) {
 
     var _this = this,
-        backgroundPatternLoaded,
-        backgroundImageLoaded,
-        overlayImageLoaded;
+      backgroundPatternLoaded,
+      backgroundImageLoaded,
+      overlayImageLoaded;
 
-    var cbIfLoaded = function () {
+    var cbIfLoaded = function() {
       callback && backgroundImageLoaded && overlayImageLoaded && backgroundPatternLoaded && callback();
     };
 
@@ -12067,8 +12226,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
         cbIfLoaded();
       });
-    }
-    else {
+    } else {
       backgroundImageLoaded = true;
     }
 
@@ -12083,8 +12241,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
         cbIfLoaded();
       });
-    }
-    else {
+    } else {
       overlayImageLoaded = true;
     }
 
@@ -12096,8 +12253,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
         cbIfLoaded();
       });
-    }
-    else {
+    } else {
       backgroundPatternLoaded = true;
     }
 
@@ -12112,7 +12268,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} callback
    * @param {Function} [reviver]
    */
-  _enlivenObjects: function (objects, callback, reviver) {
+  _enlivenObjects: function(objects, callback, reviver) {
     var _this = this;
 
     if (objects.length === 0) {
@@ -12137,8 +12293,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {String} format
    * @param {Function} callback
    */
-  _toDataURL: function (format, callback) {
-    this.clone(function (clone) {
+  _toDataURL: function(format, callback) {
+    this.clone(function(clone) {
       callback(clone.toDataURL(format));
     });
   },
@@ -12149,8 +12305,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Number} multiplier
    * @param {Function} callback
    */
-  _toDataURLWithMultiplier: function (format, multiplier, callback) {
-    this.clone(function (clone) {
+  _toDataURLWithMultiplier: function(format, multiplier, callback) {
+    this.clone(function(clone) {
       callback(clone.toDataURLWithMultiplier(format, multiplier));
     });
   },
@@ -12159,7 +12315,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * Clones canvas instance
    * @param {Object} [callback] Receives cloned instance as a first argument
    */
-  clone: function (callback) {
+  clone: function(callback) {
     var data = JSON.stringify(this);
     this.cloneWithoutData(function(clone) {
       clone.loadFromJSON(data, function() {
@@ -12189,8 +12345,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       });
       clone.backgroundImageOpacity = this.backgroundImageOpacity;
       clone.backgroundImageStretch = this.backgroundImageStretch;
-    }
-    else {
+    } else {
       callback && callback(clone);
     }
   }
@@ -12198,7 +12353,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 (function() {
 
   var degreesToRadians = fabric.util.degreesToRadians,
-      radiansToDegrees = fabric.util.radiansToDegrees;
+    radiansToDegrees = fabric.util.radiansToDegrees;
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
 
@@ -12222,7 +12377,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         this._scaleObjectBy(self.scale);
       }
 
-      this.fire('touch:gesture', {target: target, e: e, self: self});
+      this.fire('touch:gesture', {
+        target: target,
+        e: e,
+        self: self
+      });
     },
 
     /**
@@ -12249,11 +12408,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         if (!lockScalingY) {
           target.set('scaleY', t.scaleY * s);
         }
-      }
-      else if (by === 'x' && !target.get('lockUniScaling')) {
+      } else if (by === 'x' && !target.get('lockUniScaling')) {
         lockScalingX || target.set('scaleX', t.scaleX * s);
-      }
-      else if (by === 'y' && !target.get('lockUniScaling')) {
+      } else if (by === 'y' && !target.get('lockUniScaling')) {
         lockScalingY || target.set('scaleY', t.scaleY * s);
       }
     },
@@ -12274,12 +12431,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      toFixed = fabric.util.toFixed,
-      capitalize = fabric.util.string.capitalize,
-      degreesToRadians = fabric.util.degreesToRadians,
-      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend,
+    toFixed = fabric.util.toFixed,
+    capitalize = fabric.util.string.capitalize,
+    degreesToRadians = fabric.util.degreesToRadians,
+    supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Object) {
     return;
@@ -12289,243 +12446,243 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
    */
-  fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
+  fabric.Object = fabric.util.createClass( /** @lends fabric.Object.prototype */ {
 
     /**
      * Type of an object (rect, circle, path, etc.)
      * @type String
      * @default
      */
-    type:                     'object',
+    type: 'object',
 
     /**
      * Horizontal origin of transformation of an object (one of "left", "right", "center")
      * @type String
      * @default
      */
-    originX:                  'center',
+    originX: 'center',
 
     /**
      * Vertical origin of transformation of an object (one of "top", "bottom", "center")
      * @type String
      * @default
      */
-    originY:                  'center',
+    originY: 'center',
 
     /**
      * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
      * @type Number
      * @default
      */
-    top:                      0,
+    top: 0,
 
     /**
      * Left position of an object. Note that by default it's relative to object center. You can change this by setting originX={left/center/right}
      * @type Number
      * @default
      */
-    left:                     0,
+    left: 0,
 
     /**
      * Object width
      * @type Number
      * @default
      */
-    width:                    0,
+    width: 0,
 
     /**
      * Object height
      * @type Number
      * @default
      */
-    height:                   0,
+    height: 0,
 
     /**
      * Object scale factor (horizontal)
      * @type Number
      * @default
      */
-    scaleX:                   1,
+    scaleX: 1,
 
     /**
      * Object scale factor (vertical)
      * @type Number
      * @default
      */
-    scaleY:                   1,
+    scaleY: 1,
 
     /**
      * When true, an object is rendered as flipped horizontally
      * @type Boolean
      * @default
      */
-    flipX:                    false,
+    flipX: false,
 
     /**
      * When true, an object is rendered as flipped vertically
      * @type Boolean
      * @default
      */
-    flipY:                    false,
+    flipY: false,
 
     /**
      * Opacity of an object
      * @type Number
      * @default
      */
-    opacity:                  1,
+    opacity: 1,
 
     /**
      * Angle of rotation of an object (in degrees)
      * @type Number
      * @default
      */
-    angle:                    0,
+    angle: 0,
 
     /**
      * Size of object's controlling corners (in pixels)
      * @type Number
      * @default
      */
-    cornerSize:               12,
+    cornerSize: 12,
 
     /**
      * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
      * @type Boolean
      * @default
      */
-    transparentCorners:       true,
+    transparentCorners: true,
 
     /**
      * Default cursor value used when hovering over this object on canvas
      * @type String
      * @default
      */
-    hoverCursor:              null,
+    hoverCursor: null,
 
     /**
      * Padding between object and its controlling borders (in pixels)
      * @type Number
      * @default
      */
-    padding:                  0,
+    padding: 0,
 
     /**
      * Color of controlling borders of an object (when it's active)
      * @type String
      * @default
      */
-    borderColor:              'rgba(102,153,255,0.75)',
+    borderColor: 'rgba(102,153,255,0.75)',
 
     /**
      * Color of controlling corners of an object (when it's active)
      * @type String
      * @default
      */
-    cornerColor:              'rgba(102,153,255,0.5)',
+    cornerColor: 'rgba(102,153,255,0.5)',
 
     /**
      * When true, this object will use center point as the origin of transformation
      * when being resized via the controls
      * @type Boolean
      */
-    centerTransform:          false,
+    centerTransform: false,
 
     /**
      * Color of object's fill
      * @type String
      * @default
      */
-    fill:                     'rgb(0,0,0)',
+    fill: 'rgb(0,0,0)',
 
     /**
      * Fill rule used to fill an object
      * @type String
      * @default
      */
-    fillRule:                 'source-over',
+    fillRule: 'source-over',
 
     /**
      * Overlay fill (takes precedence over fill value)
      * @type String
      * @default
      */
-    overlayFill:              null,
+    overlayFill: null,
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color
      * @type String
      * @default
      */
-    stroke:                   null,
+    stroke: null,
 
     /**
      * Width of a stroke used to render this object
      * @type Number
      * @default
      */
-    strokeWidth:              1,
+    strokeWidth: 1,
 
     /**
      * Array specifying dash pattern of an object's stroke (stroke must be defined)
      * @type Array
      */
-    strokeDashArray:          null,
+    strokeDashArray: null,
 
     /**
      * Line endings style of an object's stroke (one of "butt", "round", "square")
      * @type String
      * @default
      */
-    strokeLineCap:            'butt',
+    strokeLineCap: 'butt',
 
     /**
      * Corner style of an object's stroke (one of "bevil", "round", "miter")
      * @type String
      * @default
      */
-    strokeLineJoin:           'miter',
+    strokeLineJoin: 'miter',
 
     /**
      * Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
      * @type Number
      * @default
      */
-    strokeMiterLimit:         10,
+    strokeMiterLimit: 10,
 
     /**
      * Shadow object representing shadow of this shape
      * @type fabric.Shadow
      * @default
      */
-    shadow:                   null,
+    shadow: null,
 
     /**
      * Opacity of object's controlling borders when object is active and moving
      * @type Number
      * @default
      */
-    borderOpacityWhenMoving:  0.4,
+    borderOpacityWhenMoving: 0.4,
 
     /**
      * Scale factor of object's controlling borders
      * @type Number
      * @default
      */
-    borderScaleFactor:        1,
+    borderScaleFactor: 1,
 
     /**
      * Transform matrix (similar to SVG's transform matrix)
      * @type Array
      */
-    transformMatrix:          null,
+    transformMatrix: null,
 
     /**
      * Minimum allowed scale value of an object
      * @type Number
      * @default
      */
-    minScaleLimit:            0.01,
+    minScaleLimit: 0.01,
 
     /**
      * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection).
@@ -12533,104 +12690,104 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @type Boolean
      * @default
      */
-    selectable:               true,
+    selectable: true,
 
     /**
      * When set to `false`, an object is not rendered on canvas
      * @type Boolean
      * @default
      */
-    visible:                  true,
+    visible: true,
 
     /**
      * When set to `false`, object's controls are not displayed and can not be used to manipulate object
      * @type Boolean
      * @default
      */
-    hasControls:              true,
+    hasControls: true,
 
     /**
      * When set to `false`, object's controlling borders are not rendered
      * @type Boolean
      * @default
      */
-    hasBorders:               true,
+    hasBorders: true,
 
     /**
      * When set to `false`, object's controlling rotating point will not be visible or selectable
      * @type Boolean
      * @default
      */
-    hasRotatingPoint:         true,
+    hasRotatingPoint: true,
 
     /**
      * Offset for object's controlling rotating point (when enabled via `hasRotatingPoint`)
      * @type Number
      * @default
      */
-    rotatingPointOffset:      40,
+    rotatingPointOffset: 40,
 
     /**
      * When set to `true`, objects are "found" on canvas on per-pixel basis rather than according to bounding box
      * @type Boolean
      * @default
      */
-    perPixelTargetFind:       false,
+    perPixelTargetFind: false,
 
     /**
      * When `false`, default object's values are not included in its serialization
      * @type Boolean
      * @default
      */
-    includeDefaultValues:     true,
+    includeDefaultValues: true,
 
     /**
      * Function that determines clipping of an object (context is passed as a first argument)
      * @type Function
      */
-    clipTo:                   null,
+    clipTo: null,
 
     /**
      * When `true`, object horizontal movement is locked
      * @type Boolean
      * @default
      */
-    lockMovementX:            false,
+    lockMovementX: false,
 
     /**
      * When `true`, object vertical movement is locked
      * @type Boolean
      * @default
      */
-    lockMovementY:            false,
+    lockMovementY: false,
 
     /**
      * When `true`, object rotation is locked
      * @type Boolean
      * @default
      */
-    lockRotation:             false,
+    lockRotation: false,
 
     /**
      * When `true`, object horizontal scaling is locked
      * @type Boolean
      * @default
      */
-    lockScalingX:             false,
+    lockScalingX: false,
 
     /**
      * When `true`, object vertical scaling is locked
      * @type Boolean
      * @default
      */
-    lockScalingY:             false,
+    lockScalingY: false,
 
     /**
      * When `true`, object non-uniform scaling is locked
      * @type Boolean
      * @default
      */
-    lockUniScaling:           false,
+    lockUniScaling: false,
 
     /**
      * List of properties to consider when checking if state
@@ -12638,7 +12795,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties:  (
+    stateProperties: (
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill fillRule overlayFill shadow clipTo visible'
@@ -12727,30 +12884,30 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       var object = {
-        type:               this.type,
-        originX:            this.originX,
-        originY:            this.originY,
-        left:               toFixed(this.left, NUM_FRACTION_DIGITS),
-        top:                toFixed(this.top, NUM_FRACTION_DIGITS),
-        width:              toFixed(this.width, NUM_FRACTION_DIGITS),
-        height:             toFixed(this.height, NUM_FRACTION_DIGITS),
-        fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
-        overlayFill:        this.overlayFill,
-        stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
-        strokeWidth:        toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
-        strokeDashArray:    this.strokeDashArray,
-        strokeLineCap:      this.strokeLineCap,
-        strokeLineJoin:     this.strokeLineJoin,
-        strokeMiterLimit:   toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
-        scaleX:             toFixed(this.scaleX, NUM_FRACTION_DIGITS),
-        scaleY:             toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-        angle:              toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
-        flipX:              this.flipX,
-        flipY:              this.flipY,
-        opacity:            toFixed(this.opacity, NUM_FRACTION_DIGITS),
-        shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
-        visible:            this.visible,
-        clipTo:             this.clipTo && String(this.clipTo)
+        type: this.type,
+        originX: this.originX,
+        originY: this.originY,
+        left: toFixed(this.left, NUM_FRACTION_DIGITS),
+        top: toFixed(this.top, NUM_FRACTION_DIGITS),
+        width: toFixed(this.width, NUM_FRACTION_DIGITS),
+        height: toFixed(this.height, NUM_FRACTION_DIGITS),
+        fill: (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
+        overlayFill: this.overlayFill,
+        stroke: (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
+        strokeWidth: toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
+        strokeDashArray: this.strokeDashArray,
+        strokeLineCap: this.strokeLineCap,
+        strokeLineJoin: this.strokeLineJoin,
+        strokeMiterLimit: toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
+        scaleX: toFixed(this.scaleX, NUM_FRACTION_DIGITS),
+        scaleY: toFixed(this.scaleY, NUM_FRACTION_DIGITS),
+        angle: toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
+        flipX: this.flipX,
+        flipY: this.flipY,
+        opacity: toFixed(this.opacity, NUM_FRACTION_DIGITS),
+        shadow: (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
+        visible: this.visible,
+        clipTo: this.clipTo && String(this.clipTo)
       };
 
       if (!this.includeDefaultValues) {
@@ -12779,13 +12936,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     getSvgStyles: function() {
 
-      var fill = this.fill
-        ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
-        : 'none';
+      var fill = this.fill ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none';
 
-      var stroke = this.stroke
-        ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
-        : 'none';
+      var stroke = this.stroke ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke) : 'none';
 
       var strokeWidth = this.strokeWidth ? this.strokeWidth : '0';
       var strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : '';
@@ -12822,31 +12975,28 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       var translatePart = "translate(" +
-                            toFixed(center.x, NUM_FRACTION_DIGITS) +
-                            " " +
-                            toFixed(center.y, NUM_FRACTION_DIGITS) +
-                          ")";
+        toFixed(center.x, NUM_FRACTION_DIGITS) +
+        " " +
+        toFixed(center.y, NUM_FRACTION_DIGITS) +
+        ")";
 
-      var anglePart = angle !== 0
-        ? (" rotate(" + toFixed(angle, NUM_FRACTION_DIGITS) + ")")
-        : '';
+      var anglePart = angle !== 0 ? (" rotate(" + toFixed(angle, NUM_FRACTION_DIGITS) + ")") : '';
 
-      var scalePart = (this.scaleX === 1 && this.scaleY === 1)
-        ? '' :
+      var scalePart = (this.scaleX === 1 && this.scaleY === 1) ? '' :
         (" scale(" +
-          toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
-          " " +
-          toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
+        toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
+        " " +
+        toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
         ")");
 
       var flipXPart = this.flipX ? "matrix(-1 0 0 1 0 0) " : "";
       var flipYPart = this.flipY ? "matrix(1 0 0 -1 0 0)" : "";
 
-      return [ translatePart, anglePart, scalePart, flipXPart, flipYPart ].join('');
+      return [translatePart, anglePart, scalePart, flipXPart, flipYPart].join('');
     },
 
     _createBaseSVGMarkup: function() {
-      var markup = [ ];
+      var markup = [];
 
       if (this.fill && this.fill.toLive) {
         markup.push(this.fill.toSVG(this, false));
@@ -12903,12 +13053,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         for (var prop in key) {
           this._set(prop, key[prop]);
         }
-      }
-      else {
+      } else {
         if (typeof value === 'function' && key !== 'clipTo') {
           this._set(key, value(this.get(key)));
-        }
-        else {
+        } else {
           this._set(key, value);
         }
       }
@@ -12930,15 +13078,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (key === 'scaleX' && value < 0) {
         this.flipX = !this.flipX;
         value *= -1;
-      }
-      else if (key === 'scaleY' && value < 0) {
+      } else if (key === 'scaleY' && value < 0) {
         this.flipY = !this.flipY;
         value *= -1;
-      }
-      else if (key === 'width' || key === 'height') {
-        this.minScaleLimit = toFixed(Math.min(0.1, 1/Math.max(this.width, this.height)), 2);
-      }
-      else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
+      } else if (key === 'width' || key === 'height') {
+        this.minScaleLimit = toFixed(Math.min(0.1, 1 / Math.max(this.width, this.height)), 2);
+      } else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
       }
 
@@ -12997,22 +13142,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         ctx.lineCap = this.strokeLineCap;
         ctx.lineJoin = this.strokeLineJoin;
         ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx)
-          : this.stroke;
+        ctx.strokeStyle = this.stroke.toLive ? this.stroke.toLive(ctx) : this.stroke;
       }
 
       if (this.overlayFill) {
         ctx.fillStyle = this.overlayFill;
-      }
-      else if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
-          : this.fill;
+      } else if (this.fill) {
+        ctx.fillStyle = this.fill.toLive ? this.fill.toLive(ctx) : this.fill;
       }
 
       if (m && this.group) {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
+        ctx.translate(-this.group.width / 2, -this.group.height / 2);
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
 
@@ -13060,9 +13200,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       if (this.fill.toLive) {
         ctx.save();
-        ctx.translate(
-          -this.width / 2 + this.fill.offsetX || 0,
-          -this.height / 2 + this.fill.offsetY || 0);
+        ctx.translate(-this.width / 2 + this.fill.offsetX || 0, -this.height / 2 + this.fill.offsetY || 0);
       }
       ctx.fill();
       if (this.fill.toLive) {
@@ -13090,13 +13228,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         if (supportsLineDash) {
           ctx.setLineDash(this.strokeDashArray);
           this._stroke && this._stroke(ctx);
-        }
-        else {
+        } else {
           this._renderDashedStroke && this._renderDashedStroke(ctx);
         }
         ctx.stroke();
-      }
-      else {
+      } else {
         this._stroke ? this._stroke(ctx) : ctx.stroke();
       }
       this._removeShadow(ctx);
@@ -13144,10 +13280,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      */
     toDataURL: function(options) {
-      options || (options = { });
+      options || (options = {});
 
       var el = fabric.util.createCanvasElement(),
-          boundingRect = this.getBoundingRect();
+        boundingRect = this.getBoundingRect();
 
       el.width = boundingRect.width;
       el.height = boundingRect.height;
@@ -13240,9 +13376,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @chainable
      */
     setGradient: function(property, options) {
-      options || (options = { });
+      options || (options = {});
 
-      var gradient = {colorStops: []};
+      var gradient = {
+        colorStops: []
+      };
 
       gradient.type = options.type || (options.r1 || options.r2 ? 'radial' : 'linear');
       gradient.coords = {
@@ -13259,7 +13397,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       for (var position in options.colorStops) {
         var color = new fabric.Color(options.colorStops[position]);
-        gradient.colorStops.push({offset: position, color: color.toRgb(), opacity: color.getAlpha()});
+        gradient.colorStops.push({
+          offset: position,
+          color: color.toRgb(),
+          opacity: color.getAlpha()
+        });
       }
 
       return this.set(property, fabric.Gradient.forObject(this, gradient));
@@ -13310,7 +13452,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    centerH: function () {
+    centerH: function() {
       this.canvas.centerObjectH(this);
       return this;
     },
@@ -13321,7 +13463,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    centerV: function () {
+    centerV: function() {
       this.canvas.centerObjectV(this);
       return this;
     },
@@ -13332,7 +13474,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    center: function () {
+    center: function() {
       return this.centerH().centerV();
     },
 
@@ -13353,8 +13495,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     sendToBack: function() {
       if (this.group) {
         fabric.StaticCanvas.prototype.sendToBack.call(this.group, this);
-      }
-      else {
+      } else {
         this.canvas.sendToBack(this);
       }
       return this;
@@ -13368,8 +13509,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     bringToFront: function() {
       if (this.group) {
         fabric.StaticCanvas.prototype.bringToFront.call(this.group, this);
-      }
-      else {
+      } else {
         this.canvas.bringToFront(this);
       }
       return this;
@@ -13384,8 +13524,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     sendBackwards: function(intersecting) {
       if (this.group) {
         fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this, intersecting);
-      }
-      else {
+      } else {
         this.canvas.sendBackwards(this, intersecting);
       }
       return this;
@@ -13400,8 +13539,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     bringForward: function(intersecting) {
       if (this.group) {
         fabric.StaticCanvas.prototype.bringForward.call(this.group, this, intersecting);
-      }
-      else {
+      } else {
         this.canvas.bringForward(this, intersecting);
       }
       return this;
@@ -13416,8 +13554,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     moveTo: function(index) {
       if (this.group) {
         fabric.StaticCanvas.prototype.moveTo.call(this.group, this, index);
-      }
-      else {
+      } else {
         this.canvas.moveTo(this, index);
       }
       return this;
@@ -13466,20 +13603,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {fabric.Point}
      */
     translateToCenterPoint: function(point, originX, originY) {
-      var cx = point.x, cy = point.y;
+      var cx = point.x,
+        cy = point.y;
 
-      if ( originX === "left" ) {
-        cx = point.x + ( this.getWidth() + (this.strokeWidth*this.scaleX) )/ 2;
-      }
-      else if ( originX === "right" ) {
-        cx = point.x - ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
+      if (originX === "left") {
+        cx = point.x + (this.getWidth() + (this.strokeWidth * this.scaleX)) / 2;
+      } else if (originX === "right") {
+        cx = point.x - (this.getWidth() + (this.strokeWidth * this.scaleX)) / 2;
       }
 
-      if ( originY === "top" ) {
-        cy = point.y +( this.getHeight() + (this.strokeWidth*this.scaleY) ) / 2;
-      }
-      else if ( originY === "bottom" ) {
-        cy = point.y - ( this.getHeight() + (this.strokeWidth*this.scaleY) )  / 2;
+      if (originY === "top") {
+        cy = point.y + (this.getHeight() + (this.strokeWidth * this.scaleY)) / 2;
+      } else if (originY === "bottom") {
+        cy = point.y - (this.getHeight() + (this.strokeWidth * this.scaleY)) / 2;
       }
 
       // Apply the reverse rotation to the point (it's already scaled properly)
@@ -13494,20 +13630,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {fabric.Point}
      */
     translateToOriginPoint: function(center, originX, originY) {
-      var x = center.x, y = center.y;
+      var x = center.x,
+        y = center.y;
 
       // Get the point coordinates
-      if ( originX === "left" ) {
-        x = center.x - ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
+      if (originX === "left") {
+        x = center.x - (this.getWidth() + (this.strokeWidth * this.scaleX)) / 2;
+      } else if (originX === "right") {
+        x = center.x + (this.getWidth() + (this.strokeWidth * this.scaleX)) / 2;
       }
-      else if ( originX === "right" ) {
-        x = center.x + ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
-      }
-      if ( originY === "top" ) {
-        y = center.y - ( this.getHeight() + (this.strokeWidth*this.scaleY) )/ 2;
-      }
-      else if ( originY === "bottom" ) {
-        y = center.y + ( this.getHeight() + (this.strokeWidth*this.scaleY) )/ 2;
+      if (originY === "top") {
+        y = center.y - (this.getHeight() + (this.strokeWidth * this.scaleY)) / 2;
+      } else if (originY === "bottom") {
+        y = center.y + (this.getHeight() + (this.strokeWidth * this.scaleY)) / 2;
       }
 
       // Apply the rotation to the point (it's already scaled properly)
@@ -13553,27 +13688,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       var x, y;
       if (originX !== undefined && originY !== undefined) {
-        if ( originX === "left" ) {
-          x = center.x - (this.getWidth() + this.strokeWidth*this.scaleX) / 2;
-        }
-        else if ( originX === "right" ) {
-          x = center.x + (this.getWidth() + this.strokeWidth*this.scaleX)/ 2;
-        }
-        else {
+        if (originX === "left") {
+          x = center.x - (this.getWidth() + this.strokeWidth * this.scaleX) / 2;
+        } else if (originX === "right") {
+          x = center.x + (this.getWidth() + this.strokeWidth * this.scaleX) / 2;
+        } else {
           x = center.x;
         }
 
-        if ( originY === "top" ) {
-          y = center.y - (this.getHeight() + this.strokeWidth*this.scaleY) / 2;
-        }
-        else if ( originY === "bottom" ) {
-          y = center.y + (this.getHeight() + this.strokeWidth*this.scaleY)/ 2;
-        }
-        else {
+        if (originY === "top") {
+          y = center.y - (this.getHeight() + this.strokeWidth * this.scaleY) / 2;
+        } else if (originY === "bottom") {
+          y = center.y + (this.getHeight() + this.strokeWidth * this.scaleY) / 2;
+        } else {
           y = center.y;
         }
-      }
-      else {
+      } else {
         x = this.left;
         y = this.top;
       }
@@ -13619,23 +13749,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var yFull = Math.sin(angle) * hypotFull;
 
       if (this.originX === 'center' && to === 'left' ||
-          this.originX === 'right' && to === 'center') {
+        this.originX === 'right' && to === 'center') {
         // move half left
         this.left -= xHalf;
         this.top -= yHalf;
-      }
-      else if (this.originX === 'left' && to === 'center' ||
-               this.originX === 'center' && to === 'right') {
+      } else if (this.originX === 'left' && to === 'center' ||
+        this.originX === 'center' && to === 'right') {
         // move half right
         this.left += xHalf;
         this.top += yHalf;
-      }
-      else if (this.originX === 'left' && to === 'right') {
+      } else if (this.originX === 'left' && to === 'right') {
         // move full right
         this.left += xFull;
         this.top += yFull;
-      }
-      else if (this.originX === 'right' && to === 'left') {
+      } else if (this.originX === 'right' && to === 'left') {
         // move full left
         this.left -= xFull;
         this.top -= yFull;
@@ -13664,7 +13791,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         y -= yHalf;
       }
 
-      return { x: x, y: y };
+      return {
+        x: x,
+        y: y
+      };
     }
   });
 
@@ -13690,10 +13820,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     intersectsWithRect: function(pointTL, pointBR) {
       var oCoords = this.oCoords,
-          tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
-          tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
-          bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
-          br = new fabric.Point(oCoords.br.x, oCoords.br.y);
+        tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
+        tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
+        bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
+        br = new fabric.Point(oCoords.br.x, oCoords.br.y);
 
       var intersection = fabric.Intersection.intersectPolygonRectangle(
         [tl, tr, br, bl],
@@ -13719,11 +13849,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         };
       }
       var thisCoords = getCoords(this.oCoords),
-          otherCoords = getCoords(other.oCoords);
+        otherCoords = getCoords(other.oCoords);
 
       var intersection = fabric.Intersection.intersectPolygonPolygon(
-        [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl],
-        [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
+        [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl], [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
       );
 
       return intersection.status === 'Intersection';
@@ -13736,8 +13865,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     isContainedWithinObject: function(other) {
       var boundingRect = other.getBoundingRect(),
-          point1 = new fabric.Point(boundingRect.left, boundingRect.top),
-          point2 = new fabric.Point(boundingRect.left + boundingRect.width, boundingRect.top + boundingRect.height);
+        point1 = new fabric.Point(boundingRect.left, boundingRect.top),
+        point2 = new fabric.Point(boundingRect.left + boundingRect.width, boundingRect.top + boundingRect.height);
 
       return this.isContainedWithinRect(point1, point2);
     },
@@ -13766,7 +13895,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     containsPoint: function(point) {
       var lines = this._getImageLines(this.oCoords),
-          xPoints = this._findCrossPoints(point, lines);
+        xPoints = this._findCrossPoints(point, lines);
 
       // if xPoints is odd then point is inside the object
       return (xPoints !== 0 && xPoints % 2 === 1);
@@ -13807,8 +13936,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     _findCrossPoints: function(point, oCoords) {
       var b1, b2, a1, a2, xi, yi,
-          xcount = 0,
-          iLine;
+        xcount = 0,
+        iLine;
 
       for (var lineKey in oCoords) {
         iLine = oCoords[lineKey];
@@ -13829,10 +13958,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         else {
           b1 = 0;
           b2 = (iLine.d.y - iLine.o.y) / (iLine.d.x - iLine.o.x);
-          a1 = point.y- b1 * point.x;
+          a1 = point.y - b1 * point.x;
           a2 = iLine.o.y - b2 * iLine.o.x;
 
-          xi = - (a1 - a2) / (b1 - b2);
+          xi = -(a1 - a2) / (b1 - b2);
           yi = a1 + b1 * xi;
         }
         // dont count xi < point.x cases
@@ -13976,8 +14105,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     setCoords: function() {
 
       var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
-          padding = this.padding,
-          theta = degreesToRadians(this.angle);
+        padding = this.padding,
+        theta = degreesToRadians(this.angle);
 
       this.currentWidth = (this.width + strokeWidth) * this.scaleX + padding * 2;
       this.currentHeight = (this.height + strokeWidth) * this.scaleY + padding * 2;
@@ -13995,9 +14124,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       // offset added for rotate and scale actions
       var offsetX = Math.cos(_angle + theta) * _hypotenuse,
-          offsetY = Math.sin(_angle + theta) * _hypotenuse,
-          sinTh = Math.sin(theta),
-          cosTh = Math.cos(theta);
+        offsetY = Math.sin(_angle + theta) * _hypotenuse,
+        sinTh = Math.sin(theta),
+        cosTh = Math.cos(theta);
 
       var coords = this.getCenterPoint();
       var tl = {
@@ -14017,20 +14146,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         y: tl.y + (this.currentHeight * cosTh)
       };
       var ml = {
-        x: tl.x - (this.currentHeight/2 * sinTh),
-        y: tl.y + (this.currentHeight/2 * cosTh)
+        x: tl.x - (this.currentHeight / 2 * sinTh),
+        y: tl.y + (this.currentHeight / 2 * cosTh)
       };
       var mt = {
-        x: tl.x + (this.currentWidth/2 * cosTh),
-        y: tl.y + (this.currentWidth/2 * sinTh)
+        x: tl.x + (this.currentWidth / 2 * cosTh),
+        y: tl.y + (this.currentWidth / 2 * sinTh)
       };
       var mr = {
-        x: tr.x - (this.currentHeight/2 * sinTh),
-        y: tr.y + (this.currentHeight/2 * cosTh)
+        x: tr.x - (this.currentHeight / 2 * sinTh),
+        y: tr.y + (this.currentHeight / 2 * cosTh)
       };
       var mb = {
-        x: bl.x + (this.currentWidth/2 * cosTh),
-        y: bl.y + (this.currentWidth/2 * sinTh)
+        x: bl.x + (this.currentWidth / 2 * cosTh),
+        y: bl.y + (this.currentWidth / 2 * sinTh)
       };
       var mtr = {
         x: mt.x,
@@ -14053,9 +14182,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       this.oCoords = {
         // corners
-        tl: tl, tr: tr, br: br, bl: bl,
+        tl: tl,
+        tr: tr,
+        br: br,
+        bl: bl,
         // middle
-        ml: ml, mt: mt, mr: mr, mb: mb,
+        ml: ml,
+        mt: mt,
+        mr: mr,
+        mb: mb,
         // rotating point
         mtr: mtr
       };
@@ -14106,16 +14241,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {fabric.Object} thisArg
    */
   setupState: function() {
-    this.originalState = { };
+    this.originalState = {};
     this.saveState();
 
     return this;
   }
 });
-(function(){
+(function() {
 
   var getPointer = fabric.util.getPointer,
-      degreesToRadians = fabric.util.degreesToRadians;
+    degreesToRadians = fabric.util.degreesToRadians;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
@@ -14130,10 +14265,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (!this.hasControls || !this.active) return false;
 
       var pointer = getPointer(e, this.canvas.upperCanvasEl),
-          ex = pointer.x - offset.left,
-          ey = pointer.y - offset.top,
-          xPoints,
-          lines;
+        ex = pointer.x - offset.left,
+        ey = pointer.y - offset.top,
+        xPoints,
+        lines;
 
       for (var i in this.oCoords) {
 
@@ -14161,7 +14296,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         // canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
         // canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
 
-        xPoints = this._findCrossPoints({x: ex, y: ey}, lines);
+        xPoints = this._findCrossPoints({
+          x: ex,
+          y: ey
+        }, lines);
         if (xPoints !== 0 && xPoints % 2 === 1) {
           this.__corner = i;
           return i;
@@ -14177,13 +14315,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _setCornerCoords: function() {
       var coords = this.oCoords,
-          theta = degreesToRadians(this.angle),
-          newTheta = degreesToRadians(45 - this.angle),
-          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2,
-          cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
-          sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
-          sinTh = Math.sin(theta),
-          cosTh = Math.cos(theta);
+        theta = degreesToRadians(this.angle),
+        newTheta = degreesToRadians(45 - this.angle),
+        cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2,
+        cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
+        sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
+        sinTh = Math.sin(theta),
+        cosTh = Math.cos(theta);
 
       coords.tl.corner = {
         tl: {
@@ -14368,8 +14506,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (!this.hasBorders) return this;
 
       var padding = this.padding,
-          padding2 = padding * 2,
-          strokeWidth = ~~(this.strokeWidth / 2) * 2; // Round down to even number
+        padding2 = padding * 2,
+        strokeWidth = ~~ (this.strokeWidth / 2) * 2; // Round down to even number
 
       ctx.save();
 
@@ -14377,28 +14515,24 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.strokeStyle = this.borderColor;
 
       var scaleX = 1 / this._constrainScale(this.scaleX),
-          scaleY = 1 / this._constrainScale(this.scaleY);
+        scaleY = 1 / this._constrainScale(this.scaleY);
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
       ctx.scale(scaleX, scaleY);
 
       var w = this.getWidth(),
-          h = this.getHeight();
+        h = this.getHeight();
 
-      ctx.strokeRect(
-        ~~(-(w / 2) - padding - strokeWidth / 2 * this.scaleX) - 0.5, // offset needed to make lines look sharper
-        ~~(-(h / 2) - padding - strokeWidth / 2 * this.scaleY) - 0.5,
-        ~~(w + padding2 + strokeWidth * this.scaleX) + 1, // double offset needed to make lines look sharper
-        ~~(h + padding2 + strokeWidth * this.scaleY) + 1
+      ctx.strokeRect(~~(-(w / 2) - padding - strokeWidth / 2 * this.scaleX) - 0.5, // offset needed to make lines look sharper
+        ~~ (-(h / 2) - padding - strokeWidth / 2 * this.scaleY) - 0.5, ~~ (w + padding2 + strokeWidth * this.scaleX) + 1, // double offset needed to make lines look sharper
+        ~~ (h + padding2 + strokeWidth * this.scaleY) + 1
       );
 
       if (this.hasRotatingPoint && !this.get('lockRotation') && this.hasControls) {
 
         var rotateHeight = (
-          this.flipY
-            ? h + (strokeWidth * this.scaleY) + (padding * 2)
-            : -h - (strokeWidth * this.scaleY) - (padding * 2)
+          this.flipY ? h + (strokeWidth * this.scaleY) + (padding * 2) : -h - (strokeWidth * this.scaleY) - (padding * 2)
         ) / 2;
 
         ctx.beginPath();
@@ -14424,25 +14558,25 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (!this.hasControls) return this;
 
       var size = this.cornerSize,
-          size2 = size / 2,
-          strokeWidth2 = ~~(this.strokeWidth / 2), // half strokeWidth rounded down
-          left = -(this.width / 2),
-          top = -(this.height / 2),
-          _left,
-          _top,
-          sizeX = size / this.scaleX,
-          sizeY = size / this.scaleY,
-          paddingX = this.padding / this.scaleX,
-          paddingY = this.padding / this.scaleY,
-          scaleOffsetY = size2 / this.scaleY,
-          scaleOffsetX = size2 / this.scaleX,
-          scaleOffsetSizeX = (size2 - size) / this.scaleX,
-          scaleOffsetSizeY = (size2 - size) / this.scaleY,
-          height = this.height,
-          width = this.width,
-          methodName = this.transparentCorners ? 'strokeRect' : 'fillRect',
-          transparent = this.transparentCorners,
-          isVML = typeof G_vmlCanvasManager !== 'undefined';
+        size2 = size / 2,
+        strokeWidth2 = ~~ (this.strokeWidth / 2), // half strokeWidth rounded down
+        left = -(this.width / 2),
+        top = -(this.height / 2),
+        _left,
+        _top,
+        sizeX = size / this.scaleX,
+        sizeY = size / this.scaleY,
+        paddingX = this.padding / this.scaleX,
+        paddingY = this.padding / this.scaleY,
+        scaleOffsetY = size2 / this.scaleY,
+        scaleOffsetX = size2 / this.scaleX,
+        scaleOffsetSizeX = (size2 - size) / this.scaleX,
+        scaleOffsetSizeY = (size2 - size) / this.scaleY,
+        height = this.height,
+        width = this.width,
+        methodName = this.transparentCorners ? 'strokeRect' : 'fillRect',
+        transparent = this.transparentCorners,
+        isVML = typeof G_vmlCanvasManager !== 'undefined';
 
       ctx.save();
 
@@ -14481,14 +14615,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       if (!this.get('lockUniScaling')) {
         // middle-top
-        _left = left + width/2 - scaleOffsetX;
+        _left = left + width / 2 - scaleOffsetX;
         _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
         isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-bottom
-        _left = left + width/2 - scaleOffsetX;
+        _left = left + width / 2 - scaleOffsetX;
         _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
         isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
@@ -14496,14 +14630,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
         // middle-right
         _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-        _top = top + height/2 - scaleOffsetY;
+        _top = top + height / 2 - scaleOffsetY;
 
         isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-left
         _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-        _top = top + height/2 - scaleOffsetY;
+        _top = top + height / 2 - scaleOffsetY;
 
         isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
@@ -14512,10 +14646,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       // middle-top-rotate
       if (this.hasRotatingPoint) {
 
-        _left = left + width/2 - scaleOffsetX;
+        _left = left + width / 2 - scaleOffsetX;
         _top = this.flipY ?
-          (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2 + strokeWidth2 + paddingY)
-          : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2 - paddingY);
+          (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY / 2 + strokeWidth2 + paddingY) : (top - (this.rotatingPointOffset / this.scaleY) - sizeY / 2 - strokeWidth2 - paddingY);
 
         isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
@@ -14545,13 +14678,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  fxCenterObjectH: function (object, callbacks) {
-    callbacks = callbacks || { };
+  fxCenterObjectH: function(object, callbacks) {
+    callbacks = callbacks || {};
 
-    var empty = function() { },
-        onComplete = callbacks.onComplete || empty,
-        onChange = callbacks.onChange || empty,
-        _this = this;
+    var empty = function() {},
+      onComplete = callbacks.onComplete || empty,
+      onChange = callbacks.onChange || empty,
+      _this = this;
 
     fabric.util.animate({
       startValue: object.get('left'),
@@ -14580,13 +14713,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  fxCenterObjectV: function (object, callbacks) {
-    callbacks = callbacks || { };
+  fxCenterObjectV: function(object, callbacks) {
+    callbacks = callbacks || {};
 
-    var empty = function() { },
-        onComplete = callbacks.onComplete || empty,
-        onChange = callbacks.onChange || empty,
-        _this = this;
+    var empty = function() {},
+      onComplete = callbacks.onComplete || empty,
+      onChange = callbacks.onChange || empty,
+      _this = this;
 
     fabric.util.animate({
       startValue: object.get('top'),
@@ -14615,13 +14748,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  fxRemove: function (object, callbacks) {
-    callbacks = callbacks || { };
+  fxRemove: function(object, callbacks) {
+    callbacks = callbacks || {};
 
-    var empty = function() { },
-        onComplete = callbacks.onComplete || empty,
-        onChange = callbacks.onChange || empty,
-        _this = this;
+    var empty = function() {},
+      onComplete = callbacks.onComplete || empty,
+      onChange = callbacks.onChange || empty,
+      _this = this;
 
     fabric.util.animate({
       startValue: object.get('opacity'),
@@ -14635,7 +14768,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this.renderAll();
         onChange();
       },
-      onComplete: function () {
+      onComplete: function() {
         _this.remove(object);
         onComplete();
       }
@@ -14666,17 +14799,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   animate: function() {
     if (arguments[0] && typeof arguments[0] === 'object') {
-      var propsToAnimate = [ ], prop, skipCallbacks;
+      var propsToAnimate = [],
+        prop, skipCallbacks;
       for (prop in arguments[0]) {
         propsToAnimate.push(prop);
       }
-      for (var i = 0, len = propsToAnimate.length; i<len; i++) {
+      for (var i = 0, len = propsToAnimate.length; i < len; i++) {
         prop = propsToAnimate[i];
         skipCallbacks = i !== len - 1;
         this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks);
       }
-    }
-    else {
+    } else {
       this._animate.apply(this, arguments);
     }
     return this;
@@ -14690,14 +14823,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @param {Boolean} [skipCallbacks] When true, callbacks like onchange and oncomplete are not invoked
    */
   _animate: function(property, to, options, skipCallbacks) {
-    var obj = this, propPair;
+    var obj = this,
+      propPair;
 
     to = to.toString();
 
     if (!options) {
-      options = { };
-    }
-    else {
+      options = {};
+    } else {
       options = fabric.util.object.clone(options);
     }
 
@@ -14705,9 +14838,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       propPair = property.split('.');
     }
 
-    var currentValue = propPair
-      ? this.get(propPair[0])[propPair[1]]
-      : this.get(property);
+    var currentValue = propPair ? this.get(propPair[0])[propPair[1]] : this.get(property);
 
     if (!('from' in options)) {
       options.from = currentValue;
@@ -14715,8 +14846,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     if (~to.indexOf('=')) {
       to = currentValue + parseFloat(to.replace('=', ''));
-    }
-    else {
+    } else {
       to = parseFloat(to);
     }
 
@@ -14732,8 +14862,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       onChange: function(value) {
         if (propPair) {
           obj[propPair[0]][propPair[1]] = value;
-        }
-        else {
+        } else {
           obj.set(property, value);
         }
         if (skipCallbacks) return;
@@ -14752,10 +14881,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      coordProps = { 'x1': 1, 'x2': 1, 'y1': 1, 'y2': 1 },
-      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend,
+    coordProps = {
+      'x1': 1,
+      'x2': 1,
+      'y1': 1,
+      'y2': 1
+    },
+    supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Line) {
     fabric.warn('fabric.Line is already defined');
@@ -14783,7 +14917,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Line} thisArg
      */
     initialize: function(points, options) {
-      options = options || { };
+      options = options || {};
 
       if (!points) {
         points = [0, 0, 0, 0];
@@ -14804,7 +14938,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Object} [options] Options
      */
     _setWidthHeight: function(options) {
-      options || (options = { });
+      options || (options = {});
 
       this.set('width', Math.abs(this.x2 - this.x1) || 1);
       this.set('height', Math.abs(this.y2 - this.y1) || 1);
@@ -14835,7 +14969,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       var isInPathGroup = this.group && this.group.type !== 'group';
       if (isInPathGroup && !this.transformMatrix) {
-        ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
+        ctx.translate(-this.group.width / 2 + this.left, -this.group.height / 2 + this.top);
       }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
@@ -14871,7 +15005,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _renderDashedStroke: function(ctx) {
       var
-        xMult = this.x1 <= this.x2 ? -1 : 1,
+      xMult = this.x1 <= this.x2 ? -1 : 1,
         yMult = this.y1 <= this.y2 ? -1 : 1,
         x = this.width === 1 ? 0 : xMult * this.width / 2,
         y = this.height === 1 ? 0 : yMult * this.height / 2;
@@ -14906,11 +15040,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       markup.push(
         '<line ',
-          'x1="', this.get('x1'),
-          '" y1="', this.get('y1'),
-          '" x2="', this.get('x2'),
-          '" y2="', this.get('y2'),
-          '" style="', this.getSvgStyles(),
+        'x1="', this.get('x1'),
+        '" y1="', this.get('y1'),
+        '" x2="', this.get('x2'),
+        '" y2="', this.get('y2'),
+        '" style="', this.getSvgStyles(),
         '"/>'
       );
 
@@ -14973,9 +15107,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { }),
-      piBy2   = Math.PI * 2,
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    piBy2 = Math.PI * 2,
+    extend = fabric.util.object.extend;
 
   if (fabric.Circle) {
     fabric.warn('fabric.Circle is already defined.');
@@ -15002,7 +15136,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Circle} thisArg
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
 
       this.set('radius', options.radius || 0);
       this.callSuper('initialize', options);
@@ -15045,10 +15179,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       markup.push(
         '<circle ',
-          'cx="0" cy="0" ',
-          'r="', this.radius,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
+        'cx="0" cy="0" ',
+        'r="', this.radius,
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
         '"/>'
       );
 
@@ -15124,7 +15258,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {fabric.Circle} Instance of fabric.Circle
    */
   fabric.Circle.fromElement = function(element, options) {
-    options || (options = { });
+    options || (options = {});
     var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
     if (!isValidRadius(parsedAttributes)) {
       throw new Error('value of `r` attribute is required and can not be negative');
@@ -15146,6 +15280,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    * @private
    */
+
   function isValidRadius(attributes) {
     return (('radius' in attributes) && (attributes.radius > 0));
   }
@@ -15167,7 +15302,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {});
 
   if (fabric.Triangle) {
     fabric.warn('fabric.Triangle is already defined');
@@ -15195,12 +15330,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {Object} thisArg
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
 
       this.callSuper('initialize', options);
 
       this.set('width', options.width || 100)
-          .set('height', options.height || 100);
+        .set('height', options.height || 100);
     },
 
     /**
@@ -15209,7 +15344,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _render: function(ctx) {
       var widthBy2 = this.width / 2,
-          heightBy2 = this.height / 2;
+        heightBy2 = this.height / 2;
 
       ctx.beginPath();
       ctx.moveTo(-widthBy2, heightBy2);
@@ -15227,7 +15362,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _renderDashedStroke: function(ctx) {
       var widthBy2 = this.width / 2,
-          heightBy2 = this.height / 2;
+        heightBy2 = this.height / 2;
 
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, -widthBy2, heightBy2, 0, -heightBy2, this.strokeDashArray);
@@ -15243,20 +15378,19 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function() {
       var markup = this._createBaseSVGMarkup(),
-          widthBy2 = this.width / 2,
-          heightBy2 = this.height / 2;
+        widthBy2 = this.width / 2,
+        heightBy2 = this.height / 2;
 
-      var points = [
-        -widthBy2 + " " + heightBy2,
+      var points = [-widthBy2 + " " + heightBy2,
         "0 " + -heightBy2,
         widthBy2 + " " + heightBy2
       ].join(",");
 
       markup.push(
         '<polygon ',
-          'points="', points,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
+        'points="', points,
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
         '"/>'
       );
 
@@ -15285,13 +15419,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
-(function(global){
+(function(global) {
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { }),
-      piBy2   = Math.PI * 2,
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    piBy2 = Math.PI * 2,
+    extend = fabric.util.object.extend;
 
   if (fabric.Ellipse) {
     fabric.warn('fabric.Ellipse is already defined.');
@@ -15318,14 +15452,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @type Number
      * @default
      */
-    rx:   0,
+    rx: 0,
 
     /**
      * Vertical radius
      * @type Number
      * @default
      */
-    ry:   0,
+    ry: 0,
 
     /**
      * Constructor
@@ -15333,7 +15467,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Ellipse} thisArg
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
 
       this.callSuper('initialize', options);
 
@@ -15366,10 +15500,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       markup.push(
         '<ellipse ',
-          'rx="', this.get('rx'),
-          '" ry="', this.get('ry'),
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
+        'rx="', this.get('rx'),
+        '" ry="', this.get('ry'),
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
         '"/>'
       );
 
@@ -15399,7 +15533,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (this.transformMatrix && this.group) {
         ctx.translate(this.cx, this.cy);
       }
-      ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
+      ctx.transform(1, 0, 0, this.ry / this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
 
       this._renderFill(ctx);
@@ -15434,7 +15568,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {fabric.Ellipse}
    */
   fabric.Ellipse.fromElement = function(element, options) {
-    options || (options = { });
+    options || (options = {});
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
     var cx = parsedAttributes.left;
@@ -15472,8 +15606,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend;
 
   if (fabric.Rect) {
     console.warn('fabric.Rect is already defined');
@@ -15510,14 +15644,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @type Number
      * @default
      */
-    rx:   0,
+    rx: 0,
 
     /**
      * Vertical border radius
      * @type Number
      * @default
      */
-    ry:   0,
+    ry: 0,
 
     /**
      * Used to specify dash pattern for stroke on this object
@@ -15531,7 +15665,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {Object} thisArg
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
 
       this.callSuper('initialize', options);
       this._initRxRy();
@@ -15547,8 +15681,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _initRxRy: function() {
       if (this.rx && !this.ry) {
         this.ry = this.rx;
-      }
-      else if (this.ry && !this.rx) {
+      } else if (this.ry && !this.rx) {
         this.rx = this.ry;
       }
     },
@@ -15559,12 +15692,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _render: function(ctx) {
       var rx = this.rx || 0,
-          ry = this.ry || 0,
-          x = -this.width / 2,
-          y = -this.height / 2,
-          w = this.width,
-          h = this.height,
-          isInPathGroup = this.group && this.group.type !== 'group';
+        ry = this.ry || 0,
+        x = -this.width / 2,
+        y = -this.height / 2,
+        w = this.width,
+        h = this.height,
+        isInPathGroup = this.group && this.group.type !== 'group';
 
       ctx.beginPath();
       ctx.globalAlpha = isInPathGroup ? (ctx.globalAlpha * this.opacity) : this.opacity;
@@ -15575,22 +15708,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           this.height / 2 + this.y);
       }
       if (!this.transformMatrix && isInPathGroup) {
-        ctx.translate(
-          -this.group.width / 2 + this.width / 2 + this.x,
-          -this.group.height / 2 + this.height / 2 + this.y);
+        ctx.translate(-this.group.width / 2 + this.width / 2 + this.x, -this.group.height / 2 + this.height / 2 + this.y);
       }
 
       var isRounded = rx !== 0 || ry !== 0;
 
-      ctx.moveTo(x+rx, y);
-      ctx.lineTo(x+w-rx, y);
-      isRounded && ctx.quadraticCurveTo(x+w, y, x+w, y+ry, x+w, y+ry);
-      ctx.lineTo(x+w, y+h-ry);
-      isRounded && ctx.quadraticCurveTo(x+w,y+h,x+w-rx,y+h,x+w-rx,y+h);
-      ctx.lineTo(x+rx,y+h);
-      isRounded && ctx.quadraticCurveTo(x,y+h,x,y+h-ry,x,y+h-ry);
-      ctx.lineTo(x,y+ry);
-      isRounded && ctx.quadraticCurveTo(x,y,x+rx,y,x+rx,y);
+      ctx.moveTo(x + rx, y);
+      ctx.lineTo(x + w - rx, y);
+      isRounded && ctx.quadraticCurveTo(x + w, y, x + w, y + ry, x + w, y + ry);
+      ctx.lineTo(x + w, y + h - ry);
+      isRounded && ctx.quadraticCurveTo(x + w, y + h, x + w - rx, y + h, x + w - rx, y + h);
+      ctx.lineTo(x + rx, y + h);
+      isRounded && ctx.quadraticCurveTo(x, y + h, x, y + h - ry, x, y + h - ry);
+      ctx.lineTo(x, y + ry);
+      isRounded && ctx.quadraticCurveTo(x, y, x + rx, y, x + rx, y);
       ctx.closePath();
 
       this._renderFill(ctx);
@@ -15602,16 +15733,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _renderDashedStroke: function(ctx) {
-     var x = -this.width/2,
-         y = -this.height/2,
-         w = this.width,
-         h = this.height;
+      var x = -this.width / 2,
+        y = -this.height / 2,
+        w = this.width,
+        h = this.height;
 
       ctx.beginPath();
-      fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x+w, y+h, x, y+h, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x, y+h, x, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y, x + w, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y, x + w, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y + h, x, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y + h, x, y, this.strokeDashArray);
       ctx.closePath();
     },
 
@@ -15655,11 +15786,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       markup.push(
         '<rect ',
-          'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
-          '" rx="', this.get('rx'), '" ry="', this.get('ry'),
-          '" width="', this.width, '" height="', this.height,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
+        'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
+        '" rx="', this.get('rx'), '" ry="', this.get('ry'),
+        '" width="', this.width, '" height="', this.height,
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
         '"/>'
       );
 
@@ -15688,9 +15819,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    * @private
    */
+
   function _setDefaultLeftTopValues(attributes) {
     attributes.left = attributes.left || 0;
-    attributes.top  = attributes.top  || 0;
+    attributes.top = attributes.top || 0;
     return attributes;
   }
 
@@ -15710,7 +15842,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
     parsedAttributes = _setDefaultLeftTopValues(parsedAttributes);
 
-    var rect = new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
+    var rect = new fabric.Rect(extend((options ? fabric.util.object.clone(options) : {}), parsedAttributes));
     rect._normalizeLeftTopProperties(parsedAttributes);
 
     return rect;
@@ -15733,9 +15865,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { }),
-      toFixed = fabric.util.toFixed,
-      min = fabric.util.array.min;
+  var fabric = global.fabric || (global.fabric = {}),
+    toFixed = fabric.util.toFixed,
+    min = fabric.util.array.min;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -15764,7 +15896,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Polyline} thisArg
      */
     initialize: function(points, options, skipOffset) {
-      options = options || { };
+      options = options || {};
       this.set('points', points);
       this.callSuper('initialize', options);
       this._calcDimensions(skipOffset);
@@ -15794,7 +15926,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function() {
       var points = [],
-          markup = this._createBaseSVGMarkup();
+        markup = this._createBaseSVGMarkup();
 
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
@@ -15802,9 +15934,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       markup.push(
         '<polyline ',
-          'points="', points.join(''),
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
+        'points="', points.join(''),
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
         '"/>'
       );
 
@@ -15839,7 +15971,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.beginPath();
       for (var i = 0, len = this.points.length; i < len; i++) {
         p1 = this.points[i];
-        p2 = this.points[i+1] || p1;
+        p2 = this.points[i + 1] || p1;
         fabric.util.drawDashedLine(ctx, p1.x, p1.y, p2.x, p2.y, this.strokeDashArray);
       }
     },
@@ -15874,12 +16006,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (!element) {
       return null;
     }
-    options || (options = { });
+    options || (options = {});
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES),
-        minX = min(points, 'x'),
-        minY = min(points, 'y');
+      parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES),
+      minX = min(points, 'x'),
+      minY = min(points, 'y');
 
     minX = minX < 0 ? minX : 0;
     minY = minX < 0 ? minY : 0;
@@ -15911,11 +16043,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      min = fabric.util.array.min,
-      max = fabric.util.array.max,
-      toFixed = fabric.util.toFixed;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend,
+    min = fabric.util.array.min,
+    max = fabric.util.array.max,
+    toFixed = fabric.util.toFixed;
 
   if (fabric.Polygon) {
     fabric.warn('fabric.Polygon is already defined');
@@ -15944,7 +16076,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Polygon} thisArg
      */
     initialize: function(points, options, skipOffset) {
-      options = options || { };
+      options = options || {};
       this.points = points;
       this.callSuper('initialize', options);
       this._calcDimensions(skipOffset);
@@ -15957,10 +16089,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _calcDimensions: function(skipOffset) {
 
       var points = this.points,
-          minX = min(points, 'x'),
-          minY = min(points, 'y'),
-          maxX = max(points, 'x'),
-          maxY = max(points, 'y');
+        minX = min(points, 'x'),
+        minY = min(points, 'y'),
+        maxX = max(points, 'x'),
+        maxY = max(points, 'y');
 
       this.width = (maxX - minX) || 1;
       this.height = (maxY - minY) || 1;
@@ -15971,7 +16103,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (skipOffset) return;
 
       var halfWidth = this.width / 2 + this.minX,
-          halfHeight = this.height / 2 + this.minY;
+        halfHeight = this.height / 2 + this.minY;
 
       // change points to offset polygon into a bounding box
       this.points.forEach(function(p) {
@@ -15998,7 +16130,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function() {
       var points = [],
-          markup = this._createBaseSVGMarkup();
+        markup = this._createBaseSVGMarkup();
 
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
@@ -16006,9 +16138,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       markup.push(
         '<polygon ',
-          'points="', points.join(''),
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
+        'points="', points.join(''),
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
         '"/>'
       );
 
@@ -16045,7 +16177,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.beginPath();
       for (var i = 0, len = this.points.length; i < len; i++) {
         p1 = this.points[i];
-        p2 = this.points[i+1] || this.points[0];
+        p2 = this.points[i + 1] || this.points[0];
         fabric.util.drawDashedLine(ctx, p1.x, p1.y, p2.x, p2.y, this.strokeDashArray);
       }
       ctx.closePath();
@@ -16081,12 +16213,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (!element) {
       return null;
     }
-    options || (options = { });
+    options || (options = {});
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES),
-        minX = min(points, 'x'),
-        minY = min(points, 'y');
+      parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES),
+      minX = min(points, 'x'),
+      minY = min(points, 'y');
 
     minX = minX < 0 ? minX : 0;
     minY = minX < 0 ? minY : 0;
@@ -16129,12 +16261,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { }),
-      min = fabric.util.array.min,
-      max = fabric.util.array.max,
-      extend = fabric.util.object.extend,
-      _toString = Object.prototype.toString,
-      drawArc = fabric.util.drawArc;
+  var fabric = global.fabric || (global.fabric = {}),
+    min = fabric.util.array.min,
+    max = fabric.util.array.max,
+    extend = fabric.util.object.extend,
+    _toString = Object.prototype.toString,
+    drawArc = fabric.util.drawArc;
 
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
@@ -16144,6 +16276,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    * @private
    */
+
   function getX(item) {
     if (item[0] === 'H') {
       return item[1];
@@ -16154,6 +16287,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    * @private
    */
+
   function getY(item) {
     if (item[0] === 'V') {
       return item[1];
@@ -16182,7 +16316,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Path} thisArg
      */
     initialize: function(path, options) {
-      options = options || { };
+      options = options || {};
 
       this.setOptions(options);
 
@@ -16192,10 +16326,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       var fromArray = _toString.call(path) === '[object Array]';
 
-      this.path = fromArray
-        ? path
-        // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
-        : path.match && path.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
+      this.path = fromArray ? path
+      // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
+      : path.match && path.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
 
       if (!this.path) return;
 
@@ -16213,13 +16346,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      * @param {Object} [options] Options object
      */
-    _initializePath: function (options) {
+    _initializePath: function(options) {
       var isWidthSet = 'width' in options && options.width != null,
-          isHeightSet = 'height' in options && options.width != null,
-          isLeftSet = 'left' in options,
-          isTopSet = 'top' in options,
-          origLeft = isLeftSet ? this.left : 0,
-          origTop = isTopSet ? this.top : 0;
+        isHeightSet = 'height' in options && options.width != null,
+        isLeftSet = 'left' in options,
+        isTopSet = 'top' in options,
+        origLeft = isLeftSet ? this.left : 0,
+        origTop = isTopSet ? this.top : 0;
 
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
@@ -16229,8 +16362,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         if (isHeightSet) {
           this.height = options.height;
         }
-      }
-      else { //Set center location relative to given height/width if not specified
+      } else { //Set center location relative to given height/width if not specified
         if (!isTopSet) {
           this.top = this.height / 2;
         }
@@ -16245,7 +16377,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      * @param {Boolean} positionSet When false, path offset is returned otherwise 0
      */
-    _calculatePathOffset: function (origLeft, origTop) {
+    _calculatePathOffset: function(origLeft, origTop) {
       return {
         x: this.left - origLeft - (this.width / 2),
         y: this.top - origTop - (this.height / 2)
@@ -16258,17 +16390,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _render: function(ctx) {
       var current, // current instruction
-          previous = null,
-          x = 0, // current x
-          y = 0, // current y
-          controlX = 0, // current control point x
-          controlY = 0, // current control point y
-          tempX,
-          tempY,
-          tempControlX,
-          tempControlY,
-          l = -((this.width / 2) + this.pathOffset.x),
-          t = -((this.height / 2) + this.pathOffset.y);
+        previous = null,
+        x = 0, // current x
+        y = 0, // current y
+        controlX = 0, // current control point x
+        controlY = 0, // current control point y
+        tempX,
+        tempY,
+        tempControlX,
+        tempControlY,
+        l = -((this.width / 2) + this.pathOffset.x),
+        t = -((this.height / 2) + this.pathOffset.y);
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -16385,8 +16517,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             tempX = current[3];
             tempY = current[4];
             // calculate reflection of previous control points
-            controlX = 2*x - controlX;
-            controlY = 2*y - controlY;
+            controlX = 2 * x - controlX;
+            controlY = 2 * y - controlY;
             ctx.bezierCurveTo(
               controlX + l,
               controlY + t,
@@ -16451,13 +16583,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
               // assume the control point is coincident with the current point
               controlX = x;
               controlY = y;
-            }
-            else if (previous[0] === 't') {
+            } else if (previous[0] === 't') {
               // calculate reflection of previous control points for t
               controlX = 2 * x - tempControlX;
               controlY = 2 * y - tempControlY;
-            }
-            else if (previous[0] === 'q') {
+            } else if (previous[0] === 'q') {
               // calculate reflection of previous control points for q
               controlX = 2 * x - controlX;
               controlY = 2 * y - controlY;
@@ -16555,11 +16685,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       if (this.overlayFill) {
         ctx.fillStyle = this.overlayFill;
-      }
-      else if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
-          : this.fill;
+      } else if (this.fill) {
+        ctx.fillStyle = this.fill.toLive ? this.fill.toLive(ctx) : this.fill;
       }
 
       if (this.stroke) {
@@ -16567,9 +16694,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         ctx.lineCap = this.strokeLineCap;
         ctx.lineJoin = this.strokeLineJoin;
         ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx)
-          : this.stroke;
+        ctx.strokeStyle = this.stroke.toLive ? this.stroke.toLive(ctx) : this.stroke;
       }
 
       this._setShadow(ctx);
@@ -16638,7 +16763,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function() {
       var chunks = [],
-          markup = this._createBaseSVGMarkup();
+        markup = this._createBaseSVGMarkup();
 
       for (var i = 0, len = this.path.length; i < len; i++) {
         chunks.push(this.path[i].join(' '));
@@ -16647,12 +16772,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       markup.push(
         '<g transform="', (this.group ? '' : this.getSvgTransform()), '">',
-          '<path ',
-            'd="', path,
-            '" style="', this.getSvgStyles(),
-            '" transform="translate(', (-this.width / 2), ' ', (-this.height/2), ')',
-            '" stroke-linecap="round" ',
-          '/>',
+        '<path ',
+        'd="', path,
+        '" style="', this.getSvgStyles(),
+        '" transform="translate(', (-this.width / 2), ' ', (-this.height / 2), ')',
+        '" stroke-linecap="round" ',
+        '/>',
         '</g>'
       );
 
@@ -16672,13 +16797,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      */
     _parsePath: function() {
-      var result = [ ],
-          coords = [ ],
-          currentPath,
-          parsed,
-          re = /(-?\.\d+)|(-?\d+(\.\d+)?)/g,
-          match,
-          coordsStr;
+      var result = [],
+        coords = [],
+        currentPath,
+        parsed,
+        re = /(-?\.\d+)|(-?\d+(\.\d+)?)/g,
+        match,
+        coordsStr;
 
       for (var i = 0, coordsParsed, len = this.path.length; i < len; i++) {
         currentPath = this.path[i];
@@ -16690,7 +16815,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           coords.push(match[0]);
         }
 
-        coordsParsed = [ currentPath.charAt(0) ];
+        coordsParsed = [currentPath.charAt(0)];
 
         for (var j = 0, jlen = coords.length; j < jlen; j++) {
           parsed = parseFloat(coords[j]);
@@ -16700,14 +16825,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         }
 
         var command = coordsParsed[0].toLowerCase(),
-            commandLength = commandLengths[command];
+          commandLength = commandLengths[command];
 
         if (coordsParsed.length - 1 > commandLength) {
           for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([ coordsParsed[0] ].concat(coordsParsed.slice(k, k + commandLength)));
+            result.push([coordsParsed[0]].concat(coordsParsed.slice(k, k + commandLength)));
           }
-        }
-        else {
+        } else {
           result.push(coordsParsed);
         }
       }
@@ -16720,19 +16844,19 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _parseDimensions: function() {
       var aX = [],
-          aY = [],
-          previousX,
-          previousY,
-          isLowerCase = false,
-          x,
-          y;
+        aY = [],
+        previousX,
+        previousY,
+        isLowerCase = false,
+        x,
+        y;
 
       this.path.forEach(function(item, i) {
         if (item[0] !== 'H') {
-          previousX = (i === 0) ? getX(item) : getX(this.path[i-1]);
+          previousX = (i === 0) ? getX(item) : getX(this.path[i - 1]);
         }
         if (item[0] !== 'V') {
-          previousY = (i === 0) ? getY(item) : getY(this.path[i-1]);
+          previousY = (i === 0) ? getY(item) : getY(this.path[i - 1]);
         }
 
         // lowercased letter denotes relative position;
@@ -16746,17 +16870,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
         // TODO (kangax): support relative h/v commands
 
-        x = isLowerCase
-          ? previousX + getX(item)
-          : item[0] === 'V'
-            ? previousX
-            : getX(item);
+        x = isLowerCase ? previousX + getX(item) : item[0] === 'V' ? previousX : getX(item);
 
-        y = isLowerCase
-          ? previousY + getY(item)
-          : item[0] === 'H'
-            ? previousY
-            : getY(item);
+        y = isLowerCase ? previousY + getY(item) : item[0] === 'H' ? previousY : getY(item);
 
         var val = parseInt(x, 10);
         if (!isNaN(val)) aX.push(val);
@@ -16767,11 +16883,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }, this);
 
       var minX = min(aX),
-          minY = min(aY),
-          maxX = max(aX),
-          maxY = max(aY),
-          deltaX = maxX - minX,
-          deltaY = maxY - minY;
+        minY = min(aY),
+        maxX = max(aX),
+        maxY = max(aY),
+        deltaX = maxX - minX,
+        deltaY = maxY - minY;
 
       var o = {
         left: this.left + (minX + deltaX / 2),
@@ -16793,7 +16909,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   fabric.Path.fromObject = function(object, callback) {
     if (typeof object.path === 'string') {
-      fabric.loadSVGFromURL(object.path, function (elements) {
+      fabric.loadSVGFromURL(object.path, function(elements) {
         var path = elements[0];
 
         var pathUrl = object.path;
@@ -16804,8 +16920,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
         callback(path);
       });
-    }
-    else {
+    } else {
       callback(new fabric.Path(object.path, object));
     }
   };
@@ -16847,10 +16962,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      invoke = fabric.util.array.invoke,
-      parentToObject = fabric.Object.prototype.toObject;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend,
+    invoke = fabric.util.array.invoke,
+    parentToObject = fabric.Object.prototype.toObject;
 
   if (fabric.PathGroup) {
     fabric.warn('fabric.PathGroup is already defined');
@@ -16886,10 +17001,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     initialize: function(paths, options) {
 
-      options = options || { };
-      this.paths = paths || [ ];
+      options = options || {};
+      this.paths = paths || [];
 
-      for (var i = this.paths.length; i--; ) {
+      for (var i = this.paths.length; i--;) {
         this.paths[i].group = this;
       }
 
@@ -16985,8 +17100,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var objects = this.getObjects();
       var markup = [
         '<g ',
-          'style="', this.getSvgStyles(), '" ',
-          'transform="', this.getSvgTransform(), '" ',
+        'style="', this.getSvgStyles(), '" ',
+        'transform="', this.getSvgTransform(), '" ',
         '>'
       ];
 
@@ -17030,9 +17145,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-      * Makes path group grayscale
-      * @return {fabric.PathGroup} thisArg
-      */
+     * Makes path group grayscale
+     * @return {fabric.PathGroup} thisArg
+     */
     toGrayscale: function() {
       var i = this.paths.length;
       while (i--) {
@@ -17059,7 +17174,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   fabric.PathGroup.fromObject = function(object, callback) {
     if (typeof object.paths === 'string') {
-      fabric.loadSVGFromURL(object.paths, function (elements) {
+      fabric.loadSVGFromURL(object.paths, function(elements) {
 
         var pathUrl = object.paths;
         delete object.paths;
@@ -17068,8 +17183,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
         callback(pathGroup);
       });
-    }
-    else {
+    } else {
       fabric.util.enlivenObjects(object.paths, function(enlivenedObjects) {
         delete object.paths;
         callback(new fabric.PathGroup(enlivenedObjects, object));
@@ -17087,15 +17201,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   fabric.PathGroup.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);
-(function(global){
+(function(global) {
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      min = fabric.util.array.min,
-      max = fabric.util.array.max,
-      invoke = fabric.util.array.invoke;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend,
+    min = fabric.util.array.min,
+    max = fabric.util.array.max,
+    invoke = fabric.util.array.invoke;
 
   if (fabric.Group) {
     return;
@@ -17105,11 +17219,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   // to enable locking behavior on group
   // when one of its objects has lock-related properties set
   var _lockProperties = {
-    lockMovementX:  true,
-    lockMovementY:  true,
-    lockRotation:   true,
-    lockScalingX:   true,
-    lockScalingY:   true,
+    lockMovementX: true,
+    lockMovementY: true,
+    lockRotation: true,
+    lockScalingX: true,
+    lockScalingY: true,
     lockUniScaling: true
   };
 
@@ -17135,14 +17249,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {Object} thisArg
      */
     initialize: function(objects, options) {
-      options = options || { };
+      options = options || {};
 
       this._objects = objects || [];
-      for (var i = this._objects.length; i--; ) {
+      for (var i = this._objects.length; i--;) {
         this._objects[i].group = this;
       }
 
-      this.originalState = { };
+      this.originalState = {};
       this.callSuper('initialize');
 
       this._calcBounds();
@@ -17162,12 +17276,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _updateObjectsCoords: function() {
       var groupDeltaX = this.left,
-          groupDeltaY = this.top;
+        groupDeltaY = this.top;
 
       this.forEachObject(function(object) {
 
         var objectLeft = object.get('left'),
-            objectTop = object.get('top');
+          objectTop = object.get('top');
 
         object.set('originalLeft', objectLeft);
         object.set('originalTop', objectTop);
@@ -17210,7 +17324,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._objects.push(object);
       object.group = this;
       // since _restoreObjectsState set objects inactive
-      this.forEachObject(function(o){ o.set('active', true); o.group = this; }, this);
+      this.forEachObject(function(o) {
+        o.set('active', true);
+        o.group = this;
+      }, this);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -17225,7 +17342,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
       // since _restoreObjectsState set objects inactive
-      this.forEachObject(function(o){ o.set('active', true); o.group = this; }, this);
+      this.forEachObject(function(o) {
+        o.set('active', true);
+        o.group = this;
+      }, this);
 
       this.remove(object);
       this._calcBounds();
@@ -17253,16 +17373,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Object} delegatedProperties
      */
     delegatedProperties: {
-      fill:             true,
-      opacity:          true,
-      fontFamily:       true,
-      fontWeight:       true,
-      fontSize:         true,
-      fontStyle:        true,
-      lineHeight:       true,
-      textDecoration:   true,
-      textAlign:        true,
-      backgroundColor:  true
+      fill: true,
+      opacity: true,
+      fontFamily: true,
+      fontWeight: true,
+      fontSize: true,
+      fontStyle: true,
+      lineHeight: true,
+      textDecoration: true,
+      textAlign: true,
+      backgroundColor: true
     },
 
     /**
@@ -17275,8 +17395,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         while (i--) {
           this._objects[i].set(key, value);
         }
-      }
-      else {
+      } else {
         this[key] = value;
       }
     },
@@ -17312,8 +17431,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       for (var i = 0, len = this._objects.length; i < len; i++) {
 
         var object = this._objects[i],
-            originalScaleFactor = object.borderScaleFactor,
-            originalHasRotatingPoint = object.hasRotatingPoint;
+          originalScaleFactor = object.borderScaleFactor,
+          originalHasRotatingPoint = object.hasRotatingPoint;
 
         // do not render if object is not visible
         if (!object.visible) continue;
@@ -17356,10 +17475,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _restoreObjectState: function(object) {
 
       var groupLeft = this.get('left'),
-          groupTop = this.get('top'),
-          groupAngle = this.getAngle() * (Math.PI / 180),
-          rotatedTop = Math.cos(groupAngle) * object.get('top') * this.get('scaleY') + Math.sin(groupAngle) * object.get('left') * this.get('scaleX'),
-          rotatedLeft = -Math.sin(groupAngle) * object.get('top') * this.get('scaleY') + Math.cos(groupAngle) * object.get('left') * this.get('scaleX');
+        groupTop = this.get('top'),
+        groupAngle = this.getAngle() * (Math.PI / 180),
+        rotatedTop = Math.cos(groupAngle) * object.get('top') * this.get('scaleY') + Math.sin(groupAngle) * object.get('left') * this.get('scaleX'),
+        rotatedLeft = -Math.sin(groupAngle) * object.get('top') * this.get('scaleY') + Math.cos(groupAngle) * object.get('left') * this.get('scaleX');
 
       object.setAngle(object.getAngle() + this.getAngle());
 
@@ -17406,7 +17525,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     hasMoved: function() {
       return this._originalLeft !== this.get('left') ||
-             this._originalTop !== this.get('top');
+        this._originalTop !== this.get('top');
     },
 
     /**
@@ -17426,7 +17545,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _setOpacityIfSame: function() {
       var objects = this.getObjects(),
-          firstValue = objects[0] ? objects[0].get('opacity') : 1;
+        firstValue = objects[0] ? objects[0].get('opacity') : 1;
 
       var isSameOpacity = objects.every(function(o) {
         return o.get('opacity') === firstValue;
@@ -17442,10 +17561,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _calcBounds: function() {
       var aX = [],
-          aY = [],
-          minX, minY, maxX, maxY, o, width, height,
-          i = 0,
-          len = this._objects.length;
+        aY = [],
+        minX, minY, maxX, maxY, o, width, height,
+        i = 0,
+        len = this._objects.length;
 
       for (; i < len; ++i) {
         o = this._objects[i];
@@ -17477,14 +17596,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      var objectsMarkup = [ ];
+      var objectsMarkup = [];
       for (var i = 0, len = this._objects.length; i < len; i++) {
         objectsMarkup.push(this._objects[i].toSVG());
       }
 
       return (
         '<g transform="' + this.getSvgTransform() + '">' +
-          objectsMarkup.join('') +
+        objectsMarkup.join('') +
         '</g>');
     },
     /* _TO_SVG_END_ */
@@ -17498,8 +17617,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (prop in _lockProperties) {
         if (this[prop]) {
           return this[prop];
-        }
-        else {
+        } else {
           for (var i = 0, len = this._objects.length; i < len; i++) {
             if (this._objects[i][prop]) {
               return true;
@@ -17507,8 +17625,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           }
           return false;
         }
-      }
-      else {
+      } else {
         if (prop in this.delegatedProperties) {
           return this._objects[0] && this._objects[0].get(prop);
         }
@@ -17549,7 +17666,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   var extend = fabric.util.object.extend;
 
   if (!global.fabric) {
-    global.fabric = { };
+    global.fabric = {};
   }
 
   if (global.fabric.Image) {
@@ -17578,9 +17695,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Image} thisArg
      */
     initialize: function(element, options) {
-      options || (options = { });
+      options || (options = {});
 
-      this.filters = [ ];
+      this.filters = [];
 
       this.callSuper('initialize', options);
       this._initElement(element);
@@ -17648,7 +17765,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       // this._resetWidthHeight();
       if (isInPathGroup) {
-        ctx.translate(-this.group.width/2 + this.width/2, -this.group.height/2 + this.height/2);
+        ctx.translate(-this.group.width / 2 + this.width / 2, -this.group.height / 2 + this.height / 2);
       }
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
@@ -17685,9 +17802,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.lineCap = this.strokeLineCap;
       ctx.lineJoin = this.strokeLineJoin;
       ctx.miterLimit = this.strokeMiterLimit;
-      ctx.strokeStyle = this.stroke.toLive
-        ? this.stroke.toLive(ctx)
-        : this.stroke;
+      ctx.strokeStyle = this.stroke.toLive ? this.stroke.toLive(ctx) : this.stroke;
 
       ctx.beginPath();
       ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
@@ -17700,25 +17815,23 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderDashedStroke: function(ctx) {
-     var x = -this.width/2,
-         y = -this.height/2,
-         w = this.width,
-         h = this.height;
+      var x = -this.width / 2,
+        y = -this.height / 2,
+        w = this.width,
+        h = this.height;
 
       ctx.save();
       ctx.lineWidth = this.strokeWidth;
       ctx.lineCap = this.strokeLineCap;
       ctx.lineJoin = this.strokeLineJoin;
       ctx.miterLimit = this.strokeMiterLimit;
-      ctx.strokeStyle = this.stroke.toLive
-        ? this.stroke.toLive(ctx)
-        : this.stroke;
+      ctx.strokeStyle = this.stroke.toLive ? this.stroke.toLive(ctx) : this.stroke;
 
       ctx.beginPath();
-      fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x+w, y+h, x, y+h, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x, y+h, x, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y, x + w, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y, x + w, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y + h, x, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y + h, x, y, this.strokeDashArray);
       ctx.closePath();
       ctx.restore();
     },
@@ -17747,15 +17860,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       markup.push(
         '<g transform="', this.getSvgTransform(), '">',
-          '<image xlink:href="', this.getSvgSrc(),
-            '" style="', this.getSvgStyles(),
-            // we're essentially moving origin of transformation from top/left corner to the center of the shape
-            // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
-            // so that object's center aligns with container's left/top
-            '" transform="translate(' + (-this.width/2) + ' ' + (-this.height/2) + ')',
-            '" width="', this.width,
-            '" height="', this.height,
-          '"></image>'
+        '<image xlink:href="', this.getSvgSrc(),
+        '" style="', this.getSvgStyles(),
+        // we're essentially moving origin of transformation from top/left corner to the center of the shape
+        // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
+        // so that object's center aligns with container's left/top
+        '" transform="translate(' + (-this.width / 2) + ' ' + (-this.height / 2) + ')',
+        '" width="', this.width,
+        '" height="', this.height,
+        '"></image>'
       );
 
       if (this.stroke || this.strokeDashArray) {
@@ -17763,9 +17876,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this.fill = null;
         markup.push(
           '<rect ',
-            'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
-            '" width="', this.width, '" height="', this.height,
-            '" style="', this.getSvgStyles(),
+          'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
+          '" width="', this.width, '" height="', this.height,
+          '" style="', this.getSvgStyles(),
           '"/>'
         );
         this.fill = origFill;
@@ -17818,9 +17931,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
 
       var imgEl = this._originalElement,
-          canvasEl = fabric.util.createCanvasElement(),
-          replacement = fabric.util.createImage(),
-          _this = this;
+        canvasEl = fabric.util.createCanvasElement(),
+        replacement = fabric.util.createImage(),
+        _this = this;
 
       canvasEl.width = imgEl.width;
       canvasEl.height = imgEl.height;
@@ -17831,7 +17944,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         filter && filter.applyTo(canvasEl);
       });
 
-       /** @ignore */
+      /** @ignore */
 
       replacement.width = imgEl.width;
       replacement.height = imgEl.height;
@@ -17842,8 +17955,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;
         callback && callback();
-      }
-      else {
+      } else {
         replacement.onload = function() {
           _this._element = replacement;
           callback && callback();
@@ -17861,9 +17973,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _render: function(ctx) {
       ctx.drawImage(
-        this._element,
-        -this.width / 2,
-        -this.height / 2,
+        this._element, -this.width / 2, -this.height / 2,
         this.width,
         this.height
       );
@@ -17895,7 +18005,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Object} [options] Options object
      */
     _initConfig: function(options) {
-      options || (options = { });
+      options || (options = {});
       this.setOptions(options);
       this._setWidthHeight(options);
     },
@@ -17910,8 +18020,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         fabric.util.enlivenObjects(object.filters, function(enlivenedObjects) {
           callback && callback(enlivenedObjects);
         }, 'fabric.Image.filters');
-      }
-      else {
+      } else {
         callback && callback();
       }
     },
@@ -17921,13 +18030,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Object} [options] Object with width/height properties
      */
     _setWidthHeight: function(options) {
-      this.width = 'width' in options
-        ? options.width
-        : (this.getElement().width || 0);
+      this.width = 'width' in options ? options.width : (this.getElement().width || 0);
 
-      this.height = 'height' in options
-        ? options.height
-        : (this.getElement().height || 0);
+      this.height = 'height' in options ? options.height : (this.getElement().height || 0);
     },
 
     /**
@@ -17961,12 +18066,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   fabric.Image.fromObject = function(object, callback) {
     var img = fabric.document.createElement('img'),
-        src = object.src;
+      src = object.src;
 
     /** @ignore */
     img.onload = function() {
       fabric.Image.prototype._initFilters.call(object, object, function(filters) {
-        object.filters = filters || [ ];
+        object.filters = filters || [];
 
         var instance = new fabric.Image(img, object);
         callback && callback(instance);
@@ -18017,7 +18122,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
 
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
-      extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
+      extend((options ? fabric.util.object.clone(options) : {}), parsedAttributes));
   };
   /* _FROM_SVG_END_ */
 
@@ -18042,7 +18147,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
  * @namespace fabric.Image.filters
  * @memberOf fabric.Image
  */
-fabric.Image.filters = fabric.Image.filters || { };
+fabric.Image.filters = fabric.Image.filters || {};
 
 
 /**
@@ -18050,7 +18155,7 @@ fabric.Image.filters = fabric.Image.filters || { };
  * @class fabric.Image.filters.BaseFilter
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Image.filters.BaseFilter.prototype */ {
+fabric.Image.filters.BaseFilter = fabric.util.createClass( /** @lends fabric.Image.filters.BaseFilter.prototype */ {
 
   /**
    * Filter type
@@ -18064,7 +18169,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @return {Object} Object representation of an instance
    */
   toObject: function() {
-    return { type: this.type };
+    return {
+      type: this.type
+    };
   },
 
   /**
@@ -18080,8 +18187,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend;
 
   /**
    * Brightness filter class
@@ -18104,7 +18211,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
       this.brightness = options.brightness || 100;
     },
 
@@ -18114,9 +18221,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          brightness = this.brightness;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        brightness = this.brightness;
 
       for (var i = 0, len = data.length; i < len; i += 4) {
         data[i] += brightness;
@@ -18153,8 +18260,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend;
 
   /**
    * Adapted from <a href="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/">html5rocks article</a>
@@ -18177,12 +18284,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
 
       this.opaque = options.opaque;
-      this.matrix = options.matrix || [ 0, 0, 0,
+      this.matrix = options.matrix || [0, 0, 0,
         0, 1, 0,
-        0, 0, 0 ];
+        0, 0, 0
+      ];
 
       var canvasEl = fabric.util.createCanvasElement();
       this.tmpCtx = canvasEl.getContext('2d');
@@ -18205,7 +18313,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       var pixels = context.getImageData(0, 0, canvasEl.width, canvasEl.height);
 
       var side = Math.round(Math.sqrt(weights.length));
-      var halfSide = Math.floor(side/2);
+      var halfSide = Math.floor(side / 2);
       var src = pixels.data;
       var sw = pixels.width;
       var sh = pixels.height;
@@ -18219,32 +18327,35 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
       // go through the destination image pixels
       var alphaFac = this.opaque ? 1 : 0;
-      for (var y=0; y<h; y++) {
-        for (var x=0; x<w; x++) {
+      for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
           var sy = y;
           var sx = x;
-          var dstOff = (y*w+x)*4;
+          var dstOff = (y * w + x) * 4;
           // calculate the weighed sum of the source image pixels that
           // fall under the convolution matrix
-          var r=0, g=0, b=0, a=0;
-          for (var cy=0; cy<side; cy++) {
-            for (var cx=0; cx<side; cx++) {
+          var r = 0,
+            g = 0,
+            b = 0,
+            a = 0;
+          for (var cy = 0; cy < side; cy++) {
+            for (var cx = 0; cx < side; cx++) {
               var scy = sy + cy - halfSide;
               var scx = sx + cx - halfSide;
               if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
-                var srcOff = (scy*sw+scx)*4;
-                var wt = weights[cy*side+cx];
+                var srcOff = (scy * sw + scx) * 4;
+                var wt = weights[cy * side + cx];
                 r += src[srcOff] * wt;
-                g += src[srcOff+1] * wt;
-                b += src[srcOff+2] * wt;
-                a += src[srcOff+3] * wt;
+                g += src[srcOff + 1] * wt;
+                b += src[srcOff + 2] * wt;
+                a += src[srcOff + 3] * wt;
               }
             }
           }
           dst[dstOff] = r;
-          dst[dstOff+1] = g;
-          dst[dstOff+2] = b;
-          dst[dstOff+3] = a + alphaFac*(255-a);
+          dst[dstOff + 1] = g;
+          dst[dstOff + 2] = b;
+          dst[dstOff + 3] = a + alphaFac * (255 - a);
         }
       }
 
@@ -18270,7 +18381,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @return {fabric.Image.filters.Convolute} Instance of fabric.Image.filters.Convolute
    */
   fabric.Image.filters.Convolute.fromObject = function(object) {
-      return new fabric.Image.filters.Convolute(object);
+    return new fabric.Image.filters.Convolute(object);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -18278,8 +18389,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend;
 
   /**
    * GradientTransparency filter class
@@ -18302,7 +18413,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
       this.threshold = options.threshold || 100;
     },
 
@@ -18312,10 +18423,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          threshold = this.threshold,
-          total = data.length;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        threshold = this.threshold,
+        total = data.length;
 
       for (var i = 0, len = data.length; i < len; i += 4) {
         data[i + 3] = threshold + 255 * (total - i) / total;
@@ -18350,7 +18461,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {});
 
   /**
    * Grayscale image filter class
@@ -18374,15 +18485,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          len = imageData.width * imageData.height * 4,
-          index = 0,
-          average;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        len = imageData.width * imageData.height * 4,
+        index = 0,
+        average;
 
       while (index < len) {
         average = (data[index] + data[index + 1] + data[index + 2]) / 3;
-        data[index]     = average;
+        data[index] = average;
         data[index + 1] = average;
         data[index + 2] = average;
         index += 4;
@@ -18406,7 +18517,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {});
 
   /**
    * Invert filter class
@@ -18430,11 +18541,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = data.length, i;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        iLen = data.length,
+        i;
 
-      for (i = 0; i < iLen; i+=4) {
+      for (i = 0; i < iLen; i += 4) {
         data[i] = 255 - data[i];
         data[i + 1] = 255 - data[i + 1];
         data[i + 2] = 255 - data[i + 2];
@@ -18458,8 +18570,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend;
 
   /**
    * Mask filter class
@@ -18482,10 +18594,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
 
       this.mask = options.mask;
-      this.channel = [ 0, 1, 2, 3 ].indexOf(options.channel) > -1 ? options.channel : 0;
+      this.channel = [0, 1, 2, 3].indexOf(options.channel) > -1 ? options.channel : 0;
     },
 
     /**
@@ -18496,13 +18608,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       if (!this.mask) return;
 
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          maskEl = this.mask.getElement(),
-          maskCanvasEl = fabric.util.createCanvasElement(),
-          channel = this.channel,
-          i,
-          iLen = imageData.width * imageData.height * 4;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        maskEl = this.mask.getElement(),
+        maskCanvasEl = fabric.util.createCanvasElement(),
+        channel = this.channel,
+        i,
+        iLen = imageData.width * imageData.height * 4;
 
       maskCanvasEl.width = maskEl.width;
       maskCanvasEl.height = maskEl.height;
@@ -18510,7 +18622,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       maskCanvasEl.getContext('2d').drawImage(maskEl, 0, 0, maskEl.width, maskEl.height);
 
       var maskImageData = maskCanvasEl.getContext('2d').getImageData(0, 0, maskEl.width, maskEl.height),
-          maskData = maskImageData.data;
+        maskData = maskImageData.data;
 
       for (i = 0; i < iLen; i += 4) {
         data[i + 3] = maskData[i + channel];
@@ -18539,7 +18651,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    */
   fabric.Image.filters.Mask.fromObject = function(object, callback) {
     var img = fabric.document.createElement('img'),
-        src = object.mask.src;
+      src = object.mask.src;
 
     /** @ignore */
     img.onload = function() {
@@ -18572,8 +18684,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend;
 
   /**
    * Noise filter class
@@ -18596,7 +18708,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
       this.noise = options.noise || 100;
     },
 
@@ -18606,9 +18718,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          noise = this.noise, rand;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        noise = this.noise,
+        rand;
 
       for (var i = 0, len = data.length; i < len; i += 4) {
 
@@ -18648,8 +18761,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend;
 
   /**
    * Pixelate filter class
@@ -18672,7 +18785,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
       this.blocksize = options.blocksize || 4;
     },
 
@@ -18682,11 +18795,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = imageData.height,
-          jLen = imageData.width,
-          index, i, j, r, g, b, a;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        iLen = imageData.height,
+        jLen = imageData.width,
+        index, i, j, r, g, b, a;
 
       for (i = 0; i < iLen; i += this.blocksize) {
         for (j = 0; j < jLen; j += this.blocksize) {
@@ -18694,9 +18807,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           index = (i * 4) * jLen + (j * 4);
 
           r = data[index];
-          g = data[index+1];
-          b = data[index+2];
-          a = data[index+3];
+          g = data[index + 1];
+          b = data[index + 2];
+          a = data[index + 3];
 
           /*
            blocksize: 4
@@ -18749,8 +18862,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend;
 
   /**
    * Remove white filter class
@@ -18773,7 +18886,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
       this.threshold = options.threshold || 30;
       this.distance = options.distance || 20;
     },
@@ -18784,27 +18897,27 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          threshold = this.threshold,
-          distance = this.distance,
-          limit = 255 - threshold,
-          abs = Math.abs,
-          r, g, b;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        threshold = this.threshold,
+        distance = this.distance,
+        limit = 255 - threshold,
+        abs = Math.abs,
+        r, g, b;
 
       for (var i = 0, len = data.length; i < len; i += 4) {
         r = data[i];
-        g = data[i+1];
-        b = data[i+2];
+        g = data[i + 1];
+        b = data[i + 2];
 
         if (r > limit &&
-            g > limit &&
-            b > limit &&
-            abs(r-g) < distance &&
-            abs(r-b) < distance &&
-            abs(g-b) < distance
+          g > limit &&
+          b > limit &&
+          abs(r - g) < distance &&
+          abs(r - b) < distance &&
+          abs(g - b) < distance
         ) {
-          data[i+3] = 1;
+          data[i + 3] = 1;
         }
       }
 
@@ -18838,7 +18951,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {});
 
   /**
    * Sepia filter class
@@ -18862,12 +18975,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = data.length, i, avg;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        iLen = data.length,
+        i, avg;
 
-      for (i = 0; i < iLen; i+=4) {
-        avg = 0.3  * data[i] + 0.59 * data[i + 1] + 0.11 * data[i + 2];
+      for (i = 0; i < iLen; i += 4) {
+        avg = 0.3 * data[i] + 0.59 * data[i + 1] + 0.11 * data[i + 2];
         data[i] = avg + 100;
         data[i + 1] = avg + 50;
         data[i + 2] = avg + 255;
@@ -18891,7 +19005,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {});
 
   /**
    * Sepia2 filter class
@@ -18915,18 +19029,19 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = data.length, i, r, g, b;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        iLen = data.length,
+        i, r, g, b;
 
-      for (i = 0; i < iLen; i+=4) {
+      for (i = 0; i < iLen; i += 4) {
         r = data[i];
         g = data[i + 1];
         b = data[i + 2];
 
-        data[i] = (r * 0.393 + g * 0.769 + b * 0.189 ) / 1.351;
-        data[i + 1] = (r * 0.349 + g * 0.686 + b * 0.168 ) / 1.203;
-        data[i + 2] = (r * 0.272 + g * 0.534 + b * 0.131 ) / 2.140;
+        data[i] = (r * 0.393 + g * 0.769 + b * 0.189) / 1.351;
+        data[i + 1] = (r * 0.349 + g * 0.686 + b * 0.168) / 1.203;
+        data[i + 2] = (r * 0.272 + g * 0.534 + b * 0.131) / 2.140;
       }
 
       context.putImageData(imageData, 0, 0);
@@ -18947,8 +19062,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend;
 
   /**
    * Tint filter class
@@ -18971,7 +19086,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      options = options || { };
+      options = options || {};
       this.color = options.color || 0;
     },
 
@@ -18981,9 +19096,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = data.length, i, a;
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        iLen = data.length,
+        i, a;
 
       var rgb = parseInt(this.color, 10).toString(16);
 
@@ -18994,13 +19110,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       var cg = parseInt('0x' + rgb.substr(2, 2), 16);
       var cb = parseInt('0x' + rgb.substr(4, 2), 16);
 
-      for (i = 0; i < iLen; i+=4) {
-        a = data[i+3];
+      for (i = 0; i < iLen; i += 4) {
+        a = data[i + 3];
 
-        if (a > 0){
+        if (a > 0) {
           data[i] = cr;
-          data[i+1] = cg;
-          data[i+2] = cb;
+          data[i + 1] = cg;
+          data[i + 2] = cb;
         }
       }
 
@@ -19033,11 +19149,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      clone = fabric.util.object.clone,
-      toFixed = fabric.util.toFixed,
-      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend,
+    clone = fabric.util.object.clone,
+    toFixed = fabric.util.toFixed,
+    supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
@@ -19234,91 +19350,91 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @type String
      * @default
      */
-    type:                 'text',
+    type: 'text',
 
     /**
      * Font size (in pixels)
      * @type Number
      * @default
      */
-    fontSize:             40,
+    fontSize: 40,
 
     /**
      * Font weight (e.g. bold, normal, 400, 600, 800)
      * @type {(Number|String)}
      * @default
      */
-    fontWeight:           'normal',
+    fontWeight: 'normal',
 
     /**
      * Font family
      * @type String
      * @default
      */
-    fontFamily:           'Times New Roman',
+    fontFamily: 'Times New Roman',
 
     /**
      * Text decoration Possible values: "", "underline", "overline" or "line-through".
      * @type String
      * @default
      */
-    textDecoration:       '',
+    textDecoration: '',
 
     /**
      * Text alignment. Possible values: "left", "center", or "right".
      * @type String
      * @default
      */
-    textAlign:            'left',
+    textAlign: 'left',
 
     /**
      * Font style . Possible values: "", "normal", "italic" or "oblique".
      * @type String
      * @default
      */
-    fontStyle:            '',
+    fontStyle: '',
 
     /**
      * Line height
      * @type Number
      * @default
      */
-    lineHeight:           1.3,
+    lineHeight: 1.3,
 
     /**
      * Background color of an entire text box
      * @type String
      * @default
      */
-    backgroundColor:      '',
+    backgroundColor: '',
 
     /**
      * Background color of text lines
      * @type String
      * @default
      */
-    textBackgroundColor:  '',
+    textBackgroundColor: '',
 
     /**
      * URL of a font file, when using Cufon
      * @type String | null
      * @default
      */
-    path:                 null,
+    path: null,
 
     /**
      * Indicates whether canvas native text methods should be used to render text (otherwise, Cufon is used)
      * @type Boolean
      * @default
      */
-    useNative:            true,
+    useNative: true,
 
     /**
      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties:      stateProperties,
+    stateProperties: stateProperties,
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color.
@@ -19326,7 +19442,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @type String
      * @default
      */
-    stroke:               null,
+    stroke: null,
 
     /**
      * Shadow object representing shadow of this shape.
@@ -19334,7 +19450,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @type fabric.Shadow
      * @default
      */
-    shadow:               null,
+    shadow: null,
 
     /**
      * Constructor
@@ -19343,7 +19459,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
-      options = options || { };
+      options = options || {};
 
       this.text = text;
       this.__skipDimension = true;
@@ -19380,16 +19496,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
       var isInPathGroup = this.group && this.group.type !== 'group';
       if (isInPathGroup && !this.transformMatrix) {
-        ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
-      }
-      else if (isInPathGroup && this.transformMatrix) {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
+        ctx.translate(-this.group.width / 2 + this.left, -this.group.height / 2 + this.top);
+      } else if (isInPathGroup && this.transformMatrix) {
+        ctx.translate(-this.group.width / 2, -this.group.height / 2);
       }
 
       if (typeof Cufon === 'undefined' || this.useNative === true) {
         this._renderViaNative(ctx);
-      }
-      else {
+      } else {
         this._renderViaCufon(ctx);
       }
     },
@@ -19442,7 +19556,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Array} textLines Array of all text lines
      */
     _setBoundaries: function(ctx, textLines) {
-      this._boundaries = [ ];
+      this._boundaries = [];
 
       for (var i = 0, len = textLines.length; i < len; i++) {
 
@@ -19463,18 +19577,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     _setTextStyles: function(ctx) {
       if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-            ? this.fill.toLive(ctx)
-            : this.fill;
+        ctx.fillStyle = this.fill.toLive ? this.fill.toLive(ctx) : this.fill;
       }
       if (this.stroke) {
         ctx.lineWidth = this.strokeWidth;
         ctx.lineCap = this.strokeLineCap;
         ctx.lineJoin = this.strokeLineJoin;
         ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx)
-          : this.stroke;
+        ctx.strokeStyle = this.stroke.toLive ? this.stroke.toLive(ctx) : this.stroke;
       }
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign = this.textAlign;
@@ -19556,8 +19666,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           this._drawChars(method, ctx, words[i], left + leftOffset, top, lineIndex);
           leftOffset += ctx.measureText(words[i]).width + spaceWidth;
         }
-      }
-      else {
+      } else {
         this._drawChars(method, ctx, line, left, top, lineIndex);
       }
     },
@@ -19581,8 +19690,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       if (fabric.isLikelyNode) {
         if (this.originY === 'center') {
           return -this.height / 2;
-        }
-        else if (this.originY === 'bottom') {
+        } else if (this.originY === 'bottom') {
           return -this.height;
         }
         return 0;
@@ -19599,7 +19707,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     _renderTextFill: function(ctx, textLines) {
       if (!this.fill && !this.skipFillStrokeCheck) return;
 
-      this._boundaries = [ ];
+      this._boundaries = [];
       var lineHeights = 0;
 
       for (var i = 0, len = textLines.length; i < len; i++) {
@@ -19739,9 +19847,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Number} Line width
      */
     _getLineWidth: function(ctx, line) {
-      return this.textAlign === 'justify'
-        ? this.width
-        : ctx.measureText(line).width;
+      return this.textAlign === 'justify' ? this.width : ctx.measureText(line).width;
     },
 
     /**
@@ -19757,6 +19863,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       var _this = this;
 
       /** @ignore */
+
       function renderLinesAtOffset(offset) {
         for (var i = 0, len = textLines.length; i < len; i++) {
 
@@ -19764,8 +19871,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           var lineLeftOffset = _this._getLineLeftOffset(lineWidth);
 
           ctx.fillRect(
-            _this._getLeftOffset() + lineLeftOffset,
-            (offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox,
+            _this._getLeftOffset() + lineLeftOffset, (offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox,
             lineWidth,
             1);
         }
@@ -19790,10 +19896,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     _getFontDeclaration: function() {
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
-        (fabric.isLikelyNode ? this.fontWeight : this.fontStyle),
-        (fabric.isLikelyNode ? this.fontStyle : this.fontWeight),
-        this.fontSize + 'px',
-        (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
+        (fabric.isLikelyNode ? this.fontWeight : this.fontStyle), (fabric.isLikelyNode ? this.fontStyle : this.fontWeight),
+        this.fontSize + 'px', (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');
     },
 
@@ -19822,18 +19926,18 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
-        text:                 this.text,
-        fontSize:             this.fontSize,
-        fontWeight:           this.fontWeight,
-        fontFamily:           this.fontFamily,
-        fontStyle:            this.fontStyle,
-        lineHeight:           this.lineHeight,
-        textDecoration:       this.textDecoration,
-        textAlign:            this.textAlign,
-        path:                 this.path,
-        backgroundColor:      this.backgroundColor,
-        textBackgroundColor:  this.textBackgroundColor,
-        useNative:            this.useNative
+        text: this.text,
+        fontSize: this.fontSize,
+        fontWeight: this.fontWeight,
+        fontFamily: this.fontFamily,
+        fontStyle: this.fontStyle,
+        lineHeight: this.lineHeight,
+        textDecoration: this.textDecoration,
+        textAlign: this.textAlign,
+        path: this.path,
+        backgroundColor: this.backgroundColor,
+        textBackgroundColor: this.textBackgroundColor,
+        useNative: this.useNative
       });
     },
 
@@ -19844,36 +19948,27 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     toSVG: function() {
       var textLines = this.text.split(/\r?\n/),
-          lineTopOffset = this.useNative
-            ? this.fontSize * this.lineHeight
-            : (-this._fontAscent - ((this._fontAscent / 5) * this.lineHeight)),
+        lineTopOffset = this.useNative ? this.fontSize * this.lineHeight : (-this._fontAscent - ((this._fontAscent / 5) * this.lineHeight)),
 
-          textLeftOffset = -(this.width/2),
-          textTopOffset = this.useNative
-            ? this.fontSize - 1
-            : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight,
+        textLeftOffset = -(this.width / 2),
+        textTopOffset = this.useNative ? this.fontSize - 1 : (this.height / 2) - (textLines.length * this.fontSize) - this._totalLineHeight,
 
-          textAndBg = this._getSVGTextAndBg(lineTopOffset, textLeftOffset, textLines),
-          shadowSpans = this._getSVGShadows(lineTopOffset, textLines);
+        textAndBg = this._getSVGTextAndBg(lineTopOffset, textLeftOffset, textLines),
+        shadowSpans = this._getSVGShadows(lineTopOffset, textLines);
 
       // move top offset by an ascent
       textTopOffset += (this._fontAscent ? ((this._fontAscent / 5) * this.lineHeight) : 0);
 
       return [
         '<g transform="', this.getSvgTransform(), '">',
-          textAndBg.textBgRects.join(''),
-          '<text ',
-            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g,'\'') + '" ': ''),
-            (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
-            (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
-            (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
-            (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ': ''),
-            'style="', this.getSvgStyles(), '" ',
-            /* svg starts from left/bottom corner so we normalize height */
-            'transform="translate(', toFixed(textLeftOffset, 2), ' ', toFixed(textTopOffset, 2), ')">',
-            shadowSpans.join(''),
-            textAndBg.textSpans.join(''),
-          '</text>',
+        textAndBg.textBgRects.join(''),
+        '<text ', (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ' : ''), (this.fontSize ? 'font-size="' + this.fontSize + '" ' : ''), (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''), (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''), (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : ''),
+        'style="', this.getSvgStyles(), '" ',
+        /* svg starts from left/bottom corner so we normalize height */
+        'transform="translate(', toFixed(textLeftOffset, 2), ' ', toFixed(textTopOffset, 2), ')">',
+        shadowSpans.join(''),
+        textAndBg.textSpans.join(''),
+        '</text>',
         '</g>'
       ].join('');
     },
@@ -19886,8 +19981,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     _getSVGShadows: function(lineTopOffset, textLines) {
       var shadowSpans = [],
-          i, len,
-          lineTopOffsetMultiplier = 1;
+        i, len,
+        lineTopOffsetMultiplier = 1;
 
       if (!this.shadow || !this._boundaries) {
         return shadowSpans;
@@ -19898,15 +19993,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
           shadowSpans.push(
             '<tspan x="',
-            toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX, 2),
-            ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
-            toFixed(this.useNative
-              ? ((lineTopOffset * i) - this.height / 2 + this.shadow.offsetY)
-              : (lineTopOffset + (i === 0 ? this.shadow.offsetY : 0)), 2),
+            toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX, 2), ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
+            toFixed(this.useNative ? ((lineTopOffset * i) - this.height / 2 + this.shadow.offsetY) : (lineTopOffset + (i === 0 ? this.shadow.offsetY : 0)), 2),
             '" ',
             this._getFillAttributes(this.shadow.color), '>',
             fabric.util.string.escapeXml(textLines[i]),
-          '</tspan>');
+            '</tspan>');
           lineTopOffsetMultiplier = 1;
         } else {
           // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
@@ -19926,21 +20018,23 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Object}
      */
     _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
-      var textSpans = [ ], textBgRects = [ ], i, lineLeftOffset, len, lineTopOffsetMultiplier = 1;
+      var textSpans = [],
+        textBgRects = [],
+        i, lineLeftOffset, len, lineTopOffsetMultiplier = 1;
 
       // bounding-box background
       if (this.backgroundColor && this._boundaries) {
         textBgRects.push(
           '<rect ',
-            this._getFillAttributes(this.backgroundColor),
-            ' x="',
-            toFixed(-this.width / 2, 2),
-            '" y="',
-            toFixed(-this.height / 2, 2),
-            '" width="',
-            toFixed(this.width, 2),
-            '" height="',
-            toFixed(this.height, 2),
+          this._getFillAttributes(this.backgroundColor),
+          ' x="',
+          toFixed(-this.width / 2, 2),
+          '" y="',
+          toFixed(-this.height / 2, 2),
+          '" width="',
+          toFixed(this.width, 2),
+          '" height="',
+          toFixed(this.height, 2),
           '"></rect>');
       }
 
@@ -19950,17 +20044,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           lineLeftOffset = (this._boundaries && this._boundaries[i]) ? toFixed(this._boundaries[i].left, 2) : 0;
           textSpans.push(
             '<tspan x="',
-              lineLeftOffset, '" ',
-              (i === 0 || this.useNative ? 'y' : 'dy'), '="',
-              toFixed(this.useNative ? ((lineTopOffset * i) - this.height / 2) : (lineTopOffset * lineTopOffsetMultiplier), 2) , '" ',
-              // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
-              this._getFillAttributes(this.fill), '>',
-              fabric.util.string.escapeXml(textLines[i]),
+            lineLeftOffset, '" ', (i === 0 || this.useNative ? 'y' : 'dy'), '="',
+            toFixed(this.useNative ? ((lineTopOffset * i) - this.height / 2) : (lineTopOffset * lineTopOffsetMultiplier), 2), '" ',
+            // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
+            this._getFillAttributes(this.fill), '>',
+            fabric.util.string.escapeXml(textLines[i]),
             '</tspan>'
           );
           lineTopOffsetMultiplier = 1;
-        }
-        else {
+        } else {
           // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
           // prevents empty tspans
           lineTopOffsetMultiplier++;
@@ -19970,16 +20062,16 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
         textBgRects.push(
           '<rect ',
-            this._getFillAttributes(this.textBackgroundColor),
-            ' x="',
-            toFixed(textLeftOffset + this._boundaries[i].left, 2),
-            '" y="',
-            /* an offset that seems to straighten things out */
-            toFixed((lineTopOffset * i) - this.height / 2, 2),
-            '" width="',
-            toFixed(this._boundaries[i].width, 2),
-            '" height="',
-            toFixed(this._boundaries[i].height, 2),
+          this._getFillAttributes(this.textBackgroundColor),
+          ' x="',
+          toFixed(textLeftOffset + this._boundaries[i].left, 2),
+          '" y="',
+          /* an offset that seems to straighten things out */
+          toFixed((lineTopOffset * i) - this.height / 2, 2),
+          '" width="',
+          toFixed(this._boundaries[i].width, 2),
+          '" height="',
+          toFixed(this._boundaries[i].height, 2),
           '"></rect>');
       }
       return {
@@ -20057,7 +20149,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     }
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
-    options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
+    options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : {}), parsedAttributes);
 
     var text = new fabric.Text(element.textContent, options);
 
@@ -20097,7 +20189,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 fabric.util.object.extend(fabric.Text.prototype, {
   _renderViaCufon: function(ctx) {
 
-    var o = Cufon.textOptions || (Cufon.textOptions = { });
+    var o = Cufon.textOptions || (Cufon.textOptions = {});
 
     // export options to be used by cufon.js
     o.left = this.left;
@@ -20146,19 +20238,18 @@ fabric.util.object.extend(fabric.Text.prototype, {
    */
   _initDummyElementForCufon: function() {
     var el = fabric.document.createElement('pre'),
-        container = fabric.document.createElement('div');
+      container = fabric.document.createElement('div');
 
     // Cufon doesn't play nice with textDecoration=underline if element doesn't have a parent
     container.appendChild(el);
 
     if (typeof G_vmlCanvasManager === 'undefined') {
       el.innerHTML = this.text;
-    }
-    else {
+    } else {
       // IE 7 & 8 drop newlines and white space on text nodes
       // see: http://web.student.tuwien.ac.at/~e0226430/innerHtmlQuirk.html
       // see: http://www.w3schools.com/dom/dom_mozilla_vs_ie.asp
-      el.innerText =  this.text.replace(/\r?\n/gi, '\r');
+      el.innerText = this.text.replace(/\r?\n/gi, '\r');
     }
 
     el.style.fontSize = this.fontSize + 'px';
@@ -20174,39 +20265,40 @@ fabric.util.object.extend(fabric.Text.prototype, {
   }
 
   var DOMParser = new require('xmldom').DOMParser,
-      URL = require('url'),
-      HTTP = require('http'),
-      HTTPS = require('https'),
+    URL = require('url'),
+    HTTP = require('http'),
+    HTTPS = require('https'),
 
-      Canvas = require('canvas'),
-      Image = require('canvas').Image;
+    Canvas = require('canvas'),
+    Image = require('canvas').Image;
 
   /** @private */
+
   function request(url, encoding, callback) {
     var oURL = URL.parse(url);
 
     // detect if http or https is used
-    if ( !oURL.port ) {
-      oURL.port = ( oURL.protocol.indexOf('https:') === 0 ) ? 443 : 80;
+    if (!oURL.port) {
+      oURL.port = (oURL.protocol.indexOf('https:') === 0) ? 443 : 80;
     }
 
     // assign request handler based on protocol
-    var reqHandler = ( oURL.port === 443 ) ? HTTPS : HTTP;
+    var reqHandler = (oURL.port === 443) ? HTTPS : HTTP;
 
     var req = reqHandler.request({
       hostname: oURL.hostname,
       port: oURL.port,
       path: oURL.path,
       method: 'GET'
-    }, function(response){
+    }, function(response) {
       var body = "";
       if (encoding) {
         response.setEncoding(encoding);
       }
-      response.on('end', function () {
+      response.on('end', function() {
         callback(body);
       });
-      response.on('data', function (chunk) {
+      response.on('data', function(chunk) {
         if (response.statusCode === 200) {
           body += chunk;
         }
@@ -20216,8 +20308,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
     req.on('error', function(err) {
       if (err.errno === process.ECONNREFUSED) {
         fabric.log('ECONNREFUSED: connection refused to ' + oURL.hostname + ':' + oURL.port);
-      }
-      else {
+      } else {
         fabric.log(err.message);
       }
     });
@@ -20226,9 +20317,10 @@ fabric.util.object.extend(fabric.Text.prototype, {
   }
 
   /** @private */
-  function request_fs(path, callback){
+
+  function request_fs(path, callback) {
     var fs = require('fs');
-    fs.readFile(path, function (err, data) {
+    fs.readFile(path, function(err, data) {
       if (err) {
         fabric.log(err);
         throw err;
@@ -20239,7 +20331,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
   }
 
   fabric.util.loadImage = function(url, callback, context) {
-    var createImageAndCallBack = function(data){
+    var createImageAndCallBack = function(data) {
       img.src = new Buffer(data, 'binary');
       // preserving original url, which seems to be lost in node-canvas
       img._src = url;
@@ -20249,11 +20341,9 @@ fabric.util.object.extend(fabric.Text.prototype, {
     if (url && (url instanceof Buffer || url.indexOf('data') === 0)) {
       img.src = img._src = url;
       callback && callback.call(context, img);
-    }
-    else if (url && url.indexOf('http') !== 0) {
+    } else if (url && url.indexOf('http') !== 0) {
       request_fs(url, createImageAndCallBack);
-    }
-    else if (url) {
+    } else if (url) {
       request(url, 'binary', createImageAndCallBack);
     }
   };
@@ -20264,8 +20354,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       request_fs(url, function(body) {
         fabric.loadSVGFromString(body, callback, reviver);
       });
-    }
-    else {
+    } else {
       request(url, '', function(body) {
         fabric.loadSVGFromString(body, callback, reviver);
       });
@@ -20292,7 +20381,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
       oImg._initConfig(object);
       oImg._initFilters(object, function(filters) {
-        oImg.filters = filters || [ ];
+        oImg.filters = filters || [];
         callback && callback(oImg);
       });
     });
@@ -20307,10 +20396,10 @@ fabric.util.object.extend(fabric.Text.prototype, {
   fabric.createCanvasForNode = function(width, height) {
 
     var canvasEl = fabric.document.createElement('canvas'),
-        nodeCanvas = new Canvas(width || 600, height || 600);
+      nodeCanvas = new Canvas(width || 600, height || 600);
 
     // jsdom doesn't create style on canvas element, so here be temp. workaround
-    canvasEl.style = { };
+    canvasEl.style = {};
 
     canvasEl.width = nodeCanvas.width;
     canvasEl.height = nodeCanvas.height;
